@@ -2,47 +2,47 @@ import { Metadata } from 'next';
 
 export const siteMetadata = {
   title: {
-    default: 'Patrick Ngige | Growth Marketer | Web, Paid Media & Conversion Strategy',
+    default: 'Patrick Ngige | Growth Engineer | Frontend Development & Conversion Systems',
     template: '%s | Patrick Ngige',
   },
   description:
-    'Growth Marketer who bridges Front-End Development and Performance Marketing. I design, launch, and scale digital systems that turn traffic into revenue.',
+    'Growth Engineer and frontend developer who builds and instruments the web systems behind measurable growth: production front-ends, tracked experiments, and automation.',
   keywords: [
-    'Growth Marketer',
-    'Performance Marketing',
+    'Growth Engineer',
+    'Frontend Developer',
     'Conversion Rate Optimization',
-    'Paid Media Strategy',
     'Web Development',
     'CRO',
     'A/B Testing',
-    'Digital Marketing',
-    'Startup Growth',
-    'Growth Strategy',
+    'Marketing Automation',
+    'Analytics Instrumentation',
+    'Next.js Developer',
+    'Growth Engineering',
   ],
   authors: [{ name: 'Patrick Ngige' }],
   creator: 'Patrick Ngige',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://patrick-growth.com',
-    siteName: 'Patrick Ngige | Growth Marketer',
-    title: 'Patrick Ngige | Growth Marketer | Web, Paid Media & Conversion Strategy',
+    url: 'https://growth-portfolio.vercel.app',
+    siteName: 'Patrick Ngige | Growth Engineer',
+    title: 'Patrick Ngige | Growth Engineer | Frontend Development & Conversion Systems',
     description:
-      'Growth Marketer who bridges Front-End Development and Performance Marketing. I design, launch, and scale digital systems that turn traffic into revenue.',
+      'Growth Engineer and frontend developer who builds and instruments the web systems behind measurable growth: production front-ends, tracked experiments, and automation.',
     images: [
       {
         url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Patrick Ngige - Growth Marketer Portfolio',
+        alt: 'Patrick Ngige - Growth Engineer Portfolio',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Patrick Ngige | Growth Marketer',
+    title: 'Patrick Ngige | Growth Engineer',
     description:
-      'Growth Marketer who bridges Front-End Development and Performance Marketing.',
+      'Growth Engineer and frontend developer who builds and instruments the web systems behind measurable growth.',
     images: ['/images/og-image.jpg'],
   },
   robots: {
@@ -66,20 +66,21 @@ export const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Patrick Ngige',
-  jobTitle: 'Growth Marketer',
+  jobTitle: 'Growth Engineer',
   description:
-    'Growth Marketer who bridges Front-End Development and Performance Marketing to scale startups.',
-  url: 'https://patrick-growth.com',
+    'Growth Engineer and frontend developer who builds and instruments the web systems behind measurable growth for banks, foundations, and payment platforms.',
+  url: 'https://growth-portfolio.vercel.app',
   sameAs: [
-    'https://linkedin.com/in/patrick-ngige',
+    'https://ke.linkedin.com/in/patrick-ngige-4b772623b',
     'https://github.com/Patrick-Ngige',
   ],
   knowsAbout: [
-    'Growth Marketing',
-    'Paid Media',
+    'Growth Engineering',
+    'Frontend Development',
     'Conversion Optimization',
     'Web Development',
     'A/B Testing',
-    'Analytics',
+    'Analytics Instrumentation',
+    'Marketing Automation',
   ],
 };

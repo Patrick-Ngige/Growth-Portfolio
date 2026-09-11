@@ -29,15 +29,15 @@ export default function Hero() {
       >
         <div className="container-main relative z-10">
           <div className="max-w-4xl">
-            <p className="data-label mb-6">Growth Marketer & Developer | 2 Years Experience</p>
+            <p className="data-label mb-6">Growth Engineer & Developer | Building Since 2022</p>
             <h1 className="text-hero font-display font-bold tracking-tight mb-6 leading-[0.9]">
-              <span className="block text-[var(--text-primary)]">I build growth</span>
-              <span className="block text-accent-growth">experiments.</span>
+              <span className="block text-[var(--text-primary)]">I engineer the systems</span>
+              <span className="block text-accent-growth">behind growth.</span>
               <span className="block text-[var(--text-primary)]">Not just campaigns.</span>
             </h1>
             <p className="text-body max-w-2xl mb-10 text-[var(--text-secondary)]">
-              A growth marketer who codes. I build landing pages, run A/B tests, and launch campaigns
-              that actually convert—without waiting on developers.
+              A developer-first Growth Engineer. I build landing pages, run A/B tests, and
+              instrument tracked campaigns myself, without a separate dev queue.
             </p>
           </div>
         </div>
@@ -74,11 +74,11 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.5 }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="data-label">ROAS</span>
+            <span className="data-label">Core Web Vitals</span>
             <span className="text-accent-growth text-sm">▲</span>
           </div>
           <div className="text-2xl font-mono font-bold text-[var(--text-primary)]">
-            +280%
+            Optimized
           </div>
           <svg className="w-full h-8 mt-2" viewBox="0 0 100 30">
             <motion.path
@@ -176,20 +176,20 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            Growth Marketer & Developer | 2 Years Experience
+            Growth Engineer & Developer | Building Since 2022
           </motion.p>
 
           {/* Main Headline with Split Text Animation */}
           <h1 className="text-hero font-display font-bold tracking-tight mb-6 leading-[0.9]">
             <SplitText
-              text="I build growth"
+              text="I engineer the systems"
               as="span"
               className="block"
               animation="slideUp"
               delay={0.3}
             />
             <SplitText
-              text="experiments."
+              text="behind growth."
               as="span"
               className="block text-accent-growth"
               animation="slideUp"
@@ -211,8 +211,8 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.75 }}
           >
-            A growth marketer who codes. I build landing pages, run A/B tests, and launch campaigns
-            that actually convert—without waiting on developers.
+            A developer-first Growth Engineer. I build landing pages, run A/B tests, and
+            instrument tracked campaigns myself, without a separate dev queue.
           </motion.p>
 
           {/* CTAs with Magnetic Effect */}

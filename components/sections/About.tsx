@@ -178,10 +178,10 @@ export default function About() {
               </h3>
               <ul className="space-y-3">
                 {[
-                  'I build what I design - no waiting on developers',
-                  'I understand both marketing and development',
-                  'I am hungry to learn and grow every day',
-                  'I am affordable compared to big agencies',
+                  'I build what I design, no waiting on developers',
+                  'I ship on regulated, high-traffic sites: banks and financial platforms',
+                  'I instrument what I build with GA4, GTM, and server-side tracking',
+                  'I automate the repetitive parts with n8n and the Claude API',
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded-full bg-accent-growth/20 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -203,9 +203,9 @@ export default function About() {
             >
               <p className="text-sm text-[var(--text-secondary)]">
                 <strong className="text-[var(--text-primary)]">
-                  Currently available for new projects
+                  Limited availability for select projects
                 </strong>{' '}
-                and looking to collaborate with businesses that are serious about growth.
+                alongside a full-time role at Creative Edge / FCB Nairobi.
               </p>
             </motion.div>
           </div>

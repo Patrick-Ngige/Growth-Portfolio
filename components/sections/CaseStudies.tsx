@@ -45,9 +45,9 @@ export default function CaseStudies() {
           viewport={{ once: true }}
         >
           <MetricBlock value="+280%" label="Checkout CR" />
-          <MetricBlock value="23%" label="CPA Reduction" />
-          <MetricBlock value="+45%" label="Organic Traffic" />
-          <MetricBlock value="2" label="Years Exp" />
+          <MetricBlock value="4" label="Bank & Enterprise Sites" />
+          <MetricBlock value="14" label="Growth Dimensions Analyzed" />
+          <MetricBlock value="4" label="Years Building" />
         </motion.div>
 
         {/* Filter Tabs */}

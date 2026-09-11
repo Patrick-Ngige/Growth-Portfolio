@@ -54,7 +54,7 @@ export default function Header() {
             <Link
               href="/"
               className="text-xl font-display font-semibold tracking-tight hover:opacity-80 transition-opacity"
-              aria-label="Patrick Ngige - Growth Marketer Home"
+              aria-label="Patrick Ngige - Growth Engineer Home"
             >
               <span className="text-[var(--text-primary)]">
                 Patrick
@@ -179,7 +179,7 @@ export default function Header() {
                   href="/"
                   className="text-xl font-display font-semibold"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  aria-label="Patrick Ngige - Growth Marketer Home"
+                  aria-label="Patrick Ngige - Growth Engineer Home"
                 >
                   <span className="text-[var(--text-primary)]">
                     Patrick

@@ -44,21 +44,21 @@ export const capabilities: Capability[] = [
     title: 'Conversion-Driven Web Design',
     icon: 'code',
     description:
-      'High-converting websites are not built on templates—they are engineered based on behavioral data. I design and develop experiences optimized for the metrics that matter: conversion rate, average order value, and customer lifetime value.',
+      'High-converting websites are not built on templates. They are engineered based on behavioral data. I design and develop experiences optimized for the metrics that matter: conversion rate, average order value, and customer lifetime value.',
   },
   {
     id: 'paid-media',
     title: 'Paid Media Strategy',
     icon: 'target',
     description:
-      'Campaigns that scale require creative systems, audience architecture, and attribution infrastructure. I build and manage Meta, Google, and LinkedIn campaigns that compound rather than decay. No vanity metrics—just attributable revenue.',
+      'Campaigns that scale require creative systems, audience architecture, and attribution infrastructure. I build and manage Meta, Google, and LinkedIn campaigns that compound rather than decay, tracked to attributable revenue, not vanity metrics.',
   },
   {
     id: 'analytics',
     title: 'Analytics & Experimentation',
     icon: 'flask',
     description:
-      'Every claim should be testable. I implement measurement infrastructure, design experiments, and translate data into actionable insights. No gut feelings—just statistically significant results.',
+      'Every claim should be testable. I implement measurement infrastructure, design experiments, and translate data into actionable insights: statistically significant results, not gut feelings.',
   },
 ];
 
@@ -76,36 +76,13 @@ export const caseStudies: CaseStudy[] = [
     approach:
       'Redesigned the entire checkout experience with conversion psychology principles. Implemented trust signals at friction points, streamlined the checkout to a single page, and optimized form field placement based on user behavior data.',
     result:
-      'Cart abandonment decreased 45%. Average order value increased 32%. Mobile conversion rate reached 2.8%, above industry benchmark.',
+      'Checkout completion rate improved substantially after the rebuild. A full before/after breakdown is being documented and will be added here once verified.',
     technicalExecution: [
       'Built on WooCommerce with custom checkout fields',
       'Implemented enhanced e-commerce tracking for funnel analysis',
-      'Optimized page speed to 92 Lighthouse score',
-      'Integrated multiple payment gateways with fallback logic',
+      'Diagnosed the leak as cart abandonment, not a traffic problem, before rebuilding',
     ],
     tags: ['E-commerce', 'WooCommerce', 'CRO', 'Conversion Optimization'],
-  },
-  {
-    id: 'eatngo-brands',
-    company: 'Eat\'N\'GO / Domino\'s / Coldstone Kenya',
-    industry: 'Food & Beverage',
-    category: 'web',
-    metricValue: '23%',
-    metricLabel: 'Reduction in CPA',
-    context: 'Multi-brand restaurant group with separate websites for each brand',
-    challenge:
-      'Eat\'N\'GO Kenya manages multiple restaurant brands with separate websites. Each brand required consistent brand representation while maintaining individual identity. Performance and Core Web Vitals were affecting ad quality scores.',
-    approach:
-      'Built a multi-brand architecture with shared component library enabling rapid new brand deployment. Implemented systematic performance optimization across all properties. Focused on Core Web Vitals improvements to boost Google Ads Quality Scores.',
-    result:
-      'New brand deployment time reduced from weeks to days. Core Web Vitals improved from Poor to Excellent across all sites. Google Ads Quality Score improved, contributing to 23% reduction in cost-per-acquisition.',
-    technicalExecution: [
-      'Built shared component library with React',
-      'Implemented systematic image optimization and lazy loading',
-      'Configured proper caching strategies with service workers',
-      'Set up unified analytics across all brand sites',
-    ],
-    tags: ['Multi-brand', 'Performance', 'Core Web Vitals', 'Component Library'],
   },
   {
     id: 'jackpot-lottery',
@@ -120,7 +97,7 @@ export const caseStudies: CaseStudy[] = [
     approach:
       'Built scalable internationalization (i18n) infrastructure enabling rapid market expansion. Implemented comprehensive tracking architecture across all conversion events for proper multi-touch attribution modeling. Created localized landing pages for each market.',
     result:
-      'Successfully launched in 20+ markets with localized experiences. Implemented proper tracking enabling accurate attribution across the customer journey. Market expansion timeline reduced from months to weeks.',
+      'Shipped a 20+ language localization with proper tracking and attribution infrastructure in place, enabling multi-market launches without rebuilding the tracking setup each time.',
     technicalExecution: [
       'Built scalable i18n infrastructure with proper fallbacks',
       'Implemented server-side tracking for accuracy',
@@ -131,25 +108,70 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     id: 'enterprise-cms',
-    company: 'I&M Bank, KCB Group, TotalEnergies Kenya',
+    company: 'KCB Bank, I&M Bank, TotalEnergies Kenya, Prime Bank',
     industry: 'Enterprise / Finance',
     category: 'web',
-    metricValue: '+45%',
-    metricLabel: 'Organic Traffic Increase',
-    context: 'Enterprise organizations requiring secure, performant CMS development',
+    metricValue: '4',
+    metricLabel: 'Enterprise & Bank Sites Built',
+    context:
+      'As part of the Creative Edge / FCB Nairobi team, building websites for banks and enterprise clients, each matching that client\'s existing CMS infrastructure',
     challenge:
-      'Major enterprise organizations in Kenya needed modern, secure, and performant websites. Legacy systems were slow, difficult to maintain, and lacked proper SEO infrastructure. Security compliance was critical for financial institutions.',
+      'Each organization needed a modern, secure, well-structured website on the CMS their team already standardized on, not a one-size-fits-all rebuild.',
     approach:
-      'Developed enterprise-grade CMS solutions with focus on security compliance and performance at scale. Implemented comprehensive technical SEO infrastructure including structured data, sitemaps, and performance optimization. Created secure authentication and authorization systems.',
+      'Rebuilt KCB Bank\'s website on Statamic, focused on Core Web Vitals and information architecture as part of a broader SEO-driven redesign. Built a WordPress site for I&M Bank and a Drupal site for TotalEnergies Kenya, each matching the client\'s existing CMS. Currently building a website for Prime Bank.',
     result:
-      'Organic traffic increased 45% year-over-year across managed sites. Site speed improvements reduced bounce rate by 32%. Security audit compliance achieved for all financial institution clients.',
+      'Three sites shipped (KCB, I&M, TotalEnergies); Prime Bank in development. Work delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
     technicalExecution: [
-      'Built on WordPress with custom security hardening',
-      'Implemented technical SEO with structured data',
-      'Optimized images and implemented CDN distribution',
-      'Created automated backup and monitoring systems',
+      'Statamic build for KCB Bank',
+      'WordPress build for I&M Bank',
+      'Drupal build for TotalEnergies Kenya',
+      'Prime Bank build in progress',
     ],
-    tags: ['Enterprise', 'CMS', 'Security', 'Technical SEO', 'Performance'],
+    tags: ['Enterprise', 'CMS', 'Statamic', 'WordPress', 'Drupal'],
+  },
+  {
+    id: 'strathmore-foundation',
+    company: 'Strathmore Foundation',
+    industry: 'Education / Nonprofit',
+    category: 'strategy',
+    metricValue: '3',
+    metricLabel: 'Platforms Wired to Server-Side Tracking',
+    context: 'KOB STEM donation funnel measurement, ongoing, plus two live university sites',
+    challenge:
+      'Donation events needed to be measured accurately across GA4, Meta, and Google Ads without relying on client-side pixels alone, which lose events to ad blockers and browser tracking prevention.',
+    approach:
+      'Designed the GA4 and Google Tag Manager measurement architecture for the KOB STEM donation funnel, including a server-side purchase event verified against DPO Pay\'s payment callback and relayed to GA4, Meta CAPI, and Google Ads. Also built and shipped foundation.strathmore.edu and alumni.strathmore.edu.',
+    result:
+      'Server-side purchase event live and verified against the payment provider\'s callback. Both university sites shipped and live.',
+    technicalExecution: [
+      'GA4 + Google Tag Manager measurement architecture',
+      'Server-side purchase event verified against DPO Pay\'s payment callback',
+      'Events relayed to GA4, Meta CAPI, and Google Ads',
+      'foundation.strathmore.edu and alumni.strathmore.edu built and shipped',
+    ],
+    tags: ['Analytics', 'Server-Side Tracking', 'GA4', 'Nonprofit'],
+  },
+  {
+    id: 'ngige-growth-audit',
+    company: 'Ngige Growth Audit (solo-built product)',
+    industry: 'AI / SaaS',
+    category: 'strategy',
+    metricValue: '14',
+    metricLabel: 'Growth Dimensions Analyzed',
+    context: 'A solo-built AI growth-audit tool, designed, built, and shipped independently',
+    challenge:
+      'Most growth audits are manual and slow. Wanted a tool that could research a business live on the web and score it across the dimensions that actually predict growth.',
+    approach:
+      'Built the frontend on Next.js 15 and TypeScript, with the Claude API performing live web research and a Supabase backend. Wired in M-Pesa Daraja, Paystack, and Stripe payment rails for monetization.',
+    result:
+      'Shipped independently end to end: product design, frontend, AI research pipeline, backend, and payments.',
+    technicalExecution: [
+      'Next.js 15 + TypeScript frontend',
+      'Claude API performing live web research',
+      'Supabase backend',
+      'M-Pesa Daraja, Paystack, and Stripe payment integration',
+    ],
+    tags: ['AI', 'Solo Product', 'Next.js', 'Payments'],
   },
 ];
 
@@ -169,7 +191,7 @@ export const methodologySteps = [
   {
     step: 3,
     title: 'Build',
-    description: 'Rapid implementation of experiments using development capability—no external dependencies or delays.',
+    description: 'Rapid implementation of experiments using development capability, with no external dependencies or delays.',
     icon: 'code',
   },
   {
@@ -193,23 +215,23 @@ export const methodologySteps = [
 ];
 
 export const metricsSnapshot: MetricSnapshot[] = [
-  { label: 'Projects Completed', value: 15, suffix: '+' },
-  { label: 'Conversion Improvements', value: 35, suffix: '% avg' },
-  { label: 'Ad Budget Managed', value: 50, suffix: 'K+' },
-  { label: 'Years Experience', value: 2, suffix: '' },
+  { label: 'Years Building', value: 4, suffix: '' },
+  { label: 'Enterprise & Bank Sites', value: 4, suffix: '' },
+  { label: 'Public GitHub Repos', value: 50, suffix: '+' },
+  { label: 'Languages Localized', value: 20, suffix: '+' },
 ];
 
 export const aboutNarrative = {
   paragraph1:
-    'I started my journey in marketing and development, always curious about what makes people click, convert, and come back for more.',
+    'I started as a developer, building custom WordPress sites and front ends for small clients and internships in 2022.',
   paragraph2:
-    'Early on, I noticed a gap: marketers had great ideas but waited weeks for developers to build them. I decided to bridge that gap by learning to build what I could design.',
+    'The last two and a half years have been full-time at Creative Edge / FCB Nairobi, progressing from intern to Web Developer on the iD7 division, building for banks, foundations, and payment platforms.',
   paragraph3:
-    'Over the past 2 years, I have been building landing pages, running A/B tests, and managing ad campaigns for businesses looking to grow.',
+    'I noticed most growth ideas stall waiting on a dev queue, so I build the fix myself: the front end, the tracking, and the automation, end to end.',
   paragraph4:
-    'My approach is simple: test fast, measure honestly, and keep improving. I am still learning every day and excited to take on new challenges.',
+    'My approach is simple: build it, instrument it properly, and measure honestly instead of guessing.',
   paragraph5:
-    'I work with founders and teams who are building something meaningful and need help getting their message in front of the right people.',
+    'I work with founders, teams, and clients who need someone who can ship a growth idea, not just design one.',
 };
 
 export const navigationLinks = [
@@ -220,14 +242,12 @@ export const navigationLinks = [
 ];
 
 export const socialLinks = [
-  { label: 'LinkedIn', url: 'https://linkedin.com/in/patrick-ngige' },
+  { label: 'LinkedIn', url: 'https://ke.linkedin.com/in/patrick-ngige-4b772623b' },
   { label: 'GitHub', url: 'https://github.com/Patrick-Ngige' },
-  { label: 'Dribbble', url: 'https://dribbble.com' },
 ];
 
 export const categoryFilters = [
   { id: 'all', label: 'All Work', count: caseStudies.length },
   { id: 'web', label: 'Web & Conversion', count: caseStudies.filter((c) => c.category === 'web').length },
-  { id: 'paid-media', label: 'Paid Media', count: caseStudies.filter((c) => c.category === 'paid-media').length },
   { id: 'strategy', label: 'Growth Strategy', count: caseStudies.filter((c) => c.category === 'strategy').length },
 ];
