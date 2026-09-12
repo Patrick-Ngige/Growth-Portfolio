@@ -194,6 +194,27 @@ export const caseStudies: CaseStudy[] = [
     ],
     tags: ['SEO', 'Content Strategy', 'Organic Growth'],
   },
+  {
+    id: 'analytics-dashboard',
+    company: 'Analytics Dashboard (automated reporting)',
+    industry: 'Data / Analytics',
+    category: 'strategy',
+    metricValue: '10K+',
+    metricLabel: 'Data Points Processed Daily',
+    context: 'An automated data pipeline and reporting system, built to replace manual reporting work',
+    challenge:
+      'Manual reporting was slow, error-prone, and required someone to pull and reconcile data by hand before it could be used for decisions.',
+    approach:
+      'Built automated data pipelines using SQL, MySQL, and n8n to collect, transform, and route data automatically instead of manually.',
+    result:
+      'Processes 10,000+ data points daily without manual intervention.',
+    technicalExecution: [
+      'SQL and MySQL data pipeline',
+      'n8n workflow automation',
+      'Automated daily processing at 10,000+ data points',
+    ],
+    tags: ['Automation', 'SQL', 'n8n', 'Analytics'],
+  },
 ];
 
 export const methodologySteps = [
