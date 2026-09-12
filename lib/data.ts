@@ -70,7 +70,7 @@ export const caseStudies: CaseStudy[] = [
     category: 'web',
     metricValue: '+280%',
     metricLabel: 'Checkout Conversion Rate',
-    context: 'Emerging beauty brand struggling with cart abandonment and checkout flow',
+    context: 'Ecommerce development, a side project done in collaboration, for an emerging beauty brand struggling with cart abandonment and checkout flow',
     challenge:
       'Phoina Beauty needed a premium e-commerce experience that matched their brand positioning. Their existing checkout flow had high abandonment rates and did not reflect the luxury positioning of their products.',
     approach:
@@ -82,7 +82,7 @@ export const caseStudies: CaseStudy[] = [
       'Implemented enhanced e-commerce tracking for funnel analysis',
       'Diagnosed the leak as cart abandonment, not a traffic problem, before rebuilding',
     ],
-    tags: ['E-commerce', 'WooCommerce', 'CRO', 'Conversion Optimization'],
+    tags: ['E-commerce', 'WooCommerce', 'CRO', 'Side Project', 'Collaboration'],
   },
   {
     id: 'jackpot-lottery',
@@ -172,6 +172,27 @@ export const caseStudies: CaseStudy[] = [
       'M-Pesa Daraja, Paystack, and Stripe payment integration',
     ],
     tags: ['AI', 'Solo Product', 'Next.js', 'Payments'],
+  },
+  {
+    id: 'organic-growth',
+    company: 'A well-known Kenyan private university, and an international payment gateway operating across Africa',
+    industry: 'Education / Fintech',
+    category: 'strategy',
+    metricValue: '+200%',
+    metricLabel: 'Organic Traffic Growth',
+    context: 'SEO content campaigns run for two different organizations: a Kenyan private university and an overseas payment gateway company with African operations',
+    challenge:
+      'Both organizations needed sustainable organic growth without depending purely on paid acquisition, one to reach prospective students, the other to build search visibility and authority content for a fintech audience across African markets.',
+    approach:
+      'Built data-driven content strategies shaped by Ahrefs keyword research and Hotjar behavior data, tailored to each organization\'s audience and search intent.',
+    result:
+      'Organic traffic grew substantially across both campaigns. A full before/after breakdown is being documented and will be added here once verified.',
+    technicalExecution: [
+      'Ahrefs keyword research and content gap analysis',
+      'Hotjar behavior data informing content structure',
+      'On-page and technical SEO implementation',
+    ],
+    tags: ['SEO', 'Content Strategy', 'Organic Growth'],
   },
 ];
 
