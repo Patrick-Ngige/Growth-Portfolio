@@ -215,6 +215,30 @@ export const caseStudies: CaseStudy[] = [
     ],
     tags: ['Automation', 'SQL', 'n8n', 'Analytics'],
   },
+  {
+    id: 'fearless-food-battles',
+    company: 'Fearless Food Battles (personal project, concept for Golden Fry / Bidco Africa)',
+    industry: 'FMCG / Brand Activation',
+    category: 'web',
+    metricValue: '$0',
+    metricLabel: 'Recurring Infra Cost',
+    context:
+      'A personal concept project, not a commissioned client engagement: a mobile-first brand-activation web app designed for Golden Fry, a Bidco Africa cooking oil brand. Live demo: 1d67ed89.fearless-food-battles.pages.dev',
+    challenge:
+      'Cooking oil is a low-interest category. The concept needed to make people care about the brand by tapping into something they already care about: the food they cook with it.',
+    approach:
+      'Designed a gamified "food tribes" battle concept: users pick a food tribe, submit a plate, get judged by four AI-voiced characters, and climb national and county leaderboards, with a receipt-scan power move tying play back to a real purchase.',
+    result:
+      'Shipped as a fully working, deployed MVP: end-to-end battle flow, four AI judges, synthesized rap verdicts generated in-browser, WhatsApp Status sharing, national and county leaderboards, crews with fair divisional leagues, and a dual light/dark design system passing WCAG AA on key pairings, built and hosted at zero recurring cost.',
+    technicalExecution: [
+      'Next.js 14 (App Router) + TypeScript + React 18',
+      'Web Audio API for synthesized rap verdicts, no audio files or licensing',
+      'Gemini vision scanner implemented and ready to activate behind a mock-first architecture',
+      'Supabase schema ready for a real shared, live leaderboard',
+      'Deployed on Cloudflare Pages via next-on-pages, with edge AI routes',
+    ],
+    tags: ['Personal Project', 'Next.js', 'Brand Concept', 'Gamification'],
+  },
 ];
 
 export const methodologySteps = [
