@@ -174,25 +174,46 @@ export const caseStudies: CaseStudy[] = [
     tags: ['AI', 'Solo Product', 'Next.js', 'Payments'],
   },
   {
-    id: 'organic-growth',
-    company: 'A well-known Kenyan private university, and an international payment gateway operating across Africa',
-    industry: 'Education / Fintech',
+    id: 'university-organic-growth',
+    company: 'A well-known Kenyan private university',
+    industry: 'Education',
     category: 'strategy',
     metricValue: '+200%',
     metricLabel: 'Organic Traffic Growth',
-    context: 'SEO content campaigns run for two different organizations: a Kenyan private university and an overseas payment gateway company with African operations',
+    context: 'An SEO content campaign for a well-known Kenyan private university',
     challenge:
-      'Both organizations needed sustainable organic growth without depending purely on paid acquisition, one to reach prospective students, the other to build search visibility and authority content for a fintech audience across African markets.',
+      'The university needed to reach prospective students organically, without depending purely on paid acquisition for admissions traffic.',
     approach:
-      'Built data-driven content strategies shaped by Ahrefs keyword research and Hotjar behavior data, tailored to each organization\'s audience and search intent.',
+      'Built a data-driven content strategy shaped by Ahrefs keyword research and Hotjar behavior data, targeting prospective-student search intent.',
     result:
-      'Organic traffic grew substantially across both campaigns. A full before/after breakdown is being documented and will be added here once verified.',
+      'Organic traffic grew substantially. A full before/after breakdown is being documented and will be added here once verified.',
     technicalExecution: [
       'Ahrefs keyword research and content gap analysis',
       'Hotjar behavior data informing content structure',
       'On-page and technical SEO implementation',
     ],
-    tags: ['SEO', 'Content Strategy', 'Organic Growth'],
+    tags: ['SEO', 'Education', 'Content Strategy'],
+  },
+  {
+    id: 'payment-gateway-organic-growth',
+    company: 'An overseas payment gateway company operating across Africa',
+    industry: 'Fintech',
+    category: 'strategy',
+    metricValue: '+200%',
+    metricLabel: 'Organic Traffic Growth',
+    context: 'An SEO content campaign for an overseas payment gateway company operating across Africa',
+    challenge:
+      'The company needed to build search visibility and authority content for a fintech audience across multiple African markets.',
+    approach:
+      'Built a data-driven content strategy shaped by Ahrefs keyword research and Hotjar behavior data, tailored to a fintech/payments audience.',
+    result:
+      'Organic traffic grew substantially. A full before/after breakdown is being documented and will be added here once verified.',
+    technicalExecution: [
+      'Ahrefs keyword research and content gap analysis',
+      'Hotjar behavior data informing content structure',
+      'On-page and technical SEO implementation',
+    ],
+    tags: ['SEO', 'Fintech', 'Content Strategy'],
   },
   {
     id: 'analytics-dashboard',
