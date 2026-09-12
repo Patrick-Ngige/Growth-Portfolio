@@ -178,7 +178,7 @@ export const caseStudies: CaseStudy[] = [
     company: 'A well-known Kenyan private university',
     industry: 'Education',
     category: 'strategy',
-    metricValue: '+200%',
+    metricValue: 'Significant',
     metricLabel: 'Organic Traffic Growth',
     context: 'An SEO content campaign for a well-known Kenyan private university',
     challenge:
@@ -199,7 +199,7 @@ export const caseStudies: CaseStudy[] = [
     company: 'An overseas payment gateway company operating across Africa',
     industry: 'Fintech',
     category: 'strategy',
-    metricValue: '+200%',
+    metricValue: 'Significant',
     metricLabel: 'Organic Traffic Growth',
     context: 'An SEO content campaign for an overseas payment gateway company operating across Africa',
     challenge:
