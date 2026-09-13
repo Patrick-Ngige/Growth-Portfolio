@@ -129,16 +129,16 @@ export default function Methodology() {
 
       {/* Pinned sequential reveal, ported from trionn-rebuild's about/process.js */}
       <div ref={pinTrackRef} className="relative" style={{ height: `${methodologySteps.length * 60}vh` }}>
-        <div ref={stickyRef} className="flex h-screen w-full items-center">
+        <div ref={stickyRef} className="flex h-screen w-full items-center pt-28 pb-6">
           <div className="container-main">
-            <div className="mx-auto flex max-w-4xl flex-col gap-4">
+            <div className="mx-auto flex max-w-4xl flex-col gap-2.5">
               {methodologySteps.map((step, i) => (
                 <div
                   key={step.step}
                   ref={(el) => {
                     stepRefs.current[i] = el;
                   }}
-                  className="group flex items-center justify-between gap-6 rounded-[2.25rem] border border-[var(--border-color)]/50 bg-[var(--background-surface)] py-5 pl-8 pr-5 transition-colors hover:border-accent-growth/40"
+                  className="group flex items-center justify-between gap-6 rounded-[2.25rem] border border-[var(--border-color)]/50 bg-[var(--background-surface)] py-3.5 pl-8 pr-5 transition-colors hover:border-accent-growth/40"
                 >
                   <div className="flex min-w-0 items-center gap-6">
                     <span className="hidden font-mono text-xs text-[var(--text-secondary)] sm:flex sm:items-center sm:gap-1.5">
@@ -157,7 +157,7 @@ export default function Methodology() {
                     </div>
                   </div>
                   <div
-                    className="flex h-14 w-20 flex-shrink-0 items-center justify-center rounded-2xl text-white sm:h-20 sm:w-32"
+                    className="flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-2xl text-white sm:h-16 sm:w-28"
                     style={{ background: CAPSULE_GRADIENT[step.step] }}
                   >
                     {iconComponents[step.icon as keyof typeof iconComponents]}

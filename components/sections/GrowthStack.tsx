@@ -145,8 +145,11 @@ export default function GrowthStack() {
     <AnimatedSection id="stack" variant="default" size="xl">
       {/* Colour-matched to PinnedPillars' panelBg (#09090B) - the reveal
           transition the user asked for right after the Build/Instrument/
-          Automate cards, wiping into this section instead of a hard cut. */}
-      <StripReveal color="#09090B" />
+          Automate cards, wiping into this section instead of a hard cut.
+          `darkColor` diverges from panelBg on purpose: this section's own
+          dark-mode background (--background-primary) is #09090B too, an
+          exact match that would make the wipe invisible in dark mode. */}
+      <StripReveal color="#09090B" darkColor="#1C1C20" />
       <div className="container-main">
         {/* Section Header */}
         <motion.div className="max-w-2xl mb-16 mx-auto text-center">
