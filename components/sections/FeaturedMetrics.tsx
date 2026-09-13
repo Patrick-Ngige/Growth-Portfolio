@@ -13,16 +13,16 @@ import { MetricBlock } from '@/components/ui/CaseStudyCard';
  * them - that full browsing experience is moving to the future /work page.
  *
  * StripReveal here is colour-matched to FeaturedWorkReel's fixed dark band
- * (#14110D) - the section right before this one - so the handoff reads as
- * a wipe uncovering this section rather than a hard colour cut. `darkColor`
- * is a separate, darker tone: this section's own dark-mode background
- * (--background-surface, #18181B) sits too close to #14110D for the wipe
- * to read as visible against it.
+ * (#000000, the same neutral set as Footer.tsx) - the section right before
+ * this one - so the handoff reads as a wipe uncovering this section rather
+ * than a hard colour cut. `darkColor` is a separate, lighter neutral tone:
+ * this section's own dark-mode background (--background-surface, #18181B)
+ * sits too close to pure black for the wipe to read as visible against it.
  */
 export default function FeaturedMetrics() {
   return (
     <AnimatedSection id="impact" variant="surface" size="md">
-      <StripReveal color="#14110D" darkColor="#080604" />
+      <StripReveal color="#000000" darkColor="#050505" />
       <div className="container-main">
         <FlipRevealGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="flip-reveal-card"><MetricBlock value="+280%" label="Checkout CR" /></div>

@@ -131,7 +131,7 @@ export default function Methodology() {
       {/* Pinned sequential reveal, ported from trionn-rebuild's about/process.js */}
       <div ref={pinTrackRef} className="relative" style={{ height: `${methodologySteps.length * 60}vh` }}>
         <div ref={stickyRef} className="flex h-screen w-full items-center pt-28 pb-6">
-          <div className="container-main">
+          <div className="container-main min-w-0">
             <div className="mx-auto flex max-w-5xl flex-col gap-3">
               {methodologySteps.map((step, i) => (
                 <div

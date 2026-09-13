@@ -31,7 +31,8 @@ if (typeof window !== 'undefined') {
  * flipping --background-primary/--text-primary tokens) so that in light
  * mode this section reads as a distinct panel against the cream page
  * around it, the same way trionn alternates light/dark sections rather
- * than using one flat background throughout.
+ * than using one flat background throughout. Colours are the same true
+ * neutral black/charcoal/white set as Footer.tsx - no warm tint.
  *
  * Deliberately NOT wrapped in AnimatedSection or any container with
  * `overflow-hidden` on an ancestor - that broke a previous GSAP pin (see
@@ -39,11 +40,11 @@ if (typeof window !== 'undefined') {
  */
 const FEATURED = caseStudies.slice(0, 6);
 
-const BAND_BG = '#14110D';
-const CARD_BG = '#211D17';
-const CARD_BORDER = '#332C22';
-const INK = '#F3EEE3';
-const INK_MUTED = '#A79E8E';
+const BAND_BG = '#000000';
+const CARD_BG = '#141414';
+const CARD_BORDER = '#2A2A2A';
+const INK = '#F5F5F5';
+const INK_MUTED = '#8A8A8A';
 
 export default function FeaturedWorkReel() {
   const sectionRef = useRef<HTMLElement>(null);
