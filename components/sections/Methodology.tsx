@@ -171,7 +171,7 @@ export default function Methodology() {
     <AnimatedSection id="approach" variant="default" size="xl">
       <div className="container-main">
         {/* Section Header */}
-        <motion.div className="mb-16 max-w-2xl w-full flex flex-col items-center justify-center" ref={containerRef}>
+        <motion.div className="mb-16 max-w-2xl w-full mx-auto flex flex-col items-center justify-center" ref={containerRef}>
           <SplitText
             text="My Approach"
             as="h2"
@@ -189,7 +189,7 @@ export default function Methodology() {
         </motion.div>
 
         {/* Timeline Visualization */}
-        <div className="max-w-2xl">
+        <div className="max-w-2xl mx-auto">
           {methodologySteps.map((step, index) => (
             <TimelineNode
               key={step.step}
