@@ -40,16 +40,15 @@ export default function Header() {
       </a>
 
       <header
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-          isScrolled
-            ? 'bg-[var(--background-primary)]/80 dark:bg-[var(--background-primary)]/80 backdrop-blur-lg border-b border-[var(--border-color)]/10'
-            : 'bg-transparent'
-        )}
+        className="fixed left-1/2 top-4 z-50 w-[min(1180px,calc(100%-2rem))] -translate-x-1/2"
         role="banner"
       >
-        <div className="container-main">
-          <div className="flex items-center justify-between h-20">
+        <div
+          className={cn(
+            'flex items-center justify-between rounded-full border border-[var(--border-color)]/70 bg-[var(--background-surface)]/90 px-6 backdrop-blur-lg transition-shadow duration-300 h-16',
+            isScrolled ? 'shadow-lg shadow-black/5' : 'shadow-sm shadow-black/[0.02]'
+          )}
+        >
             {/* Logo */}
             <Link
               href="/"
@@ -128,7 +127,7 @@ export default function Header() {
               {/* CTA */}
               <a
                 href="#contact"
-                className="hidden lg:inline-flex items-center px-4 py-2 text-sm font-medium text-[var(--background-primary)] bg-accent-growth rounded-lg hover:bg-accent-growth/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]"
+                className="hidden lg:inline-flex items-center px-4 py-2 text-sm font-medium text-[var(--background-primary)] bg-accent-growth rounded-full hover:bg-accent-growth/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]"
               >
                 Work with me
               </a>
@@ -156,7 +155,6 @@ export default function Header() {
                 />
               </svg>
             </button>
-          </div>
         </div>
       </header>
 
@@ -248,7 +246,7 @@ export default function Header() {
       </AnimatePresence>
 
       {/* Spacer for fixed header */}
-      <div className="h-20" aria-hidden="true" />
+      <div className="h-24" aria-hidden="true" />
     </>
   );
 }
