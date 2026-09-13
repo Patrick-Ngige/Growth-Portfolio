@@ -82,16 +82,6 @@
     @apply bg-[var(--background-surface)] border border-[var(--border-color)];
   }
 
-  /* Continuous scrolling banner, ported from trionn-rebuild's marquee.js */
-  .marquee-track {
-    animation: marquee-scroll 22s linear infinite;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .marquee-track {
-      animation: none;
-    }
-  }
 
   /* Theme-aware backgrounds */
   .bg-primary {
@@ -159,11 +149,3 @@
   }
 }
 
-@keyframes marquee-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
+import StripReveal from '@/components/motion/StripReveal';
 import { cn } from '@/lib/utils';
 
 // Tool icons for the growth stack
@@ -142,6 +143,10 @@ export default function GrowthStack() {
 
   return (
     <AnimatedSection id="stack" variant="default" size="xl">
+      {/* Colour-matched to PinnedPillars' panelBg (#09090B) - the reveal
+          transition the user asked for right after the Build/Instrument/
+          Automate cards, wiping into this section instead of a hard cut. */}
+      <StripReveal color="#09090B" />
       <div className="container-main">
         {/* Section Header */}
         <motion.div className="max-w-2xl mb-16 mx-auto text-center">

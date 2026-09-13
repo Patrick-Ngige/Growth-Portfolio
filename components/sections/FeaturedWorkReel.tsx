@@ -20,9 +20,12 @@ if (typeof window !== 'undefined') {
  * focus with a cubic-eased translateY as it crosses the viewport's centre -
  * matched to the exact original math this time (150px rise, no opacity
  * fade - trionn's own `rise()` never touches opacity, only transform).
- * Instead of trionn's arc-converge-into-Services reveal (specific to their
- * own content), the whole pinned panel dissolves to reveal whatever section
- * follows in the real page flow - reusable regardless of what that is.
+ * The pin releases the instant the row finishes scrolling (end = dist()
+ * exactly, no padded tail) so the next section arrives immediately rather
+ * than leaving dead scroll distance with nothing animating. The reveal
+ * itself is a StripReveal on whatever section follows, colour-matched to
+ * BAND_BG below - the same generic wipe trionn uses between sections,
+ * instead of this component fading its own panel to nothing.
  *
  * Deliberately given its own FIXED dark colour band (not the theme's
  * flipping --background-primary/--text-primary tokens) so that in light
@@ -74,7 +77,7 @@ export default function FeaturedWorkReel() {
       scrollTrigger: {
         trigger: pin,
         start: 'top top',
-        end: () => '+=' + (dist() + window.innerHeight * 1.2),
+        end: () => '+=' + dist(),
         scrub: 1,
         pin: true,
         anticipatePin: 1,
@@ -90,8 +93,7 @@ export default function FeaturedWorkReel() {
     const intro = introRef.current;
     if (intro) tl.to(intro, { autoAlpha: 0, duration: 0.25, ease: 'power1.in' }, 0);
 
-    tl.to(row, { x: () => -dist(), ease: 'none', duration: 1.4 }, 0);
-    tl.to(pin, { autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, '+=0.1');
+    tl.to(row, { x: () => -dist(), ease: 'none', duration: 1 }, 0);
 
     rise();
 

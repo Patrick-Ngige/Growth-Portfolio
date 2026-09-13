@@ -216,11 +216,11 @@ export default function UnfairAdvantage() {
     </AnimatedSection>
 
     {/*
-      Three Disciplines, One Engineer — replaces the old static capability grid.
+      Three Disciplines, One Engineer - replaces the old static capability grid.
       Deliberately rendered OUTSIDE AnimatedSection: that component's `motion.div`
       wrapper applies `overflow-hidden` (needed to clip the decorative gradient
       above), and ANY ancestor with overflow other than visible silently breaks
-      `position: sticky` for everything inside it — which is exactly what a
+      `position: sticky` for everything inside it - which is exactly what a
       GSAP ScrollTrigger pin like PinnedPillars relies on. Nesting it inside
       cost hours to diagnose: the animation looked fine in isolation (opacity
       scrubbed correctly) but the whole panel scrolled off-screen instead of
