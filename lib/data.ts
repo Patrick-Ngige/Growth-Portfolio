@@ -260,6 +260,52 @@ export const caseStudies: CaseStudy[] = [
     ],
     tags: ['Personal Project', 'Next.js', 'Brand Concept', 'Gamification'],
   },
+  {
+    id: 'pulseke',
+    company: 'PulseKE (personal project, solo product)',
+    industry: 'SaaS / MarTech',
+    category: 'strategy',
+    metricValue: '8',
+    metricLabel: 'Product Areas Designed & Built',
+    context:
+      'A solo-designed and built SaaS concept: an influencer-campaign management platform for the Kenyan market, built Kenya-first rather than adapted from a Western tool',
+    challenge:
+      'Kenyan agencies were running influencer campaigns through WhatsApp groups, spreadsheets, and manual M-Pesa transfers. International tools like Grin and AspireIQ ignored M-Pesa, KRA tax compliance, and local market specifics entirely.',
+    approach:
+      'Designed and built a Kenya-first platform end to end: influencer discovery with AI match scoring, campaign assignment with real-time budget tracking, a collaboration hub with Swahili support, KRA-compliant contracts, and M-Pesa-first payouts with automatic withholding tax.',
+    result:
+      'Shipped as a complete MVP across 8 product areas (dashboard, discovery, campaigns, analytics, collaboration, contracts, payments, AI insights), with a typed data layer built to mirror real API shapes for a low-friction swap to live data once integrations are wired in.',
+    technicalExecution: [
+      'Next.js 14 + TypeScript + Tailwind CSS',
+      'Chart.js analytics visualizations',
+      'Kenya-first product decisions: M-Pesa-first payouts, KRA withholding tax, EAT timezone, Swahili UI support',
+      'API-shaped data layer designed for a one-file swap to live integrations',
+    ],
+    tags: ['Personal Project', 'SaaS', 'Next.js', 'Product Design'],
+  },
+  {
+    id: 'sentinel-ai',
+    company: 'Sentinel-AI (personal project, solo product)',
+    industry: 'AI Security',
+    category: 'strategy',
+    metricValue: '30',
+    metricLabel: 'Prompt-Injection Attacks Built',
+    context:
+      'A solo-built AI red-teaming tool for testing LLM applications against prompt-injection vulnerabilities, positioned for SMBs and emerging markets underserved by enterprise pentesting tools',
+    challenge:
+      'Enterprise AI red-teaming tools cost thousands to tens of thousands per year and are built for US/EU markets. Nothing affordable or self-hostable existed for SMBs, consultants, or African startups shipping LLM apps without security testing.',
+    approach:
+      'Built a human-in-the-loop red-teaming architecture (an LLM as attacker and judge, a human as the final decision-maker) instead of a fully autonomous model, since autonomous pentesting benchmarks well below human-reviewed approaches. Designed a focused 30-attack suite across 6 categories, each mapped to the OWASP LLM Top 10, with a deterministic, explainable risk-scoring formula.',
+    result:
+      'Shipped as a working prototype in a 2-week build: a Python CLI, a Flask web UI, a standalone React demo, and a model-agnostic LLM client supporting Claude, GPT-4o, and Ollama.',
+    technicalExecution: [
+      'Python CLI engine + Flask web UI',
+      'React demo, runs fully in-browser with simulated responses',
+      '30 attacks across 6 categories, mapped to the OWASP LLM Top 10',
+      'Model-agnostic LLM client (Claude, GPT-4o, Ollama, custom endpoints)',
+    ],
+    tags: ['Personal Project', 'AI Security', 'Python', 'Prototype'],
+  },
 ];
 
 export const methodologySteps = [
