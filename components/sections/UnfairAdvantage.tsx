@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
+import { PinnedPillars } from '@/components/motion/pinned-pillars';
 
 const standardWorkflow = [
   { label: 'Idea', delay: 0 },
@@ -23,6 +24,7 @@ const integratedWorkflow = [
 
 export default function UnfairAdvantage() {
   return (
+    <>
     <AnimatedSection
       id="advantage"
       variant="surface"
@@ -210,67 +212,50 @@ export default function UnfairAdvantage() {
           </motion.div>
         </div>
 
-        {/* Three Capability Statements */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-              ),
-              text: 'I build landing pages and funnels that convert.',
-            },
-            {
-              icon: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              ),
-              text: 'I set up tracking and run A/B tests to improve results.',
-            },
-            {
-              icon: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
-              ),
-              text: 'I manage ad campaigns across Meta, Google, and more.',
-            },
-          ].map((item, index) => (
-            <motion.div
-              key={index}
-              className="flex items-start gap-4 p-6 rounded-xl bg-[var(--background-primary)] border border-[var(--border-color)]/20"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.15 }}
-            >
-              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent-growth/10 flex items-center justify-center text-accent-growth">
-                {item.icon}
-              </div>
-              <p className="text-body font-medium text-[var(--text-primary)]">
-                {item.text}
-              </p>
-            </motion.div>
-          ))}
-        </div>
       </div>
     </AnimatedSection>
+
+    {/*
+      Three Disciplines, One Engineer — replaces the old static capability grid.
+      Deliberately rendered OUTSIDE AnimatedSection: that component's `motion.div`
+      wrapper applies `overflow-hidden` (needed to clip the decorative gradient
+      above), and ANY ancestor with overflow other than visible silently breaks
+      `position: sticky` for everything inside it — which is exactly what a
+      GSAP ScrollTrigger pin like PinnedPillars relies on. Nesting it inside
+      cost hours to diagnose: the animation looked fine in isolation (opacity
+      scrubbed correctly) but the whole panel scrolled off-screen instead of
+      staying pinned, because the sticky positioning never actually engaged.
+    */}
+    <PinnedPillars
+      eyebrow="Three disciplines. One engineer."
+      cards={[
+        {
+          index: '01',
+          title: 'Build',
+          body: 'Production front-ends and CMS systems: Next.js, WordPress, Statamic, Drupal, wired for real content teams, not just demos.',
+        },
+        {
+          index: '02',
+          title: 'Instrument',
+          body: 'Analytics and tracking that make outcomes measurable: GA4, GTM, server-side tracking, dashboards that hold up under scrutiny.',
+        },
+        {
+          index: '03',
+          title: 'Automate',
+          body: 'Workflows and AI that remove manual work: n8n, the Claude API, automations that run without babysitting.',
+        },
+      ]}
+      lobes={[
+        { symbol: 'Bd', word: 'Build', caption: 'Frontend | CMS' },
+        { symbol: 'In', word: 'Instrument', caption: 'Analytics | Tracking' },
+        { symbol: 'Au', word: 'Automate', caption: 'Workflows | AI' },
+      ]}
+      panelBg="#09090B"
+      ink="#F4F4F5"
+      inkMuted="#A1A1AA"
+      plateFill="#1e2a52"
+      approachFrom="#09090B"
+    />
+    </>
   );
 }
