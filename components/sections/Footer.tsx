@@ -8,19 +8,20 @@ import { navigationLinks, socialLinks } from '@/lib/data';
  * rounded panels side by side on a dark page - a narrow left card (brand
  * blurb + CTA) and a wider right card (Menu / Utility Pages / Contact Us
  * columns, then a divider and a bottom bar with copyright + icon-only
- * socials, all inside that same right panel). Fixed dark background
- * regardless of the site's light/dark toggle, matching FeaturedWorkReel's
- * own fixed band - the footer is the one place on the page that's always
- * the "close of day" dark, the same way trionn-rebuild alternates fixed
+ * socials, all inside that same right panel). Colours match the reference
+ * exactly - true neutral black/charcoal/white, not the warm brown-tinted
+ * palette used elsewhere on the site. Fixed dark background regardless of
+ * the site's light/dark toggle - the footer is the one place on the page
+ * that's always dark, the same way trionn-rebuild alternates fixed
  * section themes rather than one flat background throughout.
  */
-const PAGE_BG = '#0D0B08';
-const CARD_BG = '#1A1611';
-const CARD_BORDER = '#2E281F';
-const INK = '#F3EEE3';
-const INK_MUTED = '#8A8378';
-const INK_DIM = '#D8D2C4';
-const LINE = '#2E281F';
+const PAGE_BG = '#000000';
+const CARD_BG = '#141414';
+const CARD_BORDER = '#2A2A2A';
+const INK = '#F5F5F5';
+const INK_MUTED = '#8A8A8A';
+const INK_DIM = '#C7C7C7';
+const LINE = '#2A2A2A';
 
 const socialIcons: Record<string, React.ReactNode> = {
   LinkedIn: (

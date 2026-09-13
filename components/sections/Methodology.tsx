@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { methodologySteps } from '@/lib/data';
 import SplitText from '@/components/anim/SplitText';
 import MagneticButton from '@/components/anim/MagneticButton';
+import { cn } from '@/lib/utils';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -131,33 +132,34 @@ export default function Methodology() {
       <div ref={pinTrackRef} className="relative" style={{ height: `${methodologySteps.length * 60}vh` }}>
         <div ref={stickyRef} className="flex h-screen w-full items-center pt-28 pb-6">
           <div className="container-main">
-            <div className="mx-auto flex max-w-4xl flex-col gap-2.5">
+            <div className="mx-auto flex max-w-5xl flex-col gap-3">
               {methodologySteps.map((step, i) => (
                 <div
                   key={step.step}
                   ref={(el) => {
                     stepRefs.current[i] = el;
                   }}
-                  className="group flex items-center justify-between gap-6 rounded-[2.25rem] border border-[var(--border-color)]/50 bg-[var(--background-surface)] py-3.5 pl-8 pr-5 transition-colors hover:border-accent-growth/40"
+                  className={cn(
+                    'group flex w-[92%] items-center justify-between gap-5 rounded-full border border-[var(--border-color)]/50 bg-[var(--background-surface)] py-3 pl-7 pr-3 transition-colors hover:border-accent-growth/40 sm:w-[80%]',
+                    i % 2 === 0 ? 'self-start' : 'self-end'
+                  )}
                 >
-                  <div className="flex min-w-0 items-center gap-6">
-                    <span className="hidden font-mono text-xs text-[var(--text-secondary)] sm:flex sm:items-center sm:gap-1.5">
+                  <div className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-secondary)]">
                       {String(step.step).padStart(2, '0')}
                       <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="truncate font-display text-xl font-bold uppercase tracking-tight text-[var(--text-primary)] transition-colors group-hover:text-accent-growth sm:text-2xl">
-                        {step.title}
-                      </h3>
-                      <p className="mt-1.5 truncate font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-                        {TAGS[step.step].join('  •  ')}
-                      </p>
-                    </div>
+                    <h3 className="mt-1 truncate font-display text-lg font-bold uppercase tracking-tight text-[var(--text-primary)] transition-colors group-hover:text-accent-growth sm:text-2xl">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-[var(--text-secondary)] sm:text-[10px]">
+                      {TAGS[step.step].join('  •  ')}
+                    </p>
                   </div>
                   <div
-                    className="flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-2xl text-white sm:h-16 sm:w-28"
+                    className="flex h-14 w-24 flex-shrink-0 items-center justify-center rounded-full text-white sm:h-20 sm:w-36"
                     style={{ background: CAPSULE_GRADIENT[step.step] }}
                   >
                     {iconComponents[step.icon as keyof typeof iconComponents]}
