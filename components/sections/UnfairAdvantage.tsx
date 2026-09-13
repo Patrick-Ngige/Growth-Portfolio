@@ -36,7 +36,7 @@ export default function UnfairAdvantage() {
 
       <div className="container-main relative z-10">
         {/* Section Header */}
-        <motion.div className="max-w-3xl mb-16">
+        <motion.div className="max-w-3xl mb-16 mx-auto text-center">
           <h2 className="text-section font-display font-semibold mb-6 text-[var(--text-primary)]">
             Most growth marketers need a developer.{' '}
             <span className="text-accent-growth">I am the developer.</span>
