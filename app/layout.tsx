@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import Header from '@/components/navigation/Header';
 import Footer from '@/components/sections/Footer';
+import Loader from '@/components/motion/Loader';
 import './globals.css';
 import { metadata as siteMetadata, jsonLd } from './metadata';
 
@@ -27,7 +28,7 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F4F4F5' },
+    { media: '(prefers-color-scheme: light)', color: '#FAF6ED' },
     { media: '(prefers-color-scheme: dark)', color: '#0B0C10' },
   ],
   width: 'device-width',
@@ -79,6 +80,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Loader />
           <Header />
           <main id="main-content" className="relative" role="main">
             {children}
