@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
+import FlipRevealGrid from '@/components/motion/FlipRevealGrid';
 import { CaseStudyCard, MetricBlock } from '@/components/ui/CaseStudyCard';
 import CaseStudyModal from '@/components/ui/CaseStudyModal';
 import { caseStudies, categoryFilters, type CaseStudy } from '@/lib/data';
@@ -37,18 +38,14 @@ export default function CaseStudies() {
           </p>
         </motion.div>
 
-        {/* Featured Metrics - Responsive Grid */}
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <MetricBlock value="+280%" label="Checkout CR" />
-          <MetricBlock value="23%" label="CPA Reduction" />
-          <MetricBlock value="+45%" label="Organic Traffic" />
-          <MetricBlock value="2" label="Years Exp" />
-        </motion.div>
+        {/* Featured Metrics - flip-reveal on scroll, ported from trionn-rebuild's
+            "Key facts" transition (see components/motion/FlipRevealGrid.tsx) */}
+        <FlipRevealGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+          <div className="flip-reveal-card"><MetricBlock value="+280%" label="Checkout CR" /></div>
+          <div className="flip-reveal-card"><MetricBlock value="4" label="Bank & Enterprise Sites" /></div>
+          <div className="flip-reveal-card"><MetricBlock value="14" label="Growth Dimensions Analyzed" /></div>
+          <div className="flip-reveal-card"><MetricBlock value="4" label="Years Building" /></div>
+        </FlipRevealGrid>
 
         {/* Filter Tabs */}
         <motion.div

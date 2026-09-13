@@ -1,69 +1,145 @@
 'use client';
 
 import Link from 'next/link';
-import { socialLinks } from '@/lib/data';
+import { navigationLinks, socialLinks } from '@/lib/data';
+
+/**
+ * Rebuilt per the "Pixcut Studio" reference screenshot: two bordered,
+ * rounded panels side by side on a dark page - a narrow left card (brand
+ * blurb + CTA) and a wider right card (Menu / Utility Pages / Contact Us
+ * columns, then a divider and a bottom bar with copyright + icon-only
+ * socials, all inside that same right panel). Colours match the reference
+ * exactly - true neutral black/charcoal/white, not the warm brown-tinted
+ * palette used elsewhere on the site. Fixed dark background regardless of
+ * the site's light/dark toggle - the footer is the one place on the page
+ * that's always dark, the same way trionn-rebuild alternates fixed
+ * section themes rather than one flat background throughout.
+ */
+const PAGE_BG = '#000000';
+const CARD_BG = '#141414';
+const CARD_BORDER = '#2A2A2A';
+const INK = '#F5F5F5';
+const INK_MUTED = '#8A8A8A';
+const INK_DIM = '#C7C7C7';
+const LINE = '#2A2A2A';
+
+const socialIcons: Record<string, React.ReactNode> = {
+  LinkedIn: (
+    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  ),
+  GitHub: (
+    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.755-1.333-1.755-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.807 1.305 3.492.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.469-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 013.003-.404c1.02.005 2.047.138 3.003.404 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+    </svg>
+  ),
+};
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="py-8 border-t border-[var(--border-color)]/10 bg-[var(--background-primary)]">
-      <div className="container-main">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Logo */}
-          <Link href="/" className="text-lg font-display font-semibold">
-            <span className="text-[var(--text-primary)]">Patrick</span>
-            <span className="text-accent-growth">.</span>
-          </Link>
+    <footer
+      style={{ background: PAGE_BG, borderColor: CARD_BORDER }}
+      className="border-t px-[clamp(20px,5vw,64px)] py-16"
+    >
+      <div className="mx-auto flex max-w-[1240px] flex-col gap-5 lg:flex-row">
+        {/* Left panel: brand + CTA */}
+        <div
+          className="flex flex-col justify-between gap-8 rounded-[1.75rem] border p-9 lg:w-[34%]"
+          style={{ background: CARD_BG, borderColor: CARD_BORDER }}
+        >
+          <div>
+            <Link href="/" className="font-display text-lg font-semibold" style={{ color: INK }}>
+              Patrick<span className="text-accent-growth">.</span>
+            </Link>
+            <p className="mt-3.5 max-w-[30ch] text-sm leading-relaxed" style={{ color: INK_MUTED }}>
+              Developer-first Growth Engineer building the systems behind measurable growth.
+            </p>
+          </div>
+          <a
+            href="#contact"
+            className="inline-flex w-fit items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
+            style={{ background: INK, color: PAGE_BG }}
+          >
+            Get In Touch
+          </a>
+        </div>
 
-          {/* Navigation Links */}
-          <nav className="flex items-center gap-6">
-            <Link
-              href="#work"
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              Work
-            </Link>
-            <Link
-              href="#approach"
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              Approach
-            </Link>
-            <Link
-              href="#about"
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="#contact"
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              Contact
-            </Link>
-          </nav>
+        {/* Right panel: link columns + bottom bar, all in one card */}
+        <div
+          className="flex-1 rounded-[1.75rem] border p-9"
+          style={{ background: CARD_BG, borderColor: CARD_BORDER }}
+        >
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+            <div>
+              <h4 className="font-mono text-[10.5px] font-normal uppercase tracking-[0.12em]" style={{ color: INK_MUTED }}>
+                Menu
+              </h4>
+              <ul className="mt-4 flex flex-col gap-2.5">
+                {navigationLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm transition-colors hover:opacity-100" style={{ color: INK_DIM }}>
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Social Links */}
-          <div className="flex items-center gap-4">
-            {socialLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-[var(--text-secondary)] hover:text-accent-growth transition-colors"
-                aria-label={link.label}
-              >
-                {link.label}
-              </a>
-            ))}
+            <div>
+              <h4 className="font-mono text-[10.5px] font-normal uppercase tracking-[0.12em]" style={{ color: INK_MUTED }}>
+                Utility Pages
+              </h4>
+              <ul className="mt-4 flex flex-col gap-2.5">
+                <li>
+                  <a href="#contact" className="text-sm" style={{ color: INK_DIM }}>
+                    Resume
+                  </a>
+                </li>
+                {socialLinks.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm" style={{ color: INK_DIM }}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="col-span-2 sm:col-span-1">
+              <h4 className="font-mono text-[10.5px] font-normal uppercase tracking-[0.12em]" style={{ color: INK_MUTED }}>
+                Contact Us
+              </h4>
+              <div className="mt-4 flex flex-col gap-2.5 text-sm" style={{ color: INK_DIM }}>
+                <a href="mailto:wakemanjajr@gmail.com">wakemanjajr@gmail.com</a>
+                <p>Nairobi, Kenya</p>
+                <p>Available Worldwide</p>
+              </div>
+            </div>
           </div>
 
-          {/* Copyright */}
-          <p className="text-xs text-[var(--text-secondary)]">
-            © {currentYear} Patrick Ngige. All rights reserved.
-          </p>
+          <div
+            className="mt-9 flex flex-col items-start gap-3.5 border-t pt-5 font-mono text-[10.5px] tracking-[0.04em] sm:flex-row sm:items-center sm:justify-between"
+            style={{ borderColor: LINE, color: INK_MUTED }}
+          >
+            <span>© {currentYear} Patrick Ngige. All rights reserved.</span>
+            <span className="flex gap-4">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: INK_MUTED }}
+                  aria-label={link.label}
+                >
+                  {socialIcons[link.label]}
+                </a>
+              ))}
+            </span>
+          </div>
         </div>
       </div>
     </footer>

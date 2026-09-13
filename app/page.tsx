@@ -1,7 +1,8 @@
 import Hero from '@/components/sections/Hero';
 import UnfairAdvantage from '@/components/sections/UnfairAdvantage';
 import GrowthStack from '@/components/sections/GrowthStack';
-import CaseStudies from '@/components/sections/CaseStudies';
+import FeaturedWorkReel from '@/components/sections/FeaturedWorkReel';
+import FeaturedMetrics from '@/components/sections/FeaturedMetrics';
 import Methodology from '@/components/sections/Methodology';
 import About from '@/components/sections/About';
 import Contact from '@/components/sections/Contact';
@@ -16,7 +17,8 @@ export default function Home() {
       <Hero />
       <UnfairAdvantage />
       <GrowthStack />
-      <CaseStudies />
+      <FeaturedWorkReel />
+      <FeaturedMetrics />
       <Methodology />
       <About />
       <Contact />

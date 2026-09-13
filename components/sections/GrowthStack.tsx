@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
+import StripReveal from '@/components/motion/StripReveal';
 import { cn } from '@/lib/utils';
 
 // Tool icons for the growth stack
@@ -63,6 +64,55 @@ const toolIcons: Record<string, React.ReactNode> = {
   ),
 };
 
+// A single tool chip used inside the marquee tracks.
+function ToolChip({ tool }: { tool: { name: string; category: string } }) {
+  return (
+    <div
+      className="group flex items-center gap-3 shrink-0 px-5 py-3 rounded-xl bg-[var(--background-surface)] border border-[var(--border-color)] hover:border-accent-growth/50 transition-colors duration-300"
+    >
+      <div className="w-9 h-9 shrink-0 rounded-lg bg-[var(--background-primary)] flex items-center justify-center text-[var(--text-primary)] group-hover:text-accent-growth transition-colors">
+        {toolIcons[tool.name] || (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+        )}
+      </div>
+      <div className="flex flex-col whitespace-nowrap">
+        <span className="text-sm font-medium text-[var(--text-primary)]">{tool.name}</span>
+        <span className="text-xs text-[var(--text-secondary)]">{tool.category}</span>
+      </div>
+    </div>
+  );
+}
+
+// One infinitely-looping row: the track is the tool list rendered twice back
+// to back, animated from translateX(0) to translateX(-50%) so the seam
+// between the two copies is never visible. Pauses on hover so it's actually
+// readable, and motion-reduce just shows the first copy at rest (the
+// duplicate is clipped by overflow-hidden on the parent).
+function MarqueeRow({
+  tools,
+  reverse = false,
+}: {
+  tools: { name: string; category: string }[];
+  reverse?: boolean;
+}) {
+  return (
+    <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      <div
+        className={cn(
+          'flex w-max gap-4 hover:[animation-play-state:paused] motion-reduce:animate-none',
+          reverse ? 'animate-marquee-reverse' : 'animate-marquee'
+        )}
+      >
+        {[...tools, ...tools].map((tool, index) => (
+          <ToolChip key={`${tool.name}-${index}`} tool={tool} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function GrowthStack() {
   // Expanded tool list with icons
   const tools = [
@@ -70,20 +120,39 @@ export default function GrowthStack() {
     { name: 'React', category: 'Frontend' },
     { name: 'TypeScript', category: 'Frontend' },
     { name: 'Tailwind CSS', category: 'Styling' },
-    { name: 'Vercel', category: 'Deployment' },
+    { name: 'WordPress', category: 'CMS' },
+    { name: 'Statamic', category: 'CMS' },
+    { name: 'Drupal', category: 'CMS' },
+    { name: 'PHP', category: 'Backend' },
     { name: 'Node.js', category: 'Backend' },
-    { name: 'Google Analytics', category: 'Analytics' },
+    { name: 'Supabase', category: 'Backend' },
+    { name: 'GA4', category: 'Analytics' },
+    { name: 'Google Tag Manager', category: 'Analytics' },
+    { name: 'Server-Side Tracking', category: 'Analytics' },
+    { name: 'n8n', category: 'Automation' },
+    { name: 'Claude API', category: 'Automation' },
+    { name: 'M-Pesa Daraja, Paystack, Stripe', category: 'Payments' },
     { name: 'Meta Ads', category: 'Paid Media' },
     { name: 'Google Ads', category: 'Paid Media' },
-    { name: 'WordPress', category: 'CMS' },
-    { name: 'WooCommerce', category: 'E-commerce' },
+    { name: 'Vercel', category: 'Deployment' },
   ];
+
+  const midpoint = Math.ceil(tools.length / 2);
+  const rowOne = tools.slice(0, midpoint);
+  const rowTwo = tools.slice(midpoint);
 
   return (
     <AnimatedSection id="stack" variant="default" size="xl">
+      {/* Colour-matched to PinnedPillars' panelBg (#09090B) - the reveal
+          transition the user asked for right after the Build/Instrument/
+          Automate cards, wiping into this section instead of a hard cut.
+          `darkColor` diverges from panelBg on purpose: this section's own
+          dark-mode background (--background-primary) is #09090B too, an
+          exact match that would make the wipe invisible in dark mode. */}
+      <StripReveal color="#09090B" darkColor="#1E1E1E" />
       <div className="container-main">
         {/* Section Header */}
-        <motion.div className="max-w-2xl mb-16">
+        <motion.div className="max-w-2xl mb-16 mx-auto text-center">
           <h2 className="text-section font-display font-semibold mb-4 text-[var(--text-primary)]">
             My Growth Stack
           </h2>
@@ -91,36 +160,17 @@ export default function GrowthStack() {
             The tools and platforms I use to build, launch, and measure growth experiments.
           </p>
         </motion.div>
+      </div>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-16">
-          {tools.map((tool, index) => (
-            <motion.div
-              key={tool.name}
-              className="group flex flex-col items-center justify-center p-6 rounded-xl bg-[var(--background-surface)] border border-[var(--border-color)] hover:border-accent-growth/50 transition-all duration-300"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ y: -4, boxShadow: '0 10px 40px -10px rgba(21, 128, 61, 0.2)' }}
-            >
-              <div className="w-12 h-12 rounded-xl bg-[var(--background-primary)] flex items-center justify-center text-[var(--text-primary)] group-hover:text-accent-growth transition-colors mb-3">
-                {toolIcons[tool.name] || (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                  </svg>
-                )}
-              </div>
-              <span className="text-sm font-medium text-[var(--text-primary)] text-center">
-                {tool.name}
-              </span>
-              <span className="text-xs text-[var(--text-secondary)] mt-1">
-                {tool.category}
-              </span>
-            </motion.div>
-          ))}
-        </div>
+      {/* Tools: two auto-scrolling rows, opposite directions, full-bleed
+          (deliberately outside .container-main so the fade-out mask at each
+          edge reaches the true edge of the viewport, not just the container) */}
+      <div className="flex flex-col gap-4 mb-16">
+        <MarqueeRow tools={rowOne} />
+        <MarqueeRow tools={rowTwo} reverse />
+      </div>
 
+      <div className="container-main">
         {/* Bottom CTA */}
         <motion.div
           className="mt-16 text-center"

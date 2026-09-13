@@ -3,15 +3,18 @@
 @tailwind utilities;
 
 :root {
-  /* Light Mode Variables */
-  --background-primary: #FAFAFA;
-  --background-surface: #FFFFFF;
-  --text-primary: #18181B;
-  --text-secondary: #71717A;
+  /* Light Mode Variables: warm cream ground instead of neutral gray, so the
+     light theme reads "alive" rather than a flat default-SaaS white. Accent
+     stays the same warm orange; only the neutrals shifted warmer (stone-ish
+     instead of zinc-ish). Reference: dribbble.com/shots/27453066 */
+  --background-primary: #FAF6ED;
+  --background-surface: #FFFDF7;
+  --text-primary: #1C1917;
+  --text-secondary: #78716C;
   --accent-growth: #EA580C;
   --accent-technical: #0284C7;
-  --border-color: #E4E4E7;
-  --surface-color: #F4F4F5;
+  --border-color: #E7DFCF;
+  --surface-color: #F1E9DA;
 }
 
 .dark {
@@ -79,6 +82,7 @@
     @apply bg-[var(--background-surface)] border border-[var(--border-color)];
   }
 
+
   /* Theme-aware backgrounds */
   .bg-primary {
     @apply bg-[var(--background-primary)];
@@ -144,3 +148,4 @@
     box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
   }
 }
+
