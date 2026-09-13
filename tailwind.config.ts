@@ -51,6 +51,8 @@ const config: Config = {
         'draw': 'draw 1s ease-out forwards',
         'fade-in': 'fadeIn 0.6s ease-out forwards',
         'slide-up': 'slideUp 0.6s ease-out forwards',
+        'marquee': 'marquee 32s linear infinite',
+        'marquee-reverse': 'marquee-reverse 32s linear infinite',
       },
       keyframes: {
         draw: {
@@ -64,6 +66,14 @@ const config: Config = {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'marquee-reverse': {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0)' },
         },
       },
       transitionDuration: {

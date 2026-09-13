@@ -64,49 +64,6 @@ export const capabilities: Capability[] = [
 
 export const caseStudies: CaseStudy[] = [
   {
-    id: 'phoina-beauty',
-    company: 'Phoina Beauty',
-    industry: 'E-commerce',
-    category: 'web',
-    metricValue: '+280%',
-    metricLabel: 'Checkout Conversion Rate',
-    context: 'Ecommerce development, a side project done in collaboration, for an emerging beauty brand struggling with cart abandonment and checkout flow',
-    challenge:
-      'Phoina Beauty needed a premium e-commerce experience that matched their brand positioning. Their existing checkout flow had high abandonment rates and did not reflect the luxury positioning of their products.',
-    approach:
-      'Redesigned the entire checkout experience with conversion psychology principles. Implemented trust signals at friction points, streamlined the checkout to a single page, and optimized form field placement based on user behavior data.',
-    result:
-      'Checkout completion rate improved substantially after the rebuild. A full before/after breakdown is being documented and will be added here once verified.',
-    technicalExecution: [
-      'Built on WooCommerce with custom checkout fields',
-      'Implemented enhanced e-commerce tracking for funnel analysis',
-      'Diagnosed the leak as cart abandonment, not a traffic problem, before rebuilding',
-    ],
-    tags: ['E-commerce', 'WooCommerce', 'CRO', 'Side Project', 'Collaboration'],
-  },
-  {
-    id: 'jackpot-lottery',
-    company: 'Jackpot Lottery Online',
-    industry: 'Gaming / Betting',
-    category: 'strategy',
-    metricValue: '20+',
-    metricLabel: 'Language Implementations',
-    context: 'International betting platform requiring multi-language support for global expansion',
-    challenge:
-      'Jackpot Lottery Online needed to expand into new markets with localized experiences. Their platform required proper tracking infrastructure for multi-touch attribution across 20+ languages and multiple currencies.',
-    approach:
-      'Built scalable internationalization (i18n) infrastructure enabling rapid market expansion. Implemented comprehensive tracking architecture across all conversion events for proper multi-touch attribution modeling. Created localized landing pages for each market.',
-    result:
-      'Shipped a 20+ language localization with proper tracking and attribution infrastructure in place, enabling multi-market launches without rebuilding the tracking setup each time.',
-    technicalExecution: [
-      'Built scalable i18n infrastructure with proper fallbacks',
-      'Implemented server-side tracking for accuracy',
-      'Created proper UTM and attribution tracking',
-      'Integrated with multiple analytics platforms',
-    ],
-    tags: ['i18n', 'Tracking', 'Multi-market', 'Attribution'],
-  },
-  {
     id: 'enterprise-cms',
     company: 'KCB Bank, I&M Bank, TotalEnergies Kenya, Prime Bank',
     industry: 'Enterprise / Finance',
@@ -172,6 +129,49 @@ export const caseStudies: CaseStudy[] = [
       'M-Pesa Daraja, Paystack, and Stripe payment integration',
     ],
     tags: ['AI', 'Solo Product', 'Next.js', 'Payments'],
+  },
+  {
+    id: 'phoina-beauty',
+    company: 'Phoina Beauty',
+    industry: 'E-commerce',
+    category: 'web',
+    metricValue: '+280%',
+    metricLabel: 'Checkout Conversion Rate',
+    context: 'Ecommerce development, a side project done in collaboration, for an emerging beauty brand struggling with cart abandonment and checkout flow',
+    challenge:
+      'Phoina Beauty needed a premium e-commerce experience that matched their brand positioning. Their existing checkout flow had high abandonment rates and did not reflect the luxury positioning of their products.',
+    approach:
+      'Redesigned the entire checkout experience with conversion psychology principles. Implemented trust signals at friction points, streamlined the checkout to a single page, and optimized form field placement based on user behavior data.',
+    result:
+      'Checkout completion rate improved substantially after the rebuild. A full before/after breakdown is being documented and will be added here once verified.',
+    technicalExecution: [
+      'Built on WooCommerce with custom checkout fields',
+      'Implemented enhanced e-commerce tracking for funnel analysis',
+      'Diagnosed the leak as cart abandonment, not a traffic problem, before rebuilding',
+    ],
+    tags: ['E-commerce', 'WooCommerce', 'CRO', 'Side Project', 'Collaboration'],
+  },
+  {
+    id: 'jackpot-lottery',
+    company: 'Jackpot Lottery Online',
+    industry: 'Gaming / Betting',
+    category: 'strategy',
+    metricValue: '20+',
+    metricLabel: 'Language Implementations',
+    context: 'International betting platform requiring multi-language support for global expansion',
+    challenge:
+      'Jackpot Lottery Online needed to expand into new markets with localized experiences. Their platform required proper tracking infrastructure for multi-touch attribution across 20+ languages and multiple currencies.',
+    approach:
+      'Built scalable internationalization (i18n) infrastructure enabling rapid market expansion. Implemented comprehensive tracking architecture across all conversion events for proper multi-touch attribution modeling. Created localized landing pages for each market.',
+    result:
+      'Shipped a 20+ language localization with proper tracking and attribution infrastructure in place, enabling multi-market launches without rebuilding the tracking setup each time.',
+    technicalExecution: [
+      'Built scalable i18n infrastructure with proper fallbacks',
+      'Implemented server-side tracking for accuracy',
+      'Created proper UTM and attribution tracking',
+      'Integrated with multiple analytics platforms',
+    ],
+    tags: ['i18n', 'Tracking', 'Multi-market', 'Attribution'],
   },
   {
     id: 'university-organic-growth',

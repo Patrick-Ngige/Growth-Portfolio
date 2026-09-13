@@ -67,7 +67,7 @@ function arcText(
     const a = angle + (flip ? -step / 2 : step / 2);
     ctx.save();
     ctx.translate(cx + radius * Math.sin(a), cy - radius * Math.cos(a));
-    ctx.rotate(flip ? -a + Math.PI : a);
+    ctx.rotate(flip ? a + Math.PI : a);
     ctx.fillText(text[i], 0, 0);
     ctx.restore();
     angle += flip ? -step : step;
