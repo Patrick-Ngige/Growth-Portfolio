@@ -39,7 +39,10 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer style={{ background: PAGE_BG }} className="px-[clamp(20px,5vw,64px)] py-16">
+    <footer
+      style={{ background: PAGE_BG, borderColor: CARD_BORDER }}
+      className="border-t px-[clamp(20px,5vw,64px)] py-16"
+    >
       <div className="mx-auto flex max-w-[1240px] flex-col gap-5 lg:flex-row">
         {/* Left panel: brand + CTA */}
         <div
@@ -118,7 +121,7 @@ export default function Footer() {
 
           <div
             className="mt-9 flex flex-col items-start gap-3.5 border-t pt-5 font-mono text-[10.5px] tracking-[0.04em] sm:flex-row sm:items-center sm:justify-between"
-            style={{ borderColor: LINE, color: '#5F594C' }}
+            style={{ borderColor: LINE, color: INK_MUTED }}
           >
             <span>© {currentYear} Patrick Ngige. All rights reserved.</span>
             <span className="flex gap-4">
