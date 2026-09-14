@@ -32,31 +32,32 @@ export type PillarCard = { index: string; title: string; body: string };
  *
  * Remove any one of those three and the effect collapses.
  *
- * Choreography, in pin progress `p` (fixed - see the note on the component):
- *   p 0.00 -> 0.22  dial + title group exits: opacity 1 -> 0, scale 1 -> 0.55,
- *                   rotate 0 -> 15deg
- *   p 0.04 -> 0.52  plate unwinds: scale 12.5 -> 1, rotate 90deg -> 0, power4.out
- *   p 0.55 -> 0.70  plate defocuses: opacity 1 -> 0.4, blur 0 -> 25px
- *   p 0.57 -> 0.78  three cards rise on a stagger
- *   p 0.78 -> 1.00  static hold, then release
+ * Choreography, in raw timeline position (not normalised to 0-1 - the
+ * timeline's total duration is whatever the last tween finishes at):
+ *   0.00 -> 0.22  dial + title group exits: opacity 1 -> 0, scale 1 -> 0.55,
+ *                 rotate 0 -> 15deg
+ *   0.04 -> 0.52  plate unwinds: scale 12.5 -> 1, rotate 90deg -> 0, power4.out
+ *   0.55 -> 0.70  plate defocuses: opacity 1 -> 0.4, blur 0 -> 25px
+ *   0.57 -> 0.78  three cards rise on a stagger
+ *   0.87 -> 0.97  brief static hold once the cards have locked
+ *   0.97 -> 1.31  strip reveal: colour-matched bands grow bottom-to-top,
+ *                 covering the still-pinned cards, then the track ends -
+ *                 whatever follows (already that same colour) takes over
+ *                 with no visible seam
  */
-
-const TRACK_VH = 700;
 
 /**
- * Empty tail appended to the timeline purely to create a hold once the cards
- * have locked. This is not optional padding - ScrollTrigger normalises the
- * whole scroll range onto the timeline's own duration, which is set by
- * whichever tween finishes last. So however the phases are positioned, the
- * final animation always lands exactly at the release point and the section
- * moves on the instant the cards arrive. Extending the timeline past the last
- * tween is what buys reading time.
- *
- * Raising this does NOT simply add a pause - it rescales everything, because
- * the scroll range is divided across the whole timeline. Every increase here
- * needs a matching increase in TRACK_VH.
+ * Bumped from 700 to fit the strip-reveal tail (a brief hold once the cards
+ * lock, then the bottom-to-top strip sweep) without compressing everything
+ * before it. ScrollTrigger normalises the whole scroll range onto the
+ * timeline's own duration, which is set by whichever tween finishes last -
+ * so however the phases are positioned, the final animation always lands
+ * exactly at the release point. Raising the tail's own duration does NOT
+ * just add a pause, it rescales every earlier phase too (the same "unit" of
+ * timeline time now maps to fewer vh), which is why this needs bumping in
+ * step with the tail.
  */
-const HOLD = 0.25;
+const TRACK_VH = 820;
 
 const TICKS = 130;
 const TICK_REST = 2.22; // % of dial box
@@ -87,6 +88,13 @@ export default function PinnedPillars({
   radius = "0.625rem",
   /** Page inset, used only by the reduced-motion layout. */
   gutter = "5.5vw",
+  /** Strip-reveal colour (light theme) for the bottom-to-top wipe that
+   * covers the pinned cards at the end of the hold, handing off to
+   * whatever follows. Defaults to `panelBg` (no visible wipe) - pass the
+   * next section's own background so the hand-off actually reads. */
+  revealColor = panelBg,
+  /** Strip-reveal colour (dark theme). Defaults to `revealColor`. */
+  revealDarkColor = revealColor,
 }: {
   eyebrow: string;
   cards: PillarCard[];
@@ -98,6 +106,8 @@ export default function PinnedPillars({
   approachFrom?: string;
   radius?: string;
   gutter?: string;
+  revealColor?: string;
+  revealDarkColor?: string;
 }) {
   const reduced = useReducedMotion();
 
@@ -109,6 +119,7 @@ export default function PinnedPillars({
   const defocusRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
+  const stripsRef = useRef<HTMLDivElement>(null);
 
   // ── Cursor-proximity ripple on the dial ──────────────────────────────────
   useEffect(() => {
@@ -282,9 +293,30 @@ export default function PinnedPillars({
         );
       }
 
-      // The hold - see HOLD above for why this is required rather than
-      // cosmetic.
-      tl.to({}, { duration: HOLD }, 0.87);
+      // Brief hold once the cards have locked, so they read as fully
+      // assembled before anything else happens - then the strip reveal:
+      // colour-matched bands grow bottom-to-top, covering the still-pinned
+      // cards, staggered from the bottom band so the sweep reads as moving
+      // upward. By the time they've fully grown the pinned panel is a
+      // solid field of `revealColor` (or `revealDarkColor`); the track
+      // ends right as that finishes, so whatever follows in the real page
+      // - already that same colour - takes over with no visible seam.
+      tl.to({}, { duration: 0.1 }, 0.87);
+
+      const stripEls = stripsRef.current?.querySelectorAll<HTMLElement>("[data-reveal-strip]");
+      if (stripEls?.length) {
+        tl.to(
+          stripEls,
+          {
+            scaleY: 1.04,
+            transformOrigin: "50% 100%",
+            ease: "none",
+            stagger: { each: 0.02, from: "end" },
+            duration: 0.2,
+          },
+          0.97,
+        );
+      }
     }, trackRef);
 
     return () => {
@@ -460,11 +492,35 @@ export default function PinnedPillars({
         <div ref={cardsRef} className="pp-cards" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: "5.5vw" }}>
           {cardEls}
         </div>
+
+        {/* Strip reveal, rendered last so it paints over the cards above.
+            Bands start fully collapsed (scaleY:0) and grow bottom-to-top
+            once the scrubbed timeline reaches the reveal phase - see the
+            choreography note at the top of the file. `--pp-reveal-color`
+            reacts live to the `.dark` class, same pattern as the rest of
+            the site's tokens, since PinnedPillars itself renders once but
+            the colour it's revealing into changes with the theme. */}
+        <div
+          ref={stripsRef}
+          className="pp-reveal"
+          aria-hidden="true"
+          style={{ position: "absolute", inset: 0, zIndex: 20, display: "flex", flexDirection: "column", overflow: "hidden", pointerEvents: "none" }}
+        >
+          {Array.from({ length: 10 }, (_, i) => (
+            <div
+              key={i}
+              data-reveal-strip
+              style={{ width: "100%", flex: "1 0 auto", transformOrigin: "50% 100%", ...(reduced ? null : { transform: "scaleY(0)" }) }}
+            />
+          ))}
+        </div>
       </section>
 
       {/* Scoped responsive overrides - embedded so the component needs no
           external CSS import at all. */}
       <style>{`
+        .pp-reveal [data-reveal-strip] { background: ${revealColor}; }
+        .dark .pp-reveal [data-reveal-strip] { background: ${revealDarkColor}; }
         .pp-dial-title { font-size: 3.3vw; }
         @media (max-width: 1024px) {
           .pp-plate-wrap { width: 80vw; }

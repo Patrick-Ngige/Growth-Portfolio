@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
 import { PinnedPillars } from '@/components/motion/pinned-pillars';
-import StripReveal from '@/components/motion/StripReveal';
 
 const standardWorkflow = [
   { label: 'Idea', delay: 0 },
@@ -256,25 +255,14 @@ export default function UnfairAdvantage() {
       inkMuted="#A1A1AA"
       plateFill="#1A1A1A"
       approachFrom="#09090B"
+      // Strip reveal happens ON the pinned cards themselves (see the
+      // choreography note in PinnedPillars.tsx), not as a separate curtain
+      // after the fact - colours match GrowthStack's own current-theme
+      // background (--background-primary in light mode, dark:!bg in dark)
+      // exactly, so the hand-off has zero visible seam once the track ends.
+      revealColor="#C3C3C3"
+      revealDarkColor="#1A1A1A"
     />
-
-    {/* StripReveal 'cover' mode, pinned: the marker div itself is invisible
-        (no background), so pinning it just freezes a transparent curtain
-        over whatever's scrolling underneath (PinnedPillars releasing into
-        GrowthStack) for one viewport of scroll while colour-matched strips
-        grow bottom-to-top to fill it. By the time they've fully grown the
-        screen is solid - GrowthStack's own current-theme background - so
-        releasing the pin onto the real GrowthStack section underneath is
-        seamless, no matter what the actual hand-off looked like during the
-        curtain. Colours match GrowthStack's own default/dark:!bg exactly
-        (--background-primary in light mode, #1A1A1A in dark) - PinnedPillars
-        itself is fixed-dark regardless of theme, so this is the one place
-        that has to react to the toggle. This is nova-transitions' own
-        'cover' mode, used for exactly this kind of pinned-section-into-
-        next-section handoff on the source site. */}
-    <div className="relative h-screen w-full">
-      <StripReveal mode="cover" color="#C3C3C3" darkColor="#1A1A1A" />
-    </div>
     </>
   );
 }
