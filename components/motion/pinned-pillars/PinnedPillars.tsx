@@ -385,7 +385,13 @@ export default function PinnedPillars({
         <div
           ref={defocusRef}
           className="pp-plate-wrap"
-          style={{ position: "absolute", aspectRatio: "1 / 1", width: "55.6vw", willChange: "filter, opacity" }}
+          // inset:0 + margin:auto centres this explicitly rather than
+          // relying on the panel's flex alignItems/justifyContent to reach
+          // an absolutely-positioned child with auto insets - that wasn't
+          // reliably centring it (the plate, and the word labels drawn onto
+          // its canvas, were rendering from the panel's top-left instead,
+          // clipping behind the floating header on tall/narrow viewports).
+          style={{ position: "absolute", inset: 0, margin: "auto", aspectRatio: "1 / 1", width: "55.6vw", willChange: "filter, opacity" }}
         >
           <div ref={plateRef} style={{ height: "100%", width: "100%", willChange: "transform", transform: "scale(12.5) rotate(90deg)" }}>
             <PillarPlate lobes={lobes} ink={ink} fill={plateFill} style={{ height: "100%", width: "100%" }} />
@@ -397,11 +403,14 @@ export default function PinnedPillars({
           ref={groupRef}
           // `marginTop` nudges the dial down off the nav. The group is the
           // panel's only in-flow flex item and the panel centres it, so the
-          // margin box is what gets centred - a 12vh top margin shifts the
+          // margin box is what gets centred - a top margin shifts the
           // circle down by half that. Deliberately a margin and not a
           // translate: the group's transform is owned by the scrubbed exit
-          // tween.
-          style={{ position: "relative", zIndex: 10, marginTop: "12vh", display: "flex", width: "100%", alignItems: "center", justifyContent: "center", willChange: "transform" }}
+          // tween. Bumped from 12vh once the track's own top margin was
+          // removed (see the gap fix below) - without that section-level
+          // cushion above the pin, the dial's curved tick captions clipped
+          // behind the floating header at the top of the circle.
+          style={{ position: "relative", zIndex: 10, marginTop: "20vh", display: "flex", width: "100%", alignItems: "center", justifyContent: "center", willChange: "transform" }}
         >
           <div ref={dialRef} className="pp-dial" style={{ position: "relative", display: "grid", placeItems: "center", width: "47vw", height: "47vw" }}>
             {Array.from({ length: TICKS }, (_, i) => {

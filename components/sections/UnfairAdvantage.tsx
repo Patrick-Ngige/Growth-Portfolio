@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
 import { PinnedPillars } from '@/components/motion/pinned-pillars';
+import StripReveal from '@/components/motion/StripReveal';
 
 const standardWorkflow = [
   { label: 'Idea', delay: 0 },
@@ -256,6 +257,24 @@ export default function UnfairAdvantage() {
       plateFill="#1A1A1A"
       approachFrom="#09090B"
     />
+
+    {/* StripReveal 'cover' mode, pinned: the marker div itself is invisible
+        (no background), so pinning it just freezes a transparent curtain
+        over whatever's scrolling underneath (PinnedPillars releasing into
+        GrowthStack) for one viewport of scroll while colour-matched strips
+        grow bottom-to-top to fill it. By the time they've fully grown the
+        screen is solid - GrowthStack's own current-theme background - so
+        releasing the pin onto the real GrowthStack section underneath is
+        seamless, no matter what the actual hand-off looked like during the
+        curtain. Colours match GrowthStack's own default/dark:!bg exactly
+        (--background-primary in light mode, #1A1A1A in dark) - PinnedPillars
+        itself is fixed-dark regardless of theme, so this is the one place
+        that has to react to the toggle. This is nova-transitions' own
+        'cover' mode, used for exactly this kind of pinned-section-into-
+        next-section handoff on the source site. */}
+    <div className="relative h-screen w-full">
+      <StripReveal mode="cover" color="#C3C3C3" darkColor="#1A1A1A" />
+    </div>
     </>
   );
 }

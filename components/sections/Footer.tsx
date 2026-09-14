@@ -98,13 +98,6 @@ export default function Footer() {
                     Resume
                   </a>
                 </li>
-                {socialLinks.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm" style={{ color: INK_DIM }}>
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
               </ul>
             </div>
 

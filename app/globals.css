@@ -3,18 +3,19 @@
 @tailwind utilities;
 
 :root {
-  /* Light Mode Variables: warm cream ground instead of neutral gray, so the
-     light theme reads "alive" rather than a flat default-SaaS white. Accent
-     stays the same warm orange; only the neutrals shifted warmer (stone-ish
-     instead of zinc-ish). Reference: dribbble.com/shots/27453066 */
-  --background-primary: #FAF6ED;
-  --background-surface: #FFFDF7;
-  --text-primary: #1C1917;
-  --text-secondary: #78716C;
+  /* Light Mode Variables: matches trionn-rebuild's own light theme exactly
+     (--light-bg/--light-text/--light-muted in its style.css) rather than the
+     earlier warm-cream palette - neutral gray ground, neutral near-black
+     text, no warm tint, consistent with the neutral direction the rest of
+     the site's fixed-dark sections already moved to. */
+  --background-primary: #C3C3C3;
+  --background-surface: #D4D4D4;
+  --text-primary: #1A1A1A;
+  --text-secondary: #5C5C5C;
   --accent-growth: #EA580C;
   --accent-technical: #0284C7;
-  --border-color: #E7DFCF;
-  --surface-color: #F1E9DA;
+  --border-color: #A8A8A8;
+  --surface-color: #B0B0B0;
 }
 
 .dark {

@@ -143,14 +143,17 @@ export default function FeaturedWorkReel() {
           style={{ width: 'max-content', paddingLeft: '37vw', paddingRight: '4vw' }}
         >
           {FEATURED.map((study, i) => (
-            // trionn's .work-card: flex-basis 46vw, height 74vh, column, gap 26px
+            // trionn's .work-card: flex-basis 46vw, height 74vh, column,
+            // gap 26px. Widened to 75vw on mobile (3/4 of the viewport for
+            // the active card) - 46vw reads as a sliver on a narrow phone
+            // screen; trionn's own 46vw is tuned for wider viewports.
             <div
               key={study.id}
               ref={(el) => {
                 cardRefs.current[i] = el;
               }}
-              className="flex h-[74vh] shrink-0 flex-col gap-[26px]"
-              style={{ flex: '0 0 46vw', willChange: 'transform' }}
+              className="flex h-[74vh] shrink-0 flex-[0_0_75vw] flex-col gap-[26px] sm:flex-[0_0_46vw]"
+              style={{ willChange: 'transform' }}
             >
               {/* trionn's .wc-shot: flex:1, radius 8px, padding 30px, mono
                   label pinned top-left. Gradient placeholder stands in for

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Section from '@/components/ui/Section';
+import { AnimatedSection } from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
 
 // Tool icons for the growth stack
@@ -141,36 +141,20 @@ export default function GrowthStack() {
   const rowTwo = tools.slice(midpoint);
 
   return (
-    // Plain Section, not AnimatedSection: the latter's whileInView fade
-    // (opacity 0 -> 1, gated on an IntersectionObserver with a -100px
-    // margin) never fired here, because the negative top margin below
-    // pulls this section's entrance earlier than framer-motion's own
-    // viewport check expects - the section was geometrically in the
-    // reveal window but still sitting at opacity:0, so the "cover" was
-    // invisible the whole time. The slide-up-and-cover IS the entrance
-    // animation now; layering a separate fade on top only fights it.
-    //
-    // Pulled up with a negative top margin so this section starts sliding
-    // into view from the bottom of the screen WHILE PinnedPillars' three
-    // cards are still pinned above it (position: sticky releases only once
-    // scroll passes trackBottom - one viewport, so pulling this section's
-    // entrance earlier than that keeps both visible at once). z-20 makes it
-    // paint over the sticky panel instead of under it - a non-positioned
-    // sibling paints below a positioned one by default, so without this the
-    // pinned panel would stay on top and hide this section as it slid in.
-    <Section
+    // Renders in plain document flow, right after the StripReveal 'cover'
+    // curtain (see UnfairAdvantage.tsx) - that curtain does the actual
+    // hiding, growing strips of this section's own dark-mode colour to
+    // fill the screen before releasing onto it. dark:!bg matches that
+    // strip colour exactly (#1A1A1A, not the site-wide --background-primary
+    // #09090B) so the hand-off from "fully-grown strips" to "the real
+    // section" has zero visible seam. The `!` is load-bearing - without it,
+    // two same-specificity Tailwind utility classes leave the winner up to
+    // generation order, which isn't reliable to depend on.
+    <AnimatedSection
       id="stack"
       variant="default"
       size="xl"
-      // dark:!bg overrides the variant's own dark:bg-[var(--background-primary)]
-      // (the `!` is load-bearing - without it, two same-specificity Tailwind
-      // utility classes leave the winner up to generation order, which isn't
-      // reliable to depend on). This section's dark-mode background is
-      // otherwise IDENTICAL to PinnedPillars' panelBg (#09090B) - the cover
-      // reveal was rendering correctly (position, z-index, opacity all
-      // right) but completely invisible because there was zero colour
-      // contrast between what was being covered and what was covering it.
-      className="relative z-20 -mt-[45vh] dark:!bg-[#1A1A1A]"
+      className="dark:!bg-[#1A1A1A]"
     >
       <div className="container-main">
         {/* Section Header */}
@@ -225,6 +209,6 @@ export default function GrowthStack() {
           </a>
         </motion.div>
       </div>
-    </Section>
+    </AnimatedSection>
   );
 }
