@@ -2,6 +2,11 @@
 
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
  * Site loader, ported from trionn-rebuild's src/components/loader.js (mechanics
@@ -14,6 +19,21 @@ import { gsap } from 'gsap';
  *
  * Plays once per browser session (sessionStorage), not on every reload during
  * a single visit, and is skipped for prefers-reduced-motion.
+ *
+ * Matches trionn-rebuild's own main.js sequencing in one respect that
+ * mattered: it calls `ScrollTrigger.refresh()` once, right as this loader
+ * finishes (or immediately, on the skip path) - trionn defers ALL of its
+ * sections' own GSAP setup until AFTER its loader's dismissal, then does
+ * exactly this. This app's sections instead each set up their own
+ * ScrollTrigger independently in their own effects, on normal React mount
+ * timing, with no such coordination - which left room for a real bug: a
+ * scroll-linked trigger whose position depends on another section's
+ * runtime-computed layout (FeaturedWorkReel's `dist()`, which needs its
+ * card row's actual rendered width) could get measured before that width
+ * had settled, leaving it stale for the rest of the session. This refresh
+ * is the safety net - forcing every trigger on the page to re-measure
+ * against DOM state that even a browser mid-loading fonts/layout has had
+ * several real seconds (this loader's own animation) to settle into.
  *
  * Deliberately mounts unconditionally and decides in useLayoutEffect (not
  * useEffect + a `visible` state gating the render) whether to actually play:
@@ -54,6 +74,7 @@ export default function Loader() {
 
     if (reduced || already) {
       setGone(true);
+      ScrollTrigger.refresh();
       return;
     }
     try {
@@ -82,7 +103,12 @@ export default function Loader() {
       },
       onComplete: () => {
         gsap
-          .timeline({ onComplete: () => setGone(true) })
+          .timeline({
+            onComplete: () => {
+              setGone(true);
+              ScrollTrigger.refresh();
+            },
+          })
           .to(mark, { scale: 1.06, duration: 0.5 })
           .to([counter, word], { opacity: 0, duration: 0.35 }, 0)
           .to('.pl-frame', { opacity: 0, scale: 1.4, duration: 0.7, ease: 'power2.in' }, 0.25)

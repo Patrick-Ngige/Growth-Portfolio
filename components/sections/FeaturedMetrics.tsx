@@ -1,6 +1,5 @@
 'use client';
 
-import FlipRevealGrid from '@/components/motion/FlipRevealGrid';
 import StripReveal from '@/components/motion/StripReveal';
 import { MetricBlock } from '@/components/ui/CaseStudyCard';
 
@@ -31,13 +30,18 @@ export default function FeaturedMetrics() {
       id="impact"
       className="relative flex min-h-screen w-full flex-col justify-center bg-[var(--surface-color)] py-24 dark:bg-[var(--background-surface)] lg:py-28"
     >
+      {/* Plain grid, deliberately no entrance animation of its own (no more
+          FlipRevealGrid rotateX flip) - the strip reveal handing off from
+          Featured Work is already this section's entrance; a second,
+          separate one stacked on top was redundant, the same reasoning
+          that dropped AnimatedSection's fade from GrowthStack. */}
       <div className="container-main">
-        <FlipRevealGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="flip-reveal-card"><MetricBlock value="+280%" label="Checkout CR" /></div>
-          <div className="flip-reveal-card"><MetricBlock value="4" label="Bank & Enterprise Sites" /></div>
-          <div className="flip-reveal-card"><MetricBlock value="14" label="Growth Dimensions Analyzed" /></div>
-          <div className="flip-reveal-card"><MetricBlock value="4" label="Years Building" /></div>
-        </FlipRevealGrid>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <MetricBlock value="+280%" label="Checkout CR" />
+          <MetricBlock value="4" label="Bank & Enterprise Sites" />
+          <MetricBlock value="14" label="Growth Dimensions Analyzed" />
+          <MetricBlock value="4" label="Years Building" />
+        </div>
       </div>
 
       {/* Hands off into Methodology - colour-matched to its background

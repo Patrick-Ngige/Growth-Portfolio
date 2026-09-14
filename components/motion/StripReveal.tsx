@@ -74,59 +74,77 @@ export default function StripReveal({
     const section = cover?.parentElement;
     if (!cover || !section || reduced) return;
 
-    const strips = Array.from(cover.children) as HTMLElement[];
+    let tween: gsap.core.Tween | null = null;
 
-    const tween =
-      mode === 'cover'
-        ? gsap.fromTo(
-            strips,
-            { scaleY: 0 },
-            {
-              scaleY: overlap,
-              transformOrigin: '50% 100%',
-              ease: 'none',
-              stagger: { each, from },
-              scrollTrigger: {
-                trigger: section,
-                start: 'bottom bottom',
-                end: '+=100%',
-                pin: true,
-                pinSpacing: false,
-                scrub: true,
-                anticipatePin: 1,
-              },
-            }
-          )
-        : gsap.fromTo(
-            strips,
-            { scaleY: overlap },
-            {
-              scaleY: 0,
-              transformOrigin: '50% 0%',
-              ease: 'none',
-              stagger: { each, from },
-              scrollTrigger: pin
-                ? {
-                    trigger: section,
-                    start: 'top top',
-                    end: '+=100%',
-                    pin: true,
-                    pinSpacing: true,
-                    scrub: true,
-                    anticipatePin: 1,
-                  }
-                : {
-                    trigger: section,
-                    start: 'top bottom',
-                    end: 'top 15%',
-                    scrub: true,
-                  },
-            }
-          );
+    // Deferred one frame, deliberately: React fires a CHILD component's own
+    // effects (this one) before its PARENT's (whatever section renders
+    // <StripReveal> as a child of its own pinned trigger - e.g.
+    // FeaturedWorkReel's own horizontal-scroll pin). If that parent's pin
+    // depends on a runtime-computed value (FeaturedWorkReel's `dist()`,
+    // from its card row's actual rendered width) and hasn't run yet, this
+    // component's own ScrollTrigger gets created - and has its start/end
+    // measured and cached - against a DOM that doesn't have that pin's
+    // spacer in it yet. That's not a "layout settles later, a refresh
+    // fixes it" problem: the trigger's cached positions stay wrong even
+    // once the DOM itself is correct, because nothing tells THIS
+    // ScrollTrigger to re-measure. One rAF is enough to run after every
+    // effect in the current commit (including parent effects) has fired.
+    const raf = requestAnimationFrame(() => {
+      const strips = Array.from(cover.children) as HTMLElement[];
+
+      tween =
+        mode === 'cover'
+          ? gsap.fromTo(
+              strips,
+              { scaleY: 0 },
+              {
+                scaleY: overlap,
+                transformOrigin: '50% 100%',
+                ease: 'none',
+                stagger: { each, from },
+                scrollTrigger: {
+                  trigger: section,
+                  start: 'bottom bottom',
+                  end: '+=100%',
+                  pin: true,
+                  pinSpacing: false,
+                  scrub: true,
+                  anticipatePin: 1,
+                },
+              }
+            )
+          : gsap.fromTo(
+              strips,
+              { scaleY: overlap },
+              {
+                scaleY: 0,
+                transformOrigin: '50% 0%',
+                ease: 'none',
+                stagger: { each, from },
+                scrollTrigger: pin
+                  ? {
+                      trigger: section,
+                      start: 'top top',
+                      end: '+=100%',
+                      pin: true,
+                      pinSpacing: true,
+                      scrub: true,
+                      anticipatePin: 1,
+                    }
+                  : {
+                      trigger: section,
+                      start: 'top bottom',
+                      end: 'top 15%',
+                      scrub: true,
+                    },
+              }
+            );
+    });
 
     return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
+      cancelAnimationFrame(raf);
+      tween?.scrollTrigger?.kill();
+      tween?.kill();
     };
   }, [mode, each, overlap, from, pin]);
 
