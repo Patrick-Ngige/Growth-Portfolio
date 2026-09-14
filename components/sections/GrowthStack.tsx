@@ -114,13 +114,11 @@ function MarqueeRow({
 
 export default function GrowthStack() {
   // No custom scroll-linked JS here at all, deliberately - a hand-rolled
-  // sync tween is what broke this repeatedly. PinnedPillars' own reserved
-  // TRACK_VH (which now covers its strip reveal too) is what actually gets
-  // this section into view: it's a completely plain, normal-flow section
-  // with no ref, no transform, sitting immediately after PinnedPillars'
-  // track with zero margin - normal document flow lands it at exactly
-  // y:0 the instant the sticky panel releases. See PinnedPillars.tsx for
-  // the actual mechanism.
+  // sync tween is what broke this repeatedly. This is a completely plain,
+  // normal-flow section with no ref, no transform, sitting right after
+  // PinnedPillars' track - normal document flow lands it in place the
+  // instant the sticky panel releases. See PinnedPillars.tsx for that
+  // mechanism.
   //
   // Plain `Section`, not `AnimatedSection`, deliberately: AnimatedSection's
   // own whileInView fade (viewport margin:'-100px') doesn't reliably fire
@@ -128,8 +126,6 @@ export default function GrowthStack() {
   // panel - the result was a real gap where this section had already
   // arrived in the DOM/layout sense but was still sitting at opacity:0,
   // waiting on framer-motion's own intersection observer to catch up.
-  // The strip reveal is already this section's entrance animation; a
-  // second, separate fade gating it on top is both redundant and buggy.
 
   // Expanded tool list with icons
   const tools = [
@@ -159,28 +155,10 @@ export default function GrowthStack() {
   const rowTwo = tools.slice(midpoint);
 
   return (
-    // A completely plain section, deliberately - see the note above the
-    // component. `relative z-[2]` matters: GSAP's `pinSpacing:false`
-    // leaves the just-unpinned reveal stage sitting at
-    // `transform:translateY(...)`, still visually covering a full
-    // viewport of scroll after it "releases" (confirmed this is normal
-    // GSAP behaviour, not a bug, by inspecting trionn-rebuild's own
-    // production site the same way). Their site gets away with it because
-    // every section has an explicit, INCREASING z-index (marquee=2,
-    // facts=3, ...) - each later section always paints over the lingering
-    // one before it. PinnedPillars' reveal stage uses z-index:1; this
-    // needs to be higher than that (not `auto`, which loses to an
-    // explicit z-index regardless of DOM order) for the same reason.
-    <Section id="stack" variant="default" size="xl" className="relative z-[2]">
+    // A completely plain section - see the note above the component.
+    <Section id="stack" variant="default" size="xl">
       <div className="container-main">
         {/* Section Header */}
-        {/* Matches PinnedPillars' reveal-strip colour exactly (#1A1A1A) so
-            the hand-off from "fully-grown strips" to this real section has
-            zero visible seam. Scoped to #stack specifically since that's
-            the element Section.tsx actually paints a background on - see
-            the note on the wrapper above for why this can't just be a
-            className here. */}
-        <style>{`.dark #stack { background: #1A1A1A; }`}</style>
         <motion.div className="max-w-2xl mb-16 mx-auto text-center">
           <h2 className="text-section font-display font-semibold mb-4 text-[var(--text-primary)]">
             My Growth Stack

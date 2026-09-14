@@ -255,13 +255,6 @@ export default function UnfairAdvantage() {
       inkMuted="#A1A1AA"
       plateFill="#1A1A1A"
       approachFrom="#09090B"
-      // Strip reveal happens ON the pinned cards themselves (see the
-      // choreography note in PinnedPillars.tsx), not as a separate curtain
-      // after the fact - colours match GrowthStack's own current-theme
-      // background (--background-primary in light mode, dark:!bg in dark)
-      // exactly, so the hand-off has zero visible seam once the track ends.
-      revealColor="#C3C3C3"
-      revealDarkColor="#1A1A1A"
     />
     </>
   );

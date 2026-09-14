@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { caseStudies } from '@/lib/data';
-import StripReveal from '@/components/motion/StripReveal';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -23,12 +22,7 @@ if (typeof window !== 'undefined') {
  * fade - trionn's own `rise()` never touches opacity, only transform).
  * The pin releases the instant the row finishes scrolling (end = dist()
  * exactly, no padded tail) so the next section arrives immediately rather
- * than leaving dead scroll distance with nothing animating. Hands off into
- * the statistics band via a StripReveal (`cover` mode) - the same generic
- * wipe trionn uses between sections - colour-matched to THAT section's own
- * background, not this one's BAND_BG, since `cover` mode's strips grow to
- * become the INCOMING section's colour, revealing an already-scrolled-into-
- * place next section underneath with no visible seam.
+ * than leaving dead scroll distance with nothing animating.
  *
  * Card geometry matches trionn's `.work-row`/`.work-card`/`.wc-shot`/
  * `.wc-meta` CSS exactly: row gap 3vw, card flex-basis 46vw x 74vh, image
@@ -124,7 +118,6 @@ export default function FeaturedWorkReel() {
   }, []);
 
   return (
-    <>
     <section ref={sectionRef} id="work" className="relative w-full" style={{ background: BAND_BG }}>
       <div ref={pinRef} className="relative h-screen w-full overflow-hidden">
         {/* trionn's .work-intro: flex-basis 34vw, height 70vh, gap 22px */}
@@ -195,27 +188,5 @@ export default function FeaturedWorkReel() {
         </div>
       </div>
     </section>
-
-    {/* Bridge section carrying the hand-off into the statistics band -
-        deliberately a SEPARATE, plain sibling rather than a child of #work
-        above. #work already contains its own GSAP-pinned child (pinRef,
-        the horizontal card scroll, whose pin-spacer height depends on
-        dist() - the row's actual scrollable width, computed and set at
-        runtime) - pinning #work ITSELF for the reveal raced against that:
-        GSAP measured and locked #work's height at whatever it happened to
-        be at that moment (900px, before pinRef's own spacer had grown to
-        its real ~4200px+), leaving #work's actual trigger geometry wrong
-        for the rest of the page. A fresh, simple, never-pinned-before
-        100vh section - same BAND_BG, so it reads as a continuation of
-        #work rather than a seam - sidesteps that entirely: its own height
-        is static and known immediately, the same precondition marquee-sec
-        meets in the reference. Colour-matched to the statistics band's own
-        background so the strips growing to solid colour and that section,
-        already scrolled into place underneath, read as one continuous
-        surface with no visible seam. */}
-    <section aria-hidden="true" className="relative w-full" style={{ height: '100vh', background: BAND_BG }}>
-      <StripReveal mode="cover" color="#B0B0B0" darkColor="#18181B" />
-    </section>
-    </>
   );
 }
