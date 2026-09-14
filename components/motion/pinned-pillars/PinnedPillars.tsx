@@ -10,7 +10,7 @@ export type PillarCard = { index: string; title: string; body: string };
 
 /**
  * A pinned track holding one sticky panel that reveals a three-circle Venn
- * diagram, then three cards — for the moment in a page where "three separate
+ * diagram, then three cards - for the moment in a page where "three separate
  * things" needs to visually resolve into "one compounding system".
  *
  * What makes it work is not the zoom on its own but the interaction of three
@@ -21,7 +21,7 @@ export type PillarCard = { index: string; title: string; body: string };
  *      `plateFill` via a `--pp-page-tint` custom property, so by the time the
  *      panel sticks the page is already that colour. Style your page's own
  *      background with `background: var(--pp-page-tint, <your normal bg>)`
- *      to pick this up — it is a no-op otherwise.
+ *      to pick this up - it is a no-op otherwise.
  *   2. The sticky panel's own opaque background. This is the layer being
  *      *revealed*.
  *   3. The plate on top, which opens at 12.5x and pulls back. At that zoom the
@@ -32,7 +32,7 @@ export type PillarCard = { index: string; title: string; body: string };
  *
  * Remove any one of those three and the effect collapses.
  *
- * Choreography, in pin progress `p` (fixed — see the note on the component):
+ * Choreography, in pin progress `p` (fixed - see the note on the component):
  *   p 0.00 -> 0.22  dial + title group exits: opacity 1 -> 0, scale 1 -> 0.55,
  *                   rotate 0 -> 15deg
  *   p 0.04 -> 0.52  plate unwinds: scale 12.5 -> 1, rotate 90deg -> 0, power4.out
@@ -45,14 +45,14 @@ const TRACK_VH = 700;
 
 /**
  * Empty tail appended to the timeline purely to create a hold once the cards
- * have locked. This is not optional padding — ScrollTrigger normalises the
+ * have locked. This is not optional padding - ScrollTrigger normalises the
  * whole scroll range onto the timeline's own duration, which is set by
  * whichever tween finishes last. So however the phases are positioned, the
  * final animation always lands exactly at the release point and the section
  * moves on the instant the cards arrive. Extending the timeline past the last
  * tween is what buys reading time.
  *
- * Raising this does NOT simply add a pause — it rescales everything, because
+ * Raising this does NOT simply add a pause - it rescales everything, because
  * the scroll range is divided across the whole timeline. Every increase here
  * needs a matching increase in TRACK_VH.
  */
@@ -68,9 +68,9 @@ export default function PinnedPillars({
   eyebrow,
   cards,
   /** Diagram labels for the plate. Defaults to PillarPlate's own Build /
-   *  Automate / Grow set — pass your own three to match custom `cards`. */
+   *  Automate / Grow set - pass your own three to match custom `cards`. */
   lobes,
-  /** The sticky panel's ground colour — the brand artwork moment, fixed in
+  /** The sticky panel's ground colour - the brand artwork moment, fixed in
    *  both light and dark themes rather than a themed surface. */
   panelBg = "#0d1112",
   /** Ink over the panel. */
@@ -80,7 +80,7 @@ export default function PinnedPillars({
   /** The plate's central intersection fill, and what the page ramps to on
    *  approach. */
   plateFill = "#2a2f52",
-  /** What the page ramps FROM on approach — normally your page's own
+  /** What the page ramps FROM on approach - normally your page's own
    *  background colour. */
   approachFrom = "#08080a",
   /** Card corner radius. */
@@ -121,7 +121,7 @@ export default function PinnedPillars({
     let raf = 0;
     let pending: { x: number; y: number } | null = null;
 
-    // Event-driven, coalesced to one frame per pointer move — not a standing
+    // Event-driven, coalesced to one frame per pointer move - not a standing
     // rAF loop. Nothing runs when the pointer is still.
     const apply = () => {
       raf = 0;
@@ -177,7 +177,7 @@ export default function PinnedPillars({
     };
 
     const ctx = gsap.context(() => {
-      // Layer 1 — the approach ramp. Deliberately a SEPARATE trigger that
+      // Layer 1 - the approach ramp. Deliberately a SEPARATE trigger that
       // starts a viewport before the track, because this effect begins well
       // outside the pinned section's own scroll range.
       const from = hexToRgb(approachFrom);
@@ -186,7 +186,7 @@ export default function PinnedPillars({
       // onUpdate forces a synchronous layout on every scroll tick.
       let split = Math.min(0.9, window.innerHeight / track.getBoundingClientRect().height);
       // Writing a custom property on <html> invalidates style for the whole
-      // document, so a redundant write is not free — it is a full-page repaint.
+      // document, so a redundant write is not free - it is a full-page repaint.
       let lastWritten = "";
 
       const writeTint = (t: number) => {
@@ -220,14 +220,14 @@ export default function PinnedPillars({
           // Ramp up across the approach, then snap back the moment the pin
           // engages. The snap is deliberate: the sticky panel is opaque for
           // the pin's entire duration, so nothing behind it is visible and a
-          // gradual ramp-down buys no visual benefit — it only costs a
+          // gradual ramp-down buys no visual benefit - it only costs a
           // full-page repaint on every frame of the most expensive animation
           // on the page.
           writeTint(p < split ? p / split : 0);
         },
       });
 
-      // Layers 2 and 3 — everything inside the pin, on one scrubbed timeline.
+      // Layers 2 and 3 - everything inside the pin, on one scrubbed timeline.
       const cardEls = cardsRef.current?.querySelectorAll<HTMLElement>("[data-card]");
       const tl = gsap.timeline({
         defaults: { ease: "none" },
@@ -250,7 +250,7 @@ export default function PinnedPillars({
         0.04,
       );
 
-      // Group exit — animated on the WRAPPER, so dial and title leave as one
+      // Group exit - animated on the WRAPPER, so dial and title leave as one
       // object. There is deliberately no separate size tween on the dial: the
       // group is already scaling 1 -> 0.55, and a second tween double-counts.
       tl.fromTo(
@@ -271,7 +271,7 @@ export default function PinnedPillars({
       if (cardEls?.length) {
         // `y: 0` on both ends is load-bearing. The inline translateY(120%)
         // below exists so SSR paints the cards already offset, but GSAP
-        // resolves that percentage into a *pixel* y on first read — so
+        // resolves that percentage into a *pixel* y on first read - so
         // tweening yPercent alone leaves the pixel offset in place forever and
         // the cards settle a full card-height low.
         tl.fromTo(
@@ -282,7 +282,7 @@ export default function PinnedPillars({
         );
       }
 
-      // The hold — see HOLD above for why this is required rather than
+      // The hold - see HOLD above for why this is required rather than
       // cosmetic.
       tl.to({}, { duration: HOLD }, 0.87);
     }, trackRef);
@@ -310,7 +310,7 @@ export default function PinnedPillars({
         willChange: "transform",
         width: reduced ? "100%" : "21vw",
         color: ink,
-        // The diagonal — first card sits high, last sits low. Neutralised on
+        // The diagonal - first card sits high, last sits low. Neutralised on
         // narrow viewports via the embedded stylesheet below, where the row
         // becomes a column and a staircase has nowhere to go.
         marginTop: !reduced && i === 0 ? "19vh" : undefined,
@@ -327,7 +327,7 @@ export default function PinnedPillars({
   ));
 
   // ── Reduced motion ───────────────────────────────────────────────────────
-  // Not a softened version of the pin — a different section. A 700vh track is
+  // Not a softened version of the pin - a different section. A 700vh track is
   // markup, not motion, so it cannot be branched from inside an effect: left
   // in place it would be seven screens of scrolling past a static panel. The
   // resolved state is what the animation was travelling towards anyway.
@@ -352,11 +352,11 @@ export default function PinnedPillars({
   }
 
   return (
-    // Margins give the pin room to breathe on both sides — without them the
-    // track butts against whatever sits above and below it, so the panel
-    // snaps in and releases with no separation at all.
-    <div ref={trackRef} style={{ position: "relative", marginTop: "10vh", marginBottom: "10vh", overflow: "clip", height: `${TRACK_VH}vh` }}>
-      {/* Layer 2: the opaque panel. This is what the plate uncovers — without
+    // No top margin: the previous version left a visible gap of empty page
+    // background before the pin engaged. Bottom margin stays - the panel
+    // still needs room to release before GrowthStack slides up to cover it.
+    <div ref={trackRef} style={{ position: "relative", marginTop: 0, marginBottom: "10vh", overflow: "clip", height: `${TRACK_VH}vh` }}>
+      {/* Layer 2: the opaque panel. This is what the plate uncovers - without
           it the plate would shrink against the tinted page and nothing would
           appear to be revealed. */}
       <section
@@ -397,7 +397,7 @@ export default function PinnedPillars({
           ref={groupRef}
           // `marginTop` nudges the dial down off the nav. The group is the
           // panel's only in-flow flex item and the panel centres it, so the
-          // margin box is what gets centred — a 12vh top margin shifts the
+          // margin box is what gets centred - a 12vh top margin shifts the
           // circle down by half that. Deliberately a margin and not a
           // translate: the group's transform is owned by the scrubbed exit
           // tween.
@@ -441,11 +441,11 @@ export default function PinnedPillars({
 
         {/* Cards, on their ascending diagonal.
             `inset:0` is load-bearing: absolutely positioned without insets the
-            row falls at its static position — below the dial group — so the
+            row falls at its static position - below the dial group - so the
             whole diagonal sits low and the leading card finishes at the
             viewport floor. Filling the panel lets `alignItems:center` actually
             centre it. On narrow viewports (embedded stylesheet below) the
-            diagonal becomes a centred column — NOT hidden: these three cards
+            diagonal becomes a centred column - NOT hidden: these three cards
             are the section's content, and hiding them would leave small
             screens scrolling a 700vh pin that resolves into an empty panel. */}
         <div ref={cardsRef} className="pp-cards" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: "5.5vw" }}>
@@ -453,7 +453,7 @@ export default function PinnedPillars({
         </div>
       </section>
 
-      {/* Scoped responsive overrides — embedded so the component needs no
+      {/* Scoped responsive overrides - embedded so the component needs no
           external CSS import at all. */}
       <style>{`
         .pp-dial-title { font-size: 3.3vw; }

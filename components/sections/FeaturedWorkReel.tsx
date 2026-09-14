@@ -27,6 +27,16 @@ if (typeof window !== 'undefined') {
  * BAND_BG below - the same generic wipe trionn uses between sections,
  * instead of this component fading its own panel to nothing.
  *
+ * Card geometry matches trionn's `.work-row`/`.work-card`/`.wc-shot`/
+ * `.wc-meta` CSS exactly: row gap 3vw, card flex-basis 46vw x 74vh, image
+ * area flex:1 with 8px radius and a mono label pinned to its top-left
+ * corner, meta block flex:0 auto below with a 1.7rem/600 heading and a
+ * 14px/40ch paragraph. Trionn fills the image area with a real photo;
+ * Patrick doesn't have screenshots wired in yet, so each card gets one of
+ * three gradient placeholders (same treatment as trionn's own shot-1/2/3
+ * fallback gradients) with an honest "Screenshot pending" label instead of
+ * a faked photo.
+ *
  * Deliberately given its own FIXED dark colour band (not the theme's
  * flipping --background-primary/--text-primary tokens) so that in light
  * mode this section reads as a distinct panel against the cream page
@@ -41,10 +51,16 @@ if (typeof window !== 'undefined') {
 const FEATURED = caseStudies.slice(0, 6);
 
 const BAND_BG = '#000000';
-const CARD_BG = '#141414';
-const CARD_BORDER = '#2A2A2A';
 const INK = '#F5F5F5';
 const INK_MUTED = '#8A8A8A';
+
+// Same treatment as trionn's shot-1/shot-2/shot-3 fallback gradients, cycled
+// per card - a stand-in for a real screenshot, not a faked photo.
+const SHOT_GRADIENTS = [
+  'linear-gradient(120deg, #3a3226, #1a1712), radial-gradient(80% 120% at 80% 10%, #4d4536, transparent)',
+  'radial-gradient(90% 120% at 70% 20%, #4a1a12, #140806)',
+  'linear-gradient(160deg, #1c2620, #0a0f0c)',
+];
 
 export default function FeaturedWorkReel() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -107,61 +123,59 @@ export default function FeaturedWorkReel() {
   return (
     <section ref={sectionRef} id="work" className="relative w-full" style={{ background: BAND_BG }}>
       <div ref={pinRef} className="relative h-screen w-full overflow-hidden">
+        {/* trionn's .work-intro: flex-basis 34vw, height 70vh, gap 22px */}
         <div
           ref={introRef}
-          className="absolute left-0 top-0 flex h-full flex-col justify-center gap-3 pl-[clamp(20px,5vw,64px)] pr-12 z-10 pointer-events-none"
+          className="absolute left-0 top-0 z-10 flex h-[70vh] w-[34vw] flex-col justify-center gap-[22px] pointer-events-none"
+          style={{ paddingLeft: 'clamp(20px, 4vw, 64px)', paddingRight: '2vw' }}
         >
           <span className="font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: INK_MUTED }}>
             Featured Work
           </span>
-          <h2 className="max-w-[10ch] text-section font-display font-semibold" style={{ color: INK }}>
+          <h2 className="text-section font-display font-semibold" style={{ color: INK }}>
             Selected work &amp; systems
           </h2>
         </div>
+        {/* trionn's .work-row: gap 3vw, padding 0 4vw (left widened to clear the intro) */}
         <div
           ref={rowRef}
-          className="flex h-full items-center gap-8 pl-[42vw] pr-[10vw]"
-          style={{ width: 'max-content' }}
+          className="flex h-full items-center gap-[3vw]"
+          style={{ width: 'max-content', paddingLeft: '37vw', paddingRight: '4vw' }}
         >
           {FEATURED.map((study, i) => (
+            // trionn's .work-card: flex-basis 46vw, height 74vh, column, gap 26px
             <div
               key={study.id}
               ref={(el) => {
                 cardRefs.current[i] = el;
               }}
-              className="flex w-[min(78vw,420px)] shrink-0 flex-col overflow-hidden rounded-xl border"
-              style={{
-                height: 'min(56vh, 460px)',
-                willChange: 'transform',
-                background: CARD_BG,
-                borderColor: CARD_BORDER,
-              }}
+              className="flex h-[74vh] shrink-0 flex-col gap-[26px]"
+              style={{ flex: '0 0 46vw', willChange: 'transform' }}
             >
-              {/* Project image placeholder (trionn's .wc-shot) - Patrick doesn't
-                  have screenshots wired in yet; reserving the space and
-                  labelling it honestly rather than faking a photo. */}
+              {/* trionn's .wc-shot: flex:1, radius 8px, padding 30px, mono
+                  label pinned top-left. Gradient placeholder stands in for
+                  a real screenshot Patrick doesn't have yet. */}
               <div
-                className="flex h-[42%] items-center justify-center border-b"
-                style={{ borderColor: CARD_BORDER, background: 'rgba(255,255,255,0.02)' }}
+                className="relative flex flex-1 flex-col justify-end overflow-hidden rounded-lg p-[30px] text-white"
+                style={{ background: SHOT_GRADIENTS[i % SHOT_GRADIENTS.length] }}
               >
-                <span className="font-mono text-[10px] uppercase tracking-[0.14em]" style={{ color: INK_MUTED }}>
+                <span className="absolute left-[30px] top-[30px] font-mono text-[11px] uppercase tracking-[0.14em] text-white/70">
+                  {study.industry}
+                </span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/70">
                   Screenshot pending
                 </span>
               </div>
-              <div className="flex flex-1 flex-col justify-between p-7">
-                <div>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-accent-growth">
-                    {study.industry}
-                  </span>
-                  <h3 className="mt-3 text-xl font-display font-semibold" style={{ color: INK }}>
-                    {study.company}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed" style={{ color: INK_MUTED }}>
-                    {study.context}
-                  </p>
-                </div>
-                <div>
-                  <b className="block font-display text-3xl font-semibold" style={{ color: INK }}>
+              {/* trionn's .wc-meta: flex:0 0 auto, gap 10px, h3 1.7rem/600, p 14px/40ch */}
+              <div className="flex flex-none flex-col gap-[10px]">
+                <h3 className="text-[1.7rem] font-display font-semibold" style={{ color: INK }}>
+                  {study.company}
+                </h3>
+                <p className="max-w-[40ch] text-sm leading-relaxed" style={{ color: INK_MUTED }}>
+                  {study.context}
+                </p>
+                <div className="mt-1">
+                  <b className="block font-display text-2xl font-semibold" style={{ color: INK }}>
                     {study.metricValue}
                   </b>
                   <span className="font-mono text-[10px] uppercase tracking-[0.08em]" style={{ color: INK_MUTED }}>

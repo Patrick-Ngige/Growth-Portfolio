@@ -253,7 +253,7 @@ export default function UnfairAdvantage() {
       panelBg="#09090B"
       ink="#F4F4F5"
       inkMuted="#A1A1AA"
-      plateFill="#1e2a52"
+      plateFill="#1A1A1A"
       approachFrom="#09090B"
     />
     </>

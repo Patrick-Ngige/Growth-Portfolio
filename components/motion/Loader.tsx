@@ -101,7 +101,7 @@ export default function Loader() {
     >
       <div
         className="pl-frame relative"
-        style={{ width: 'min(26vw, 220px)', aspectRatio: '1', border: '1px solid var(--border-color)' }}
+        style={{ width: 'min(30vw, 264px)', aspectRatio: '1', border: '1px solid var(--border-color)' }}
       >
         <i className="absolute -top-2 -left-2 font-mono text-[13px] leading-none text-[var(--text-secondary)]">+</i>
         <i className="absolute -top-2 -right-2 font-mono text-[13px] leading-none text-[var(--text-secondary)]">+</i>
@@ -112,7 +112,7 @@ export default function Loader() {
           viewBox="0 0 100 100"
           fill="none"
           className="absolute inset-0 m-auto"
-          style={{ width: '42%', height: '42%' }}
+          style={{ width: '44%', height: '44%' }}
         >
           <path
             d="M20 78 L20 40 L38 40 L38 22 L62 22 L62 40 L80 40 L80 78"
@@ -127,9 +127,14 @@ export default function Loader() {
         ref={wordRef}
         className="mt-[22px] h-[14px] font-mono text-[11px] uppercase tracking-[0.34em] text-[var(--text-secondary)]"
       />
+      {/* trionn's .pl-counter is position:absolute, bottom:12% of the whole
+          panel - independent of the frame+word group above it, not stacked
+          tightly beneath it. That's what actually spaces the composition
+          out across the full screen instead of bunching everything in the
+          centre. */}
       <div
         ref={counterRef}
-        className="mt-[34px] font-mono text-xs tracking-[0.2em] text-[var(--text-primary)]"
+        className="absolute bottom-[12%] left-0 right-0 text-center font-mono text-[13px] tracking-[0.45em] text-[var(--text-primary)]"
         style={{ fontVariantNumeric: 'tabular-nums' }}
       >
         000
