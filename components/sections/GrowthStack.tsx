@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
-import StripReveal from '@/components/motion/StripReveal';
 import { cn } from '@/lib/utils';
 
 // Tool icons for the growth stack
@@ -142,14 +141,20 @@ export default function GrowthStack() {
   const rowTwo = tools.slice(midpoint);
 
   return (
-    <AnimatedSection id="stack" variant="default" size="xl">
-      {/* Colour-matched to PinnedPillars' panelBg (#09090B) - the reveal
-          transition the user asked for right after the Build/Instrument/
-          Automate cards, wiping into this section instead of a hard cut.
-          `darkColor` diverges from panelBg on purpose: this section's own
-          dark-mode background (--background-primary) is #09090B too, an
-          exact match that would make the wipe invisible in dark mode. */}
-      <StripReveal color="#09090B" darkColor="#1E1E1E" />
+    // Pulled up with a negative top margin so this section starts sliding
+    // into view from the bottom of the screen WHILE PinnedPillars' three
+    // cards are still pinned above it (position: sticky releases only once
+    // scroll passes trackBottom - one viewport, so pulling this section's
+    // entrance earlier than that keeps both visible at once). z-20 makes it
+    // paint over the sticky panel instead of under it - a non-positioned
+    // sibling paints below a positioned one by default, so without this the
+    // pinned panel would stay on top and hide this section as it slid in.
+    <AnimatedSection
+      id="stack"
+      variant="default"
+      size="xl"
+      className="relative z-20 -mt-[45vh]"
+    >
       <div className="container-main">
         {/* Section Header */}
         <motion.div className="max-w-2xl mb-16 mx-auto text-center">
