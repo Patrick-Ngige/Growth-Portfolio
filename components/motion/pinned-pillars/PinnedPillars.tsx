@@ -40,10 +40,9 @@ export type PillarCard = { index: string; title: string; body: string };
  *   0.55 -> 0.70  plate defocuses: opacity 1 -> 0.4, blur 0 -> 25px
  *   0.57 -> 0.78  three cards rise on a stagger
  *   0.87 -> 0.90  brief static hold once the cards have locked
- *   0.90 -> 1.175 strip reveal: colour-matched bands grow bottom-to-top,
- *                 covering the still-pinned cards, then the track ends -
- *                 whatever follows (already that same colour) takes over
- *                 with no visible seam
+ *   0.90 -> 1.0    strip reveal: colour-matched bands grow bottom-to-top,
+ *                  covering the still-pinned cards - see the ScrollTrigger
+ *                  config below for how this hands off with no visible seam
  */
 
 /**
@@ -57,37 +56,51 @@ export type PillarCard = { index: string; title: string; body: string };
  * timeline time now maps to fewer vh), which is why this needs bumping in
  * step with the tail.
  */
-// Trimmed from 820 alongside the shorter hold/reveal below - keeps the
-// dial-exit/plate-unwind/cards-rise phases at their original pacing (same
-// vh per raw timeline unit) while the hold and strip sweep, both shortened,
-// now cost noticeably less scroll before GrowthStack is on screen.
-const TRACK_VH = 710;
+// The track's FULL reserved scroll space - dial-exit, plate-unwind,
+// cards-rise, the hold, AND the strip reveal ALL happen within this single
+// span (see why below). Kept at roughly the same vh-per-raw-timeline-unit
+// as earlier versions (~605) so the choreography phases keep their
+// established pacing.
+//
+// Debugging note: an earlier attempt tried to make the reveal's own scroll
+// distance NOT count toward this reserved height (a GSAP `pin` with
+// `pinSpacing:false` and an `end` extended past this element's natural
+// bottom), reasoning that the next section would then scroll up "for
+// free" underneath the still-pinned panel and arrive exactly when the
+// pin released. That reasoning was wrong: a normal-flow element's
+// position is determined ENTIRELY by real, reserved layout space -
+// extending a pin's `end` beyond the trigger's own natural height doesn't
+// make anything wait for it. Measured directly: the next section had
+// already scrolled a full extra viewport PAST the top of the screen by
+// the time that longer pin finally released, leaving a blank gap - not a
+// timing quirk, a mathematical certainty of that setup. The fix is this:
+// TRACK_VH must cover the reveal's own scroll distance too, so the next
+// section's natural resting position coincides EXACTLY with where the
+// pin naturally ends - no extension, no pinSpacing trick required.
+const TRACK_VH = 645;
 
-// Raw timeline positions from the choreography above - kept as named
-// constants (not just comment numbers) so GrowthStack.tsx can import
-// REVEAL_START_FRACTION and sync its own entrance to exactly the same
-// scroll window as the strip reveal, instead of guessing at percentages.
 const HOLD_START = 0.87;
-// Trimmed from 0.1 - the pause once the cards lock was reading as a dead
-// spot before anything moved toward the next section.
 const HOLD_DURATION = 0.03;
-const REVEAL_START = HOLD_START + HOLD_DURATION; // 0.90
-const REVEAL_STRIP_COUNT = 10;
-// Both trimmed (0.02/0.2 -> 0.015/0.14) so the whole bottom-to-top sweep,
-// and therefore GrowthStack's synced climb, finishes over less scroll.
-const REVEAL_EACH = 0.015;
-const REVEAL_DURATION = 0.14;
-const TIMELINE_TOTAL = REVEAL_START + REVEAL_DURATION + (REVEAL_STRIP_COUNT - 1) * REVEAL_EACH;
-/** Fraction of the pinned track's total scroll range where the strip
- * reveal begins. */
-export const REVEAL_START_FRACTION = REVEAL_START / TIMELINE_TOTAL;
-/** Fraction of the pinned track's total scroll range at the STRIP REVEAL'S
- * OWN MIDPOINT (halfway between REVEAL_START and the track's end, not the
- * track's own midpoint) - GrowthStack.tsx starts sliding into view here
- * rather than at REVEAL_START, so the next section only starts appearing
- * once the wipe is already half done, and is visibly arriving well before
- * it finishes. */
-export const REVEAL_MID_FRACTION = (REVEAL_START + (TIMELINE_TOTAL - REVEAL_START) / 2) / TIMELINE_TOTAL;
+const HOLD_END = HOLD_START + HOLD_DURATION;
+
+// Strip-reveal tuning. nova-transitions' own `cover` mode (count 11, each
+// 0.05, default 0.5s tween) is tuned so that, driven by ITS OWN dedicated
+// 0-1 scroll progress, the sweep finishes exactly at 1.0: (11-1)*0.05 + 0.5
+// = 1.0. Folded into the SAME timeline as the choreography above (one
+// shared ScrollTrigger for everything - see below), so those proportions
+// are rescaled to fit whatever raw-time budget the reveal gets once
+// TIMELINE_TOTAL is picked to land HOLD_END at the same fraction of the
+// whole track that it used to land at when TRACK_VH covered only the
+// choreography (keeps the earlier phases' pacing unchanged even though
+// TRACK_VH itself grew to include the reveal).
+const REVEAL_STRIP_COUNT = 11;
+const REVEAL_NATURAL_SPAN = (REVEAL_STRIP_COUNT - 1) * 0.05 + 0.5; // 1.0
+const CHOREOGRAPHY_VH = 545; // what TRACK_VH used to be, choreography-only
+const TIMELINE_TOTAL = (HOLD_END * TRACK_VH) / CHOREOGRAPHY_VH;
+const REVEAL_BUDGET = TIMELINE_TOTAL - HOLD_END;
+const REVEAL_SCALE = REVEAL_BUDGET / REVEAL_NATURAL_SPAN;
+const REVEAL_EACH = 0.05 * REVEAL_SCALE;
+const REVEAL_DURATION = 0.5 * REVEAL_SCALE;
 
 const TICKS = 130;
 const TICK_REST = 2.22; // % of dial box
@@ -268,7 +281,16 @@ export default function PinnedPillars({
         },
       });
 
-      // Layers 2 and 3 - everything inside the pin, on one scrubbed timeline.
+      // Everything - choreography AND the strip reveal - on ONE scrubbed
+      // timeline, driven by ONE ScrollTrigger whose `start`/`end` exactly
+      // match `track`'s own natural top/bottom (no extension - see the
+      // TRACK_VH comment above for why extending it was wrong). The panel
+      // is pinned via plain CSS `position:sticky` (see the JSX below),
+      // NOT a GSAP `pin` - sticky already does exactly what's needed here
+      // (hold the panel fixed for track's full reserved height, release
+      // it exactly at track's bottom) with none of the edge cases GSAP's
+      // own pin mechanism has shown pinning/re-pinning this element
+      // directly.
       const cardEls = cardsRef.current?.querySelectorAll<HTMLElement>("[data-card]");
       const tl = gsap.timeline({
         defaults: { ease: "none" },
@@ -324,27 +346,30 @@ export default function PinnedPillars({
       }
 
       // Brief hold once the cards have locked, so they read as fully
-      // assembled before anything else happens - then the strip reveal:
-      // colour-matched bands grow bottom-to-top, covering the still-pinned
-      // cards, staggered from the bottom band so the sweep reads as moving
-      // upward. By the time they've fully grown the pinned panel is a
-      // solid field of `revealColor` (or `revealDarkColor`); the track
-      // ends right as that finishes, so whatever follows in the real page
-      // - already that same colour - takes over with no visible seam.
+      // assembled before the strip reveal starts.
       tl.to({}, { duration: HOLD_DURATION }, HOLD_START);
 
+      // Strip reveal - colour-matched bands grow bottom-to-top, covering
+      // the still-pinned cards. Positioned at HOLD_END and sized via
+      // REVEAL_EACH/REVEAL_DURATION (both rescaled from nova-transitions'
+      // own `cover` mode proportions - see the constants above) so it
+      // finishes exactly at TIMELINE_TOTAL, i.e. exactly when this pin's
+      // own `end` (track's natural bottom + EXTRA_VH) is reached. By then
+      // the pinned panel is a solid field of `revealColor`, and whatever
+      // follows in the real page - already scrolled into place underneath
+      // it, already that same colour - takes over with no visible seam.
       const stripEls = stripsRef.current?.querySelectorAll<HTMLElement>("[data-reveal-strip]");
       if (stripEls?.length) {
-        tl.to(
+        tl.fromTo(
           stripEls,
+          { scaleY: 0 },
           {
             scaleY: 1.04,
             transformOrigin: "50% 100%",
-            ease: "none",
             stagger: { each: REVEAL_EACH, from: "end" },
             duration: REVEAL_DURATION,
           },
-          REVEAL_START,
+          HOLD_END,
         );
       }
     }, trackRef);
@@ -414,10 +439,12 @@ export default function PinnedPillars({
   }
 
   return (
-    // No top margin: the previous version left a visible gap of empty page
-    // background before the pin engaged. Bottom margin stays - the panel
-    // still needs room to release before GrowthStack slides up to cover it.
-    <div ref={trackRef} style={{ position: "relative", marginTop: 0, marginBottom: "10vh", overflow: "clip", height: `${TRACK_VH}vh` }}>
+    // No margin, top or bottom - the next section's natural document top
+    // must sit EXACTLY at this track's own bottom edge, which is also
+    // exactly where the sticky panel releases (TRACK_VH now covers the
+    // reveal too - see its comment above). A margin here would leave a
+    // gap between the panel releasing and the next section arriving.
+    <div ref={trackRef} style={{ position: "relative", overflow: "clip", height: `${TRACK_VH}vh` }}>
       {/* Layer 2: the opaque panel. This is what the plate uncovers - without
           it the plate would shrink against the tinted page and nothing would
           appear to be revealed. */}
@@ -526,11 +553,11 @@ export default function PinnedPillars({
 
         {/* Strip reveal, rendered last so it paints over the cards above.
             Bands start fully collapsed (scaleY:0) and grow bottom-to-top
-            once the scrubbed timeline reaches the reveal phase - see the
-            choreography note at the top of the file. `--pp-reveal-color`
-            reacts live to the `.dark` class, same pattern as the rest of
-            the site's tokens, since PinnedPillars itself renders once but
-            the colour it's revealing into changes with the theme. */}
+            once the scrubbed timeline reaches the reveal phase (see the
+            effect above). Colour reacts live
+            to the `.dark` class, same pattern as the rest of the site's
+            tokens, since PinnedPillars itself renders once but the colour
+            it's revealing into changes with the theme. */}
         <div
           ref={stripsRef}
           className="pp-reveal"
