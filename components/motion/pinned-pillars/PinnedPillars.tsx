@@ -79,10 +79,15 @@ const REVEAL_EACH = 0.015;
 const REVEAL_DURATION = 0.14;
 const TIMELINE_TOTAL = REVEAL_START + REVEAL_DURATION + (REVEAL_STRIP_COUNT - 1) * REVEAL_EACH;
 /** Fraction of the pinned track's total scroll range where the strip
- * reveal begins - GrowthStack.tsx uses this to start sliding into view at
- * exactly the same point, instead of only appearing once the track
- * releases. */
+ * reveal begins. */
 export const REVEAL_START_FRACTION = REVEAL_START / TIMELINE_TOTAL;
+/** Fraction of the pinned track's total scroll range at the STRIP REVEAL'S
+ * OWN MIDPOINT (halfway between REVEAL_START and the track's end, not the
+ * track's own midpoint) - GrowthStack.tsx starts sliding into view here
+ * rather than at REVEAL_START, so the next section only starts appearing
+ * once the wipe is already half done, and is visibly arriving well before
+ * it finishes. */
+export const REVEAL_MID_FRACTION = (REVEAL_START + (TIMELINE_TOTAL - REVEAL_START) / 2) / TIMELINE_TOTAL;
 
 const TICKS = 130;
 const TICK_REST = 2.22; // % of dial box

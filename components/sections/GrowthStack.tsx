@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AnimatedSection } from '@/components/ui/Section';
-import { REVEAL_START_FRACTION } from '@/components/motion/pinned-pillars';
+import { REVEAL_MID_FRACTION } from '@/components/motion/pinned-pillars';
 import { cn } from '@/lib/utils';
 
 if (typeof window !== 'undefined') {
@@ -124,7 +124,8 @@ export default function GrowthStack() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   // Slides this section up into view in sync with PinnedPillars' own strip
-  // reveal (see REVEAL_START_FRACTION), instead of only appearing once that
+  // reveal (see REVEAL_MID_FRACTION), starting once the wipe is HALF done
+  // rather than at its very start, instead of only appearing once that
   // section's pin fully releases - so by the time the cards are fully
   // covered, this is already in view rather than starting from scratch.
   // Finds the pinned track via the DOM (this section's previous sibling)
@@ -167,10 +168,14 @@ export default function GrowthStack() {
       // needed: this trigger doesn't need to survive a resize mid-scroll.
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
       const trackHeight = track.offsetHeight;
-      const revealStart = trackTop + REVEAL_START_FRACTION * trackHeight;
+      // Starts at the strip reveal's OWN MIDPOINT (not its start) - the
+      // wipe should be half done before this section begins appearing, and
+      // past its 3/4 mark this section should already be visibly climbing
+      // into place. REVEAL_MID_FRACTION encodes that midpoint.
+      const revealMid = trackTop + REVEAL_MID_FRACTION * trackHeight;
       const trackEnd = trackTop + trackHeight;
 
-      // -(trackEnd - revealStart) alone cancels the natural document-flow
+      // -(trackEnd - revealMid) alone cancels the natural document-flow
       // scroll motion exactly (both change 1:1 with scrollY over this
       // window), which freezes this section at its FINAL viewport position
       // the instant the window starts, instead of sliding it in - a
@@ -181,7 +186,7 @@ export default function GrowthStack() {
       // off-screen, so the slide is visible across the whole window.
       const viewportH = window.innerHeight;
       const marginBottomPx = viewportH * 0.1;
-      const startOffset = viewportH - marginBottomPx - (trackEnd - revealStart);
+      const startOffset = viewportH - marginBottomPx - (trackEnd - revealMid);
 
       tween = gsap.fromTo(
         section,
@@ -191,7 +196,7 @@ export default function GrowthStack() {
           ease: 'none',
           scrollTrigger: {
             trigger: track,
-            start: revealStart,
+            start: revealMid,
             end: trackEnd,
             // Matches PinnedPillars' own scrub value (see its tl's
             // ScrollTrigger). scrub:true tracks scroll with zero smoothing,
