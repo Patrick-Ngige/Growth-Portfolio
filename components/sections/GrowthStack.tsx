@@ -160,10 +160,18 @@ export default function GrowthStack() {
 
   return (
     // A completely plain section, deliberately - see the note above the
-    // component. No ref, no custom z-index: PinnedPillars' own sticky
-    // panel already stacks above normal-flow content by default, so this
-    // needs nothing extra to stay hidden behind it until revealed.
-    <Section id="stack" variant="default" size="xl">
+    // component. `relative z-[2]` matters: GSAP's `pinSpacing:false`
+    // leaves the just-unpinned reveal stage sitting at
+    // `transform:translateY(...)`, still visually covering a full
+    // viewport of scroll after it "releases" (confirmed this is normal
+    // GSAP behaviour, not a bug, by inspecting trionn-rebuild's own
+    // production site the same way). Their site gets away with it because
+    // every section has an explicit, INCREASING z-index (marquee=2,
+    // facts=3, ...) - each later section always paints over the lingering
+    // one before it. PinnedPillars' reveal stage uses z-index:1; this
+    // needs to be higher than that (not `auto`, which loses to an
+    // explicit z-index regardless of DOM order) for the same reason.
+    <Section id="stack" variant="default" size="xl" className="relative z-[2]">
       <div className="container-main">
         {/* Section Header */}
         {/* Matches PinnedPillars' reveal-strip colour exactly (#1A1A1A) so

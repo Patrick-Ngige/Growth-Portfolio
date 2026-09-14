@@ -39,68 +39,39 @@ export type PillarCard = { index: string; title: string; body: string };
  *   0.04 -> 0.52  plate unwinds: scale 12.5 -> 1, rotate 90deg -> 0, power4.out
  *   0.55 -> 0.70  plate defocuses: opacity 1 -> 0.4, blur 0 -> 25px
  *   0.57 -> 0.78  three cards rise on a stagger
- *   0.87 -> 0.90  brief static hold once the cards have locked
- *   0.90 -> 1.0    strip reveal: colour-matched bands grow bottom-to-top,
- *                  covering the still-pinned cards - see the ScrollTrigger
- *                  config below for how this hands off with no visible seam
+ *   0.87 -> 1.0    brief static hold once the cards have locked, then this
+ *                  track ends - see the SEPARATE reveal stage below (not
+ *                  part of this timeline) for what happens next
+ *
+ * The strip reveal is a SEPARATE section entirely - see `revealStageRef`
+ * below - ported verbatim from trionn-rebuild's own production source
+ * (src/components/home/marquee.js, `homeStripReveal`, the exact function
+ * behind its "CLARITY + CRAFT + SCALE" marquee -> "Key facts" transition),
+ * not a reinterpretation of it. That function pins a plain, never-
+ * previously-pinned, ~100vh trigger via `pin: true` on itself - it does
+ * NOT work when bolted onto an element (like this track's own panel)
+ * that's already carrying a long multi-phase choreography beforehand, as
+ * multiple earlier attempts here found out the hard way (see git history
+ * on this file / growth-engineer-brand HANDOFF.md). So this component
+ * hands off to a FRESH, plain, un-pinned-before 100vh section immediately
+ * after this track (zero margin) that shows the same three cards at rest
+ * and self-pins exactly the way marquee.js does.
  */
 
-/**
- * Bumped from 700 to fit the strip-reveal tail (a brief hold once the cards
- * lock, then the bottom-to-top strip sweep) without compressing everything
- * before it. ScrollTrigger normalises the whole scroll range onto the
- * timeline's own duration, which is set by whichever tween finishes last -
- * so however the phases are positioned, the final animation always lands
- * exactly at the release point. Raising the tail's own duration does NOT
- * just add a pause, it rescales every earlier phase too (the same "unit" of
- * timeline time now maps to fewer vh), which is why this needs bumping in
- * step with the tail.
- */
-// The track's FULL reserved scroll space - dial-exit, plate-unwind,
-// cards-rise, the hold, AND the strip reveal ALL happen within this single
-// span (see why below). Kept at roughly the same vh-per-raw-timeline-unit
-// as earlier versions (~605) so the choreography phases keep their
-// established pacing.
-//
-// Debugging note: an earlier attempt tried to make the reveal's own scroll
-// distance NOT count toward this reserved height (a GSAP `pin` with
-// `pinSpacing:false` and an `end` extended past this element's natural
-// bottom), reasoning that the next section would then scroll up "for
-// free" underneath the still-pinned panel and arrive exactly when the
-// pin released. That reasoning was wrong: a normal-flow element's
-// position is determined ENTIRELY by real, reserved layout space -
-// extending a pin's `end` beyond the trigger's own natural height doesn't
-// make anything wait for it. Measured directly: the next section had
-// already scrolled a full extra viewport PAST the top of the screen by
-// the time that longer pin finally released, leaving a blank gap - not a
-// timing quirk, a mathematical certainty of that setup. The fix is this:
-// TRACK_VH must cover the reveal's own scroll distance too, so the next
-// section's natural resting position coincides EXACTLY with where the
-// pin naturally ends - no extension, no pinSpacing trick required.
-const TRACK_VH = 645;
+// This track's own reserved scroll space - dial-exit, plate-unwind,
+// cards-rise and the hold. Does NOT include the reveal any more - that's
+// the separate revealStageRef section below, with its own fixed 100vh.
+const TRACK_VH = 545;
 
 const HOLD_START = 0.87;
-const HOLD_DURATION = 0.03;
-const HOLD_END = HOLD_START + HOLD_DURATION;
+const HOLD_DURATION = 0.1;
 
-// Strip-reveal tuning. nova-transitions' own `cover` mode (count 11, each
-// 0.05, default 0.5s tween) is tuned so that, driven by ITS OWN dedicated
-// 0-1 scroll progress, the sweep finishes exactly at 1.0: (11-1)*0.05 + 0.5
-// = 1.0. Folded into the SAME timeline as the choreography above (one
-// shared ScrollTrigger for everything - see below), so those proportions
-// are rescaled to fit whatever raw-time budget the reveal gets once
-// TIMELINE_TOTAL is picked to land HOLD_END at the same fraction of the
-// whole track that it used to land at when TRACK_VH covered only the
-// choreography (keeps the earlier phases' pacing unchanged even though
-// TRACK_VH itself grew to include the reveal).
+// Reveal-stage strip tuning - copied verbatim from trionn-rebuild's own
+// `homeStripReveal` (src/components/home/marquee.js). Deliberately NOT
+// rescaled or reinterpreted: same count, same stagger `each`, same
+// (default, unspecified) 0.5s tween duration, same scaleY/transformOrigin.
 const REVEAL_STRIP_COUNT = 11;
-const REVEAL_NATURAL_SPAN = (REVEAL_STRIP_COUNT - 1) * 0.05 + 0.5; // 1.0
-const CHOREOGRAPHY_VH = 545; // what TRACK_VH used to be, choreography-only
-const TIMELINE_TOTAL = (HOLD_END * TRACK_VH) / CHOREOGRAPHY_VH;
-const REVEAL_BUDGET = TIMELINE_TOTAL - HOLD_END;
-const REVEAL_SCALE = REVEAL_BUDGET / REVEAL_NATURAL_SPAN;
-const REVEAL_EACH = 0.05 * REVEAL_SCALE;
-const REVEAL_DURATION = 0.5 * REVEAL_SCALE;
+const REVEAL_EACH = 0.05;
 
 const TICKS = 130;
 const TICK_REST = 2.22; // % of dial box
@@ -162,6 +133,8 @@ export default function PinnedPillars({
   const defocusRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
+  /** The separate, self-pinning reveal stage - see the top-of-file comment. */
+  const revealStageRef = useRef<HTMLElement>(null);
   const stripsRef = useRef<HTMLDivElement>(null);
 
   // ── Cursor-proximity ripple on the dial ──────────────────────────────────
@@ -281,16 +254,12 @@ export default function PinnedPillars({
         },
       });
 
-      // Everything - choreography AND the strip reveal - on ONE scrubbed
-      // timeline, driven by ONE ScrollTrigger whose `start`/`end` exactly
-      // match `track`'s own natural top/bottom (no extension - see the
-      // TRACK_VH comment above for why extending it was wrong). The panel
-      // is pinned via plain CSS `position:sticky` (see the JSX below),
-      // NOT a GSAP `pin` - sticky already does exactly what's needed here
-      // (hold the panel fixed for track's full reserved height, release
-      // it exactly at track's bottom) with none of the edge cases GSAP's
-      // own pin mechanism has shown pinning/re-pinning this element
-      // directly.
+      // The choreography timeline, driven by a ScrollTrigger whose
+      // `start`/`end` exactly match `track`'s own natural top/bottom. The
+      // panel is pinned via plain CSS `position:sticky` (see the JSX
+      // below), not a GSAP `pin` - sticky already does exactly what's
+      // needed here (hold the panel fixed for track's full reserved
+      // height, release it exactly at track's bottom).
       const cardEls = cardsRef.current?.querySelectorAll<HTMLElement>("[data-card]");
       const tl = gsap.timeline({
         defaults: { ease: "none" },
@@ -346,72 +315,89 @@ export default function PinnedPillars({
       }
 
       // Brief hold once the cards have locked, so they read as fully
-      // assembled before the strip reveal starts.
+      // assembled before this track ends and the separate reveal stage
+      // (below) takes over.
       tl.to({}, { duration: HOLD_DURATION }, HOLD_START);
-
-      // Strip reveal - colour-matched bands grow bottom-to-top, covering
-      // the still-pinned cards. Positioned at HOLD_END and sized via
-      // REVEAL_EACH/REVEAL_DURATION (both rescaled from nova-transitions'
-      // own `cover` mode proportions - see the constants above) so it
-      // finishes exactly at TIMELINE_TOTAL, i.e. exactly when this pin's
-      // own `end` (track's natural bottom + EXTRA_VH) is reached. By then
-      // the pinned panel is a solid field of `revealColor`, and whatever
-      // follows in the real page - already scrolled into place underneath
-      // it, already that same colour - takes over with no visible seam.
-      const stripEls = stripsRef.current?.querySelectorAll<HTMLElement>("[data-reveal-strip]");
-      if (stripEls?.length) {
-        tl.fromTo(
-          stripEls,
-          { scaleY: 0 },
-          {
-            scaleY: 1.04,
-            transformOrigin: "50% 100%",
-            stagger: { each: REVEAL_EACH, from: "end" },
-            duration: REVEAL_DURATION,
-          },
-          HOLD_END,
-        );
-      }
     }, trackRef);
+
+    // The reveal stage - a SEPARATE gsap.context, scoped to its own
+    // element rather than trackRef, because it's a structurally
+    // independent section (see the top-of-file comment for why it can't
+    // just be one more phase of the timeline above). Ported verbatim from
+    // trionn-rebuild's `homeStripReveal`.
+    const revealStage = revealStageRef.current;
+    const revealCtx = revealStage
+      ? gsap.context(() => {
+          const stripEls = stripsRef.current?.querySelectorAll<HTMLElement>("[data-reveal-strip]");
+          if (!stripEls?.length) return;
+          gsap.fromTo(
+            stripEls,
+            { scaleY: 0 },
+            {
+              scaleY: 1.04,
+              transformOrigin: "50% 100%",
+              ease: "none",
+              stagger: { each: REVEAL_EACH, from: "end" },
+              scrollTrigger: {
+                trigger: revealStage,
+                start: "bottom bottom",
+                end: "+=100%",
+                pin: true,
+                pinSpacing: false,
+                scrub: true,
+                anticipatePin: 1,
+              },
+            },
+          );
+        }, revealStage)
+      : null;
 
     return () => {
       ctx.revert();
+      revealCtx?.revert();
       root.style.removeProperty("--pp-page-tint");
     };
   }, [cards, reduced, approachFrom, plateFill]);
 
-  const cardEls = cards.map((c, i) => (
-    <article
-      key={c.title}
-      data-card
-      className="pp-card"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        gap: "0.9vw",
-        borderRadius: radius,
-        border: "1px solid rgb(255 255 255 / 0.16)",
-        background: "rgb(255 255 255 / 0.06)",
-        padding: "1.4vw",
-        willChange: "transform",
-        width: reduced ? "100%" : "21vw",
-        color: ink,
-        // The diagonal - first card sits high, last sits low. Neutralised on
-        // narrow viewports via the embedded stylesheet below, where the row
-        // becomes a column and a staircase has nowhere to go.
-        marginTop: !reduced && i === 0 ? "19vh" : undefined,
-        marginBottom: !reduced && i === 2 ? "19vh" : undefined,
-        ...(reduced ? null : { transform: "translateY(120%)", opacity: 0 }),
-      }}
-    >
-      <span style={{ fontSize: "0.8125rem", letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums", color: inkMuted }}>
-        {c.index}
-      </span>
-      <h3 style={{ fontSize: "clamp(1.5rem,1.35rem+.75vw,2rem)", lineHeight: 1.18, fontWeight: 600 }}>{c.title}</h3>
-      <p style={{ fontSize: "clamp(.875rem,.85rem+.12vw,.9375rem)", lineHeight: 1.55, color: inkMuted }}>{c.body}</p>
-    </article>
-  ));
+  // `animated`: Stage A's cards, which GSAP scrubs in from translateY(120%)
+  // opacity:0. `static`: the reveal stage's own copy, always at rest - it
+  // needs to LOOK identical to Stage A's final frame (same layout, same
+  // styling) since the strips grow over it, not Stage A's panel.
+  const renderCards = (animated: boolean) =>
+    cards.map((c, i) => (
+      <article
+        key={c.title}
+        data-card={animated ? true : undefined}
+        className="pp-card"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          gap: "0.9vw",
+          borderRadius: radius,
+          border: "1px solid rgb(255 255 255 / 0.16)",
+          background: "rgb(255 255 255 / 0.06)",
+          padding: "1.4vw",
+          willChange: animated ? "transform" : undefined,
+          width: reduced ? "100%" : "21vw",
+          color: ink,
+          // The diagonal - first card sits high, last sits low. Neutralised on
+          // narrow viewports via the embedded stylesheet below, where the row
+          // becomes a column and a staircase has nowhere to go.
+          marginTop: !reduced && i === 0 ? "19vh" : undefined,
+          marginBottom: !reduced && i === 2 ? "19vh" : undefined,
+          ...(reduced || !animated ? null : { transform: "translateY(120%)", opacity: 0 }),
+        }}
+      >
+        <span style={{ fontSize: "0.8125rem", letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums", color: inkMuted }}>
+          {c.index}
+        </span>
+        <h3 style={{ fontSize: "clamp(1.5rem,1.35rem+.75vw,2rem)", lineHeight: 1.18, fontWeight: 600 }}>{c.title}</h3>
+        <p style={{ fontSize: "clamp(.875rem,.85rem+.12vw,.9375rem)", lineHeight: 1.55, color: inkMuted }}>{c.body}</p>
+      </article>
+    ));
+  const cardEls = renderCards(true);
+  const staticCardEls = renderCards(false);
 
   // ── Reduced motion ───────────────────────────────────────────────────────
   // Not a softened version of the pin - a different section. A 700vh track is
@@ -439,11 +425,10 @@ export default function PinnedPillars({
   }
 
   return (
-    // No margin, top or bottom - the next section's natural document top
-    // must sit EXACTLY at this track's own bottom edge, which is also
-    // exactly where the sticky panel releases (TRACK_VH now covers the
-    // reveal too - see its comment above). A margin here would leave a
-    // gap between the panel releasing and the next section arriving.
+    <>
+    {/* No margin, top or bottom - the reveal stage below must sit EXACTLY
+        at this track's own bottom edge for the sticky-releases /
+        reveal-stage-appears hand-off to be seamless. */}
     <div ref={trackRef} style={{ position: "relative", overflow: "clip", height: `${TRACK_VH}vh` }}>
       {/* Layer 2: the opaque panel. This is what the plate uncovers - without
           it the plate would shrink against the tinted page and nothing would
@@ -550,14 +535,41 @@ export default function PinnedPillars({
         <div ref={cardsRef} className="pp-cards" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: "5.5vw" }}>
           {cardEls}
         </div>
+      </section>
+      </div>
 
-        {/* Strip reveal, rendered last so it paints over the cards above.
-            Bands start fully collapsed (scaleY:0) and grow bottom-to-top
-            once the scrubbed timeline reaches the reveal phase (see the
-            effect above). Colour reacts live
-            to the `.dark` class, same pattern as the rest of the site's
-            tokens, since PinnedPillars itself renders once but the colour
-            it's revealing into changes with the theme. */}
+      {/* The reveal stage - see the top-of-file comment. A fresh, plain,
+          100vh section, zero margin after the track above, showing the
+          SAME three cards at rest (they never animate here - Stage A
+          already brought them in) so the hand-off from "sticky panel
+          releases" to "this section pins itself" is visually seamless.
+          Self-pins via the effect above, exactly like trionn-rebuild's
+          own `homeStripReveal` pins its marquee section. */}
+      <section
+        ref={revealStageRef}
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          height: "100vh",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          background: panelBg,
+          color: ink,
+        }}
+        aria-hidden="true"
+      >
+        <div className="pp-cards" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: "5.5vw" }}>
+          {staticCardEls}
+        </div>
+
+        {/* Strips, rendered last so they paint over the static cards above.
+            Bands start fully collapsed (scaleY:0) and grow bottom-to-top as
+            this section's own pin engages (see the effect above). Colour
+            reacts live to the `.dark` class, same pattern as the rest of
+            the site's tokens. */}
         <div
           ref={stripsRef}
           className="pp-reveal"
@@ -587,6 +599,6 @@ export default function PinnedPillars({
           .pp-card { width: 100% !important; gap: 0.5rem !important; margin-top: 0 !important; margin-bottom: 0 !important; padding: 1rem !important; }
         }
       `}</style>
-    </div>
+    </>
   );
 }
