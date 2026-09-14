@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AnimatedSection } from '@/components/ui/Section';
+import Section from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
 
 // Tool icons for the growth stack
@@ -114,15 +114,22 @@ function MarqueeRow({
 
 export default function GrowthStack() {
   // No custom scroll-linked JS here at all, deliberately - a hand-rolled
-  // sync tween is what broke this repeatedly. PinnedPillars' own
-  // strip-reveal ScrollTrigger (see its `pin: panelRef.current,
-  // pinSpacing: false`) is what actually gets this section into view: with
-  // no extra document height reserved during that pin, this section - a
-  // completely plain, normal-flow section with no ref, no transform - is
-  // already scrolling up into its natural resting position underneath the
-  // still-pinned panel for the entire hold, for free, arriving at exactly
-  // y:0 the instant the pin releases. See PinnedPillars.tsx for the actual
-  // mechanism.
+  // sync tween is what broke this repeatedly. PinnedPillars' own reserved
+  // TRACK_VH (which now covers its strip reveal too) is what actually gets
+  // this section into view: it's a completely plain, normal-flow section
+  // with no ref, no transform, sitting immediately after PinnedPillars'
+  // track with zero margin - normal document flow lands it at exactly
+  // y:0 the instant the sticky panel releases. See PinnedPillars.tsx for
+  // the actual mechanism.
+  //
+  // Plain `Section`, not `AnimatedSection`, deliberately: AnimatedSection's
+  // own whileInView fade (viewport margin:'-100px') doesn't reliably fire
+  // the instant this section scrolls into view from behind the pinned
+  // panel - the result was a real gap where this section had already
+  // arrived in the DOM/layout sense but was still sitting at opacity:0,
+  // waiting on framer-motion's own intersection observer to catch up.
+  // The strip reveal is already this section's entrance animation; a
+  // second, separate fade gating it on top is both redundant and buggy.
 
   // Expanded tool list with icons
   const tools = [
@@ -153,11 +160,10 @@ export default function GrowthStack() {
 
   return (
     // A completely plain section, deliberately - see the note above the
-    // component. No ref, no custom z-index: PinnedPillars' own pinned
-    // panel already stacks above normal-flow content by default (it's
-    // position:fixed during the reveal, with an explicit z-index), so
-    // this needs nothing extra to stay hidden behind it until revealed.
-    <AnimatedSection id="stack" variant="default" size="xl">
+    // component. No ref, no custom z-index: PinnedPillars' own sticky
+    // panel already stacks above normal-flow content by default, so this
+    // needs nothing extra to stay hidden behind it until revealed.
+    <Section id="stack" variant="default" size="xl">
       <div className="container-main">
         {/* Section Header */}
         {/* Matches PinnedPillars' reveal-strip colour exactly (#1A1A1A) so
@@ -218,6 +224,6 @@ export default function GrowthStack() {
           </a>
         </motion.div>
       </div>
-    </AnimatedSection>
+    </Section>
   );
 }
