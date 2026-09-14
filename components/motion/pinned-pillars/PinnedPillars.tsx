@@ -59,6 +59,23 @@ export type PillarCard = { index: string; title: string; body: string };
  */
 const TRACK_VH = 820;
 
+// Raw timeline positions from the choreography above - kept as named
+// constants (not just comment numbers) so GrowthStack.tsx can import
+// REVEAL_START_FRACTION and sync its own entrance to exactly the same
+// scroll window as the strip reveal, instead of guessing at percentages.
+const HOLD_START = 0.87;
+const HOLD_DURATION = 0.1;
+const REVEAL_START = HOLD_START + HOLD_DURATION; // 0.97
+const REVEAL_STRIP_COUNT = 10;
+const REVEAL_EACH = 0.02;
+const REVEAL_DURATION = 0.2;
+const TIMELINE_TOTAL = REVEAL_START + REVEAL_DURATION + (REVEAL_STRIP_COUNT - 1) * REVEAL_EACH;
+/** Fraction of the pinned track's total scroll range where the strip
+ * reveal begins - GrowthStack.tsx uses this to start sliding into view at
+ * exactly the same point, instead of only appearing once the track
+ * releases. */
+export const REVEAL_START_FRACTION = REVEAL_START / TIMELINE_TOTAL;
+
 const TICKS = 130;
 const TICK_REST = 2.22; // % of dial box
 const TICK_PEAK = 8.06; // % at the cursor
@@ -301,7 +318,7 @@ export default function PinnedPillars({
       // solid field of `revealColor` (or `revealDarkColor`); the track
       // ends right as that finishes, so whatever follows in the real page
       // - already that same colour - takes over with no visible seam.
-      tl.to({}, { duration: 0.1 }, 0.87);
+      tl.to({}, { duration: HOLD_DURATION }, HOLD_START);
 
       const stripEls = stripsRef.current?.querySelectorAll<HTMLElement>("[data-reveal-strip]");
       if (stripEls?.length) {
@@ -311,10 +328,10 @@ export default function PinnedPillars({
             scaleY: 1.04,
             transformOrigin: "50% 100%",
             ease: "none",
-            stagger: { each: 0.02, from: "end" },
-            duration: 0.2,
+            stagger: { each: REVEAL_EACH, from: "end" },
+            duration: REVEAL_DURATION,
           },
-          0.97,
+          REVEAL_START,
         );
       }
     }, trackRef);
@@ -395,6 +412,7 @@ export default function PinnedPillars({
         ref={panelRef}
         style={{
           position: "sticky",
+          zIndex: 1,
           top: 0,
           left: 0,
           display: "flex",
@@ -506,7 +524,7 @@ export default function PinnedPillars({
           aria-hidden="true"
           style={{ position: "absolute", inset: 0, zIndex: 20, display: "flex", flexDirection: "column", overflow: "hidden", pointerEvents: "none" }}
         >
-          {Array.from({ length: 10 }, (_, i) => (
+          {Array.from({ length: REVEAL_STRIP_COUNT }, (_, i) => (
             <div
               key={i}
               data-reveal-strip

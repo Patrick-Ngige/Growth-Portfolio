@@ -1,8 +1,16 @@
 'use client';
 
+import { useLayoutEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AnimatedSection } from '@/components/ui/Section';
+import { REVEAL_START_FRACTION } from '@/components/motion/pinned-pillars';
 import { cn } from '@/lib/utils';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 // Tool icons for the growth stack
 const toolIcons: Record<string, React.ReactNode> = {
@@ -113,6 +121,79 @@ function MarqueeRow({
 }
 
 export default function GrowthStack() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Slides this section up into view in sync with PinnedPillars' own strip
+  // reveal (see REVEAL_START_FRACTION), instead of only appearing once that
+  // section's pin fully releases - so by the time the cards are fully
+  // covered, this is already in view rather than starting from scratch.
+  // Finds the pinned track via the DOM (this section's previous sibling)
+  // rather than a React ref across component boundaries - PinnedPillars is
+  // rendered by a sibling component (UnfairAdvantage), not this one.
+  //
+  // yPercent:100->0 (removing a downward offset) was the wrong shape for
+  // this: at yPercent:0 this section just sits at its own natural document
+  // position, which is still off-screen below the viewport for most of the
+  // reveal window - reducing a downward push never gets it into view any
+  // sooner than normal scrolling would. What's actually needed is an
+  // UPWARD push at the start of the window (translateY negative, computed
+  // from how far below the viewport its natural position currently sits)
+  // that eases to zero by the time the track ends - so it visibly climbs
+  // into place over the whole reveal instead of only arriving at the end.
+  useLayoutEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const section = sectionRef.current;
+    const track = section?.previousElementSibling as HTMLElement | null;
+    if (!section || !track || reduced) return;
+
+    let tween: gsap.core.Tween | null = null;
+
+    // Deferred one tick: PinnedPillars' own track height is set via a pure
+    // CSS vh value so it's correct immediately, but measuring in the same
+    // layout pass this component mounts in occasionally raced against the
+    // Loader's own fixed-position overlay unmounting (it covers the full
+    // viewport until its animation finishes) - by not calling
+    // ScrollTrigger.refresh() explicitly and instead measuring fresh right
+    // before creating the trigger, on the next frame, both this component
+    // and everything above it have had a chance to settle first.
+    const raf = requestAnimationFrame(() => {
+      // Everything computed once, as plain numbers, rather than as
+      // ScrollTrigger function-based start/end or a function-based tween
+      // value - both were unreliable here (the string keyword syntax
+      // 'top top+=X' didn't respect the offset at all, and re-evaluating
+      // track's position on every ScrollTrigger refresh produced drifting,
+      // inconsistent numbers since track contains a `position: sticky`
+      // descendant). A plain one-time measurement is what's actually
+      // needed: this trigger doesn't need to survive a resize mid-scroll.
+      const trackTop = track.getBoundingClientRect().top + window.scrollY;
+      const trackHeight = track.offsetHeight;
+      const revealStart = trackTop + REVEAL_START_FRACTION * trackHeight;
+      const trackEnd = trackTop + trackHeight;
+      const startOffset = -(trackEnd - revealStart);
+
+      tween = gsap.fromTo(
+        section,
+        { y: startOffset },
+        {
+          y: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: track,
+            start: revealStart,
+            end: trackEnd,
+            scrub: true,
+          },
+        }
+      );
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      tween?.scrollTrigger?.kill();
+      tween?.kill();
+    };
+  }, []);
+
   // Expanded tool list with icons
   const tools = [
     { name: 'Next.js', category: 'Frontend' },
@@ -141,23 +222,33 @@ export default function GrowthStack() {
   const rowTwo = tools.slice(midpoint);
 
   return (
-    // Renders in plain document flow, right after the StripReveal 'cover'
-    // curtain (see UnfairAdvantage.tsx) - that curtain does the actual
-    // hiding, growing strips of this section's own dark-mode colour to
-    // fill the screen before releasing onto it. dark:!bg matches that
-    // strip colour exactly (#1A1A1A, not the site-wide --background-primary
-    // #09090B) so the hand-off from "fully-grown strips" to "the real
-    // section" has zero visible seam. The `!` is load-bearing - without it,
-    // two same-specificity Tailwind utility classes leave the winner up to
-    // generation order, which isn't reliable to depend on.
+    // Slides up in sync with PinnedPillars' strip reveal (see the
+    // useLayoutEffect above) instead of just appearing once that section's
+    // pin releases. relative z-30 on the OUTER wrapper clears PinnedPillars'
+    // reveal strips (zIndex:20) so this section is visible sliding up over
+    // them rather than hidden behind - AnimatedSection's own `className`
+    // prop only ever reaches that outer wrapper, never the inner `<section>`
+    // Section.tsx actually renders, which is why the dark-mode background
+    // override below is a scoped <style> targeting #stack directly rather
+    // than another className here - a dark:!bg-[...] class on this element
+    // would have zero visible effect (this wrapper has no visible size of
+    // its own beyond its child).
     <AnimatedSection
+      ref={sectionRef}
       id="stack"
       variant="default"
       size="xl"
-      className="dark:!bg-[#1A1A1A]"
+      className="relative z-30"
     >
       <div className="container-main">
         {/* Section Header */}
+        {/* Matches PinnedPillars' reveal-strip colour exactly (#1A1A1A) so
+            the hand-off from "fully-grown strips" to this real section has
+            zero visible seam. Scoped to #stack specifically since that's
+            the element Section.tsx actually paints a background on - see
+            the note on the wrapper above for why this can't just be a
+            className here. */}
+        <style>{`.dark #stack { background: #1A1A1A; }`}</style>
         <motion.div className="max-w-2xl mb-16 mx-auto text-center">
           <h2 className="text-section font-display font-semibold mb-4 text-[var(--text-primary)]">
             My Growth Stack
