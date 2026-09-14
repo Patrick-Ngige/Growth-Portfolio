@@ -39,8 +39,8 @@ export type PillarCard = { index: string; title: string; body: string };
  *   0.04 -> 0.52  plate unwinds: scale 12.5 -> 1, rotate 90deg -> 0, power4.out
  *   0.55 -> 0.70  plate defocuses: opacity 1 -> 0.4, blur 0 -> 25px
  *   0.57 -> 0.78  three cards rise on a stagger
- *   0.87 -> 0.97  brief static hold once the cards have locked
- *   0.97 -> 1.31  strip reveal: colour-matched bands grow bottom-to-top,
+ *   0.87 -> 0.90  brief static hold once the cards have locked
+ *   0.90 -> 1.175 strip reveal: colour-matched bands grow bottom-to-top,
  *                 covering the still-pinned cards, then the track ends -
  *                 whatever follows (already that same colour) takes over
  *                 with no visible seam
@@ -57,18 +57,26 @@ export type PillarCard = { index: string; title: string; body: string };
  * timeline time now maps to fewer vh), which is why this needs bumping in
  * step with the tail.
  */
-const TRACK_VH = 820;
+// Trimmed from 820 alongside the shorter hold/reveal below - keeps the
+// dial-exit/plate-unwind/cards-rise phases at their original pacing (same
+// vh per raw timeline unit) while the hold and strip sweep, both shortened,
+// now cost noticeably less scroll before GrowthStack is on screen.
+const TRACK_VH = 710;
 
 // Raw timeline positions from the choreography above - kept as named
 // constants (not just comment numbers) so GrowthStack.tsx can import
 // REVEAL_START_FRACTION and sync its own entrance to exactly the same
 // scroll window as the strip reveal, instead of guessing at percentages.
 const HOLD_START = 0.87;
-const HOLD_DURATION = 0.1;
-const REVEAL_START = HOLD_START + HOLD_DURATION; // 0.97
+// Trimmed from 0.1 - the pause once the cards lock was reading as a dead
+// spot before anything moved toward the next section.
+const HOLD_DURATION = 0.03;
+const REVEAL_START = HOLD_START + HOLD_DURATION; // 0.90
 const REVEAL_STRIP_COUNT = 10;
-const REVEAL_EACH = 0.02;
-const REVEAL_DURATION = 0.2;
+// Both trimmed (0.02/0.2 -> 0.015/0.14) so the whole bottom-to-top sweep,
+// and therefore GrowthStack's synced climb, finishes over less scroll.
+const REVEAL_EACH = 0.015;
+const REVEAL_DURATION = 0.14;
 const TIMELINE_TOTAL = REVEAL_START + REVEAL_DURATION + (REVEAL_STRIP_COUNT - 1) * REVEAL_EACH;
 /** Fraction of the pinned track's total scroll range where the strip
  * reveal begins - GrowthStack.tsx uses this to start sliding into view at

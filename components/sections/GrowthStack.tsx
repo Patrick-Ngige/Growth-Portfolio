@@ -193,7 +193,12 @@ export default function GrowthStack() {
             trigger: track,
             start: revealStart,
             end: trackEnd,
-            scrub: true,
+            // Matches PinnedPillars' own scrub value (see its tl's
+            // ScrollTrigger). scrub:true tracks scroll with zero smoothing,
+            // while the strip reveal it's meant to move in lockstep with
+            // eases over 1s - during fast or jerky scrolling the two would
+            // fall out of sync and visibly judder against each other.
+            scrub: 1,
           },
         }
       );
