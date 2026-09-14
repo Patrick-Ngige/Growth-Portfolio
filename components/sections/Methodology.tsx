@@ -128,11 +128,18 @@ export default function Methodology() {
         </div>
       </div>
 
-      {/* Pinned sequential reveal, ported from trionn-rebuild's about/process.js */}
+      {/* Pinned sequential reveal, ported from trionn-rebuild's about/process.js.
+          `flex-col justify-center` here (not row + items-center) matters: a
+          row-direction flex container never stretches its child to full
+          width by default (flex-grow:0), so the pill rows were rendering at
+          their own shrink-to-fit content width instead of filling the
+          section - column direction gives the child align-items:stretch for
+          free, which combined with the explicit `w-full` below is what
+          actually makes the pills span the container. */}
       <div ref={pinTrackRef} className="relative" style={{ height: `${methodologySteps.length * 60}vh` }}>
-        <div ref={stickyRef} className="flex h-screen w-full items-center pt-28 pb-6">
-          <div className="container-main min-w-0">
-            <div className="mx-auto flex max-w-5xl flex-col gap-3">
+        <div ref={stickyRef} className="flex h-screen w-full flex-col justify-center pt-28 pb-4">
+          <div className="container-main w-full">
+            <div className="mx-auto w-full flex max-w-6xl flex-col gap-3">
               {methodologySteps.map((step, i) => (
                 <div
                   key={step.step}
@@ -140,7 +147,7 @@ export default function Methodology() {
                     stepRefs.current[i] = el;
                   }}
                   className={cn(
-                    'group flex w-[92%] items-center justify-between gap-5 rounded-full border border-[var(--border-color)]/50 bg-[var(--background-surface)] py-3 pl-7 pr-3 transition-colors hover:border-accent-growth/40 sm:w-[80%]',
+                    'group flex w-[96%] items-center justify-between gap-5 rounded-full border border-[var(--border-color)]/50 bg-[var(--background-surface)] py-2.5 pl-7 pr-3 transition-colors hover:border-accent-growth/40 sm:w-[94%]',
                     i % 2 === 0 ? 'self-start' : 'self-end'
                   )}
                 >
@@ -159,7 +166,7 @@ export default function Methodology() {
                     </p>
                   </div>
                   <div
-                    className="flex h-14 w-24 flex-shrink-0 items-center justify-center rounded-full text-white sm:h-20 sm:w-36"
+                    className="flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-full text-white sm:h-16 sm:w-28"
                     style={{ background: CAPSULE_GRADIENT[step.step] }}
                   >
                     {iconComponents[step.icon as keyof typeof iconComponents]}
