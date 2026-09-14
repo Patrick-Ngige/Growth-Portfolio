@@ -169,7 +169,19 @@ export default function GrowthStack() {
       const trackHeight = track.offsetHeight;
       const revealStart = trackTop + REVEAL_START_FRACTION * trackHeight;
       const trackEnd = trackTop + trackHeight;
-      const startOffset = -(trackEnd - revealStart);
+
+      // -(trackEnd - revealStart) alone cancels the natural document-flow
+      // scroll motion exactly (both change 1:1 with scrollY over this
+      // window), which freezes this section at its FINAL viewport position
+      // the instant the window starts, instead of sliding it in - a
+      // constant "already arrived" state rather than a climb. Adding the
+      // viewport height back (minus the track's own 10vh marginBottom,
+      // which is how far below the fold this section's natural resting
+      // point still sits at trackEnd) makes the start position genuinely
+      // off-screen, so the slide is visible across the whole window.
+      const viewportH = window.innerHeight;
+      const marginBottomPx = viewportH * 0.1;
+      const startOffset = viewportH - marginBottomPx - (trackEnd - revealStart);
 
       tween = gsap.fromTo(
         section,
