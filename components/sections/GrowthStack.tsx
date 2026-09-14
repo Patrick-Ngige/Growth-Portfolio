@@ -1,8 +1,16 @@
 'use client';
 
+import { useLayoutEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AnimatedSection } from '@/components/ui/Section';
+import { REVEAL_MID_FRACTION } from '@/components/motion/pinned-pillars';
 import { cn } from '@/lib/utils';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 // Tool icons for the growth stack
 const toolIcons: Record<string, React.ReactNode> = {
@@ -113,16 +121,100 @@ function MarqueeRow({
 }
 
 export default function GrowthStack() {
-  // No custom scroll-linked JS here at all, deliberately - a hand-rolled
-  // sync tween is what broke this repeatedly. PinnedPillars' own
-  // strip-reveal ScrollTrigger (see its `pin: panelRef.current,
-  // pinSpacing: false`) is what actually gets this section into view: with
-  // no extra document height reserved during that pin, this section - a
-  // completely plain, normal-flow section with no ref, no transform - is
-  // already scrolling up into its natural resting position underneath the
-  // still-pinned panel for the entire hold, for free, arriving at exactly
-  // y:0 the instant the pin releases. See PinnedPillars.tsx for the actual
-  // mechanism.
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Slides this section up into view in sync with PinnedPillars' own strip
+  // reveal (see REVEAL_MID_FRACTION), starting once the wipe is HALF done
+  // rather than at its very start, instead of only appearing once that
+  // section's pin fully releases - so by the time the cards are fully
+  // covered, this is already in view rather than starting from scratch.
+  // Finds the pinned track via the DOM (this section's previous sibling)
+  // rather than a React ref across component boundaries - PinnedPillars is
+  // rendered by a sibling component (UnfairAdvantage), not this one.
+  //
+  // yPercent:100->0 (removing a downward offset) was the wrong shape for
+  // this: at yPercent:0 this section just sits at its own natural document
+  // position, which is still off-screen below the viewport for most of the
+  // reveal window - reducing a downward push never gets it into view any
+  // sooner than normal scrolling would. What's actually needed is an
+  // UPWARD push at the start of the window (translateY negative, computed
+  // from how far below the viewport its natural position currently sits)
+  // that eases to zero by the time the track ends - so it visibly climbs
+  // into place over the whole reveal instead of only arriving at the end.
+  useLayoutEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const section = sectionRef.current;
+    const track = section?.previousElementSibling as HTMLElement | null;
+    if (!section || !track || reduced) return;
+
+    let tween: gsap.core.Tween | null = null;
+
+    // Deferred one tick: PinnedPillars' own track height is set via a pure
+    // CSS vh value so it's correct immediately, but measuring in the same
+    // layout pass this component mounts in occasionally raced against the
+    // Loader's own fixed-position overlay unmounting (it covers the full
+    // viewport until its animation finishes) - by not calling
+    // ScrollTrigger.refresh() explicitly and instead measuring fresh right
+    // before creating the trigger, on the next frame, both this component
+    // and everything above it have had a chance to settle first.
+    const raf = requestAnimationFrame(() => {
+      // Everything computed once, as plain numbers, rather than as
+      // ScrollTrigger function-based start/end or a function-based tween
+      // value - both were unreliable here (the string keyword syntax
+      // 'top top+=X' didn't respect the offset at all, and re-evaluating
+      // track's position on every ScrollTrigger refresh produced drifting,
+      // inconsistent numbers since track contains a `position: sticky`
+      // descendant). A plain one-time measurement is what's actually
+      // needed: this trigger doesn't need to survive a resize mid-scroll.
+      const trackTop = track.getBoundingClientRect().top + window.scrollY;
+      const trackHeight = track.offsetHeight;
+      // Starts at the strip reveal's OWN MIDPOINT (not its start) - the
+      // wipe should be half done before this section begins appearing, and
+      // past its 3/4 mark this section should already be visibly climbing
+      // into place. REVEAL_MID_FRACTION encodes that midpoint.
+      const revealMid = trackTop + REVEAL_MID_FRACTION * trackHeight;
+      const trackEnd = trackTop + trackHeight;
+
+      // -(trackEnd - revealMid) alone cancels the natural document-flow
+      // scroll motion exactly (both change 1:1 with scrollY over this
+      // window), which freezes this section at its FINAL viewport position
+      // the instant the window starts, instead of sliding it in - a
+      // constant "already arrived" state rather than a climb. Adding the
+      // viewport height back (minus the track's own 10vh marginBottom,
+      // which is how far below the fold this section's natural resting
+      // point still sits at trackEnd) makes the start position genuinely
+      // off-screen, so the slide is visible across the whole window.
+      const viewportH = window.innerHeight;
+      const marginBottomPx = viewportH * 0.1;
+      const startOffset = viewportH - marginBottomPx - (trackEnd - revealMid);
+
+      tween = gsap.fromTo(
+        section,
+        { y: startOffset },
+        {
+          y: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: track,
+            start: revealMid,
+            end: trackEnd,
+            // Matches PinnedPillars' own scrub value (see its tl's
+            // ScrollTrigger). scrub:true tracks scroll with zero smoothing,
+            // while the strip reveal it's meant to move in lockstep with
+            // eases over 1s - during fast or jerky scrolling the two would
+            // fall out of sync and visibly judder against each other.
+            scrub: 1,
+          },
+        }
+      );
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      tween?.scrollTrigger?.kill();
+      tween?.kill();
+    };
+  }, []);
 
   // Expanded tool list with icons
   const tools = [
@@ -152,12 +244,24 @@ export default function GrowthStack() {
   const rowTwo = tools.slice(midpoint);
 
   return (
-    // A completely plain section, deliberately - see the note above the
-    // component. No ref, no custom z-index: PinnedPillars' own pinned
-    // panel already stacks above normal-flow content by default (it's
-    // position:fixed during the reveal, with an explicit z-index), so
-    // this needs nothing extra to stay hidden behind it until revealed.
-    <AnimatedSection id="stack" variant="default" size="xl">
+    // Slides up in sync with PinnedPillars' strip reveal (see the
+    // useLayoutEffect above) instead of just appearing once that section's
+    // pin releases. relative z-30 on the OUTER wrapper clears PinnedPillars'
+    // reveal strips (zIndex:20) so this section is visible sliding up over
+    // them rather than hidden behind - AnimatedSection's own `className`
+    // prop only ever reaches that outer wrapper, never the inner `<section>`
+    // Section.tsx actually renders, which is why the dark-mode background
+    // override below is a scoped <style> targeting #stack directly rather
+    // than another className here - a dark:!bg-[...] class on this element
+    // would have zero visible effect (this wrapper has no visible size of
+    // its own beyond its child).
+    <AnimatedSection
+      ref={sectionRef}
+      id="stack"
+      variant="default"
+      size="xl"
+      className="relative z-30"
+    >
       <div className="container-main">
         {/* Section Header */}
         {/* Matches PinnedPillars' reveal-strip colour exactly (#1A1A1A) so
