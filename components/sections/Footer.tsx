@@ -41,8 +41,8 @@ export default function Footer() {
 
   return (
     <footer
-      style={{ background: PAGE_BG, borderColor: CARD_BORDER }}
-      className="border-t px-[clamp(20px,5vw,64px)] py-16"
+      style={{ background: PAGE_BG }}
+      className="px-[clamp(20px,5vw,64px)] py-16"
     >
       <div className="mx-auto flex max-w-[1240px] flex-col gap-5 lg:flex-row">
         {/* Left panel: brand + CTA */}
