@@ -158,32 +158,65 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - indexed display type on a marquee backdrop
+          (research/decision trail: see the "Mobile Nav Concepts" artifact
+          from this session, the "Blend" card). Mode switcher on the left,
+          close on the right, per explicit correction to the picked option -
+          the collapsed pill stays hamburger-only, the toggle only appears
+          once this overlay is open. */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-[var(--background-primary)]"
+            className="fixed inset-0 z-[60] overflow-hidden bg-[var(--background-primary)]"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile menu"
           >
-            <div className="flex flex-col h-full">
-              {/* Mobile Header */}
-              <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)]/10">
-                <Link
-                  href="/"
-                  className="text-xl font-display font-semibold"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  aria-label="Patrick Ngige - Growth Engineer Home"
-                >
-                  <span className="text-[var(--text-primary)]">
-                    Patrick
-                  </span>
-                  <span className="text-accent-growth">.</span>
-                </Link>
+            <div className="relative flex h-full flex-col">
+              {/* Menu top row: mode switcher left, close right */}
+              <div className="flex items-center justify-between p-6">
+                {mounted && (
+                  <button
+                    onClick={toggleTheme}
+                    className="p-2 rounded-lg transition-colors hover:bg-[var(--background-surface)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth"
+                    aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                  >
+                    {isDark ? (
+                      <svg
+                        className="w-5 h-5 text-accent-growth"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-5 h-5 text-[var(--text-primary)]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                )}
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth rounded-lg"
@@ -206,9 +239,48 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Mobile Navigation */}
+              {/* Ambient marquee backdrop: same animate-marquee /
+                  animate-marquee-reverse keyframes GrowthStack's tool rows
+                  already use, just decorative and low-opacity here - two
+                  bands run one direction, the middle band runs the other,
+                  matching the picked reference exactly. */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+                <div className="absolute left-0 top-[18%] flex w-max animate-marquee gap-8 opacity-[0.05] motion-reduce:animate-none">
+                  {[0, 1].map((i) => (
+                    <span
+                      key={i}
+                      className="whitespace-nowrap font-display text-6xl font-bold text-[var(--text-primary)]"
+                    >
+                      PATRICK NGIGE &middot; GROWTH ENGINEER &middot; PATRICK NGIGE &middot; GROWTH ENGINEER &middot;
+                    </span>
+                  ))}
+                </div>
+                <div className="absolute left-0 top-[45%] flex w-max animate-marquee-reverse gap-8 opacity-[0.05] motion-reduce:animate-none">
+                  {[0, 1].map((i) => (
+                    <span
+                      key={i}
+                      className="whitespace-nowrap font-display text-6xl font-bold text-[var(--text-primary)]"
+                    >
+                      BUILD &middot; INSTRUMENT &middot; AUTOMATE &middot; BUILD &middot; INSTRUMENT &middot; AUTOMATE &middot;
+                    </span>
+                  ))}
+                </div>
+                <div className="absolute left-0 top-[72%] flex w-max animate-marquee gap-8 opacity-[0.05] motion-reduce:animate-none">
+                  {[0, 1].map((i) => (
+                    <span
+                      key={i}
+                      className="whitespace-nowrap font-display text-6xl font-bold text-[var(--text-primary)]"
+                    >
+                      PATRICK NGIGE &middot; GROWTH ENGINEER &middot; PATRICK NGIGE &middot; GROWTH ENGINEER &middot;
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Navigation: indexed rows, hairline rule above every
+                  row but the first */}
               <nav
-                className="flex-1 flex flex-col items-center justify-center gap-8 p-6"
+                className="relative z-10 flex flex-1 flex-col justify-center px-8"
                 role="navigation"
                 aria-label="Mobile navigation"
               >
@@ -217,11 +289,18 @@ export default function Header() {
                     key={link.href}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: index * 0.08 }}
+                    className={cn(
+                      'flex items-baseline gap-4 py-4',
+                      index > 0 && 'border-t border-[var(--border-color)]/40'
+                    )}
                   >
+                    <span className="font-mono text-xs text-accent-growth">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
                     <Link
                       href={link.href}
-                      className="text-3xl font-display font-semibold text-[var(--text-primary)] hover:text-accent-growth transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth rounded-lg px-2"
+                      className="font-display text-3xl font-semibold text-[var(--text-primary)] hover:text-accent-growth transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth rounded-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {link.label}
@@ -231,7 +310,7 @@ export default function Header() {
               </nav>
 
               {/* Mobile Footer */}
-              <div className="p-6 border-t border-[var(--border-color)]/10">
+              <div className="relative z-10 p-6 border-t border-[var(--border-color)]/10">
                 <a
                   href="#contact"
                   className="flex items-center justify-center w-full py-4 text-lg font-medium text-[var(--background-primary)] bg-accent-growth rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]"
