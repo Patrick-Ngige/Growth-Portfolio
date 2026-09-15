@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import Header from '@/components/navigation/Header';
 import Footer from '@/components/sections/Footer';
 import Loader from '@/components/motion/Loader';
+import SmoothScroll from '@/components/anim/SmoothScroll';
 import './globals.css';
 import { metadata as siteMetadata, jsonLd } from './metadata';
 
@@ -82,10 +83,12 @@ export default function RootLayout({
         >
           <Loader />
           <Header />
-          <main id="main-content" className="relative" role="main">
-            {children}
-          </main>
-          <Footer />
+          <SmoothScroll>
+            <main id="main-content" className="relative" role="main">
+              {children}
+            </main>
+            <Footer />
+          </SmoothScroll>
         </ThemeProvider>
       </body>
     </html>
