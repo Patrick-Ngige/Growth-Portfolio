@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { caseStudies } from '@/lib/data';
@@ -64,7 +65,7 @@ export default function FeaturedWorkReel() {
   const pinRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -72,7 +73,7 @@ export default function FeaturedWorkReel() {
     const row = rowRef.current;
     if (!pin || !row || reduced) return;
 
-    const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+    const cards = cardRefs.current.filter(Boolean) as HTMLAnchorElement[];
     const dist = () => Math.max(0, row.scrollWidth - window.innerWidth);
 
     // Exact original rise() from work.js: translateY only, no opacity.
@@ -144,8 +145,9 @@ export default function FeaturedWorkReel() {
             // gap 26px. Widened to 75vw on mobile (3/4 of the viewport for
             // the active card) - 46vw reads as a sliver on a narrow phone
             // screen; trionn's own 46vw is tuned for wider viewports.
-            <div
+            <Link
               key={study.id}
+              href={`/work/${study.id}`}
               ref={(el) => {
                 cardRefs.current[i] = el;
               }}
@@ -183,7 +185,7 @@ export default function FeaturedWorkReel() {
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
