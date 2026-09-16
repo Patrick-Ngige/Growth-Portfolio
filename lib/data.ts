@@ -368,7 +368,7 @@ export const aboutNarrative = {
 };
 
 export const navigationLinks = [
-  { label: 'Work', href: '#work' },
+  { label: 'Work', href: '/work' },
   { label: 'Approach', href: '#approach' },
   { label: 'About', href: '#about' },
   { label: 'Contact', href: '#contact' },
