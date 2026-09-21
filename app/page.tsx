@@ -1,5 +1,6 @@
 import Hero from '@/components/sections/Hero';
 import UnfairAdvantage from '@/components/sections/UnfairAdvantage';
+import BeforeAfter from '@/components/sections/BeforeAfter';
 import GrowthStack from '@/components/sections/GrowthStack';
 import FeaturedWorkReel from '@/components/sections/FeaturedWorkReel';
 import FeaturedMetrics from '@/components/sections/FeaturedMetrics';
@@ -16,6 +17,7 @@ export default function Home() {
     <>
       <Hero />
       <UnfairAdvantage />
+      <BeforeAfter />
       <GrowthStack />
       <FeaturedWorkReel />
       <FeaturedMetrics />

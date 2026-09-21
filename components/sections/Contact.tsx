@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
-import Button, { AnimatedButton } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+
+const CONTACT_EMAIL = 'wakemanjajr@gmail.com';
+const NEEDS = ['Landing page build', 'Analytics & tracking', 'Automation', 'CRO experiments', 'Not sure yet'];
+const TIMELINES = ['As soon as possible', 'Within 1-2 months', 'Just exploring'];
 
 // Analytics tracking hook
 function useAnalytics() {
@@ -49,19 +53,36 @@ export default function Contact() {
     return () => observer.disconnect();
   }, [trackEvent]);
 
-  const handleScheduleClick = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [needs, setNeeds] = useState<string[]>([]);
+  const [timeline, setTimeline] = useState(TIMELINES[0]);
+  const [context, setContext] = useState('');
+
+  const toggleNeed = (need: string) =>
+    setNeeds((prev) => (prev.includes(need) ? prev.filter((n) => n !== need) : [...prev, need]));
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
     trackEvent('cta_click', {
-      cta_type: 'schedule_audit',
+      cta_type: 'contact_form_submit',
       cta_location: 'contact',
       conversion: true,
+      needs,
+      timeline,
     });
-  };
-
-  const handleEmailClick = () => {
-    trackEvent('cta_click', {
-      cta_type: 'email_initiated',
-      cta_location: 'contact',
-    });
+    const body = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Needs: ${needs.length ? needs.join(', ') : 'Not specified'}`,
+      `Timeline: ${timeline}`,
+      '',
+      'Stack and growth problem:',
+      context || '(not provided)',
+    ].join('\n');
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+      `Project enquiry from ${name}`
+    )}&body=${encodeURIComponent(body)}`;
   };
 
   const handleLinkedInClick = () => {
@@ -114,56 +135,110 @@ export default function Contact() {
             let&apos;s talk.
           </motion.p>
 
-          {/* CTA Buttons */}
-          <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+          {/* Qualifying form: what, when, and context, so the first message
+              already tells me if it's a fit. No backend on this static
+              export, so submit opens a prefilled email. */}
+          <motion.form
+            onSubmit={handleSubmit}
+            className="mb-12 rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 text-left sm:p-8"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            <AnimatedButton
-              size="lg"
-              onClick={handleScheduleClick}
-              containerClass="shadow-glow"
-            >
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                Schedule a Growth Audit
-              </span>
-            </AnimatedButton>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Name</span>
+                <input
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your full name"
+                  className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--background-primary)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-accent-growth focus:outline-none"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Email</span>
+                <input
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--background-primary)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-accent-growth focus:outline-none"
+                />
+              </label>
+            </div>
 
-            <Button size="lg" variant="outline" onClick={handleEmailClick}>
-              <a href="mailto:hello@patrick-growth.com" className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                Start a Conversation
-              </a>
-            </Button>
-          </motion.div>
+            <fieldset className="mt-6">
+              <legend className="mb-3 text-sm font-medium text-[var(--text-primary)]">What do you need?</legend>
+              <div className="flex flex-wrap gap-2">
+                {NEEDS.map((need) => {
+                  const on = needs.includes(need);
+                  return (
+                    <button
+                      key={need}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggleNeed(need)}
+                      className={cn(
+                        'rounded-full border px-4 py-2 text-sm transition-colors',
+                        on
+                          ? 'border-accent-growth bg-accent-growth text-[var(--background-primary)]'
+                          : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:border-accent-growth/60 hover:text-[var(--text-primary)]'
+                      )}
+                    >
+                      {need}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <fieldset className="mt-6">
+              <legend className="mb-3 text-sm font-medium text-[var(--text-primary)]">When do you need it?</legend>
+              <div className="flex flex-wrap gap-2">
+                {TIMELINES.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={timeline === t}
+                    onClick={() => setTimeline(t)}
+                    className={cn(
+                      'rounded-full border px-4 py-2 text-sm transition-colors',
+                      timeline === t
+                        ? 'border-accent-growth bg-accent-growth text-[var(--background-primary)]'
+                        : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:border-accent-growth/60 hover:text-[var(--text-primary)]'
+                    )}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <label className="mt-6 block">
+              <span className="mb-2 block text-sm font-medium text-[var(--text-primary)]">
+                Current stack and the growth problem
+              </span>
+              <textarea
+                rows={4}
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                placeholder="e.g. WordPress site, GA4 not tracking checkout, we can't tell which channel converts."
+                className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--background-primary)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-accent-growth focus:outline-none"
+              />
+            </label>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-[var(--text-secondary)]">
+                Opens a prefilled email to me with your answers.
+              </p>
+              <Button type="submit" size="lg">
+                Send my details
+              </Button>
+            </div>
+          </motion.form>
 
           {/* Pre-qualification */}
           <motion.div

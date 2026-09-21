@@ -25,8 +25,8 @@ const config: Config = {
             light: '#0099FF',
           },
           growth: {
-            DEFAULT: 'var(--accent-growth)',
-            light: 'var(--accent-growth)',
+            DEFAULT: 'rgb(var(--accent-growth-rgb) / <alpha-value>)',
+            light: 'rgb(var(--accent-growth-rgb) / <alpha-value>)',
           },
         },
       },
