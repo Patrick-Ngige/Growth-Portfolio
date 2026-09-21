@@ -174,7 +174,7 @@ export default function UnfairAdvantage() {
                   >
                     <motion.div
                       className="w-8 h-8 rounded-full bg-accent-growth flex items-center justify-center z-10"
-                      animate={{ boxShadow: ['0 0 0 0 rgba(204, 255, 0, 0)', '0 0 20px 5px rgba(204, 255, 0, 0.3)', '0 0 0 0 rgba(204, 255, 0, 0)'] }}
+                      animate={{ boxShadow: ['0 0 0 0 rgb(var(--accent-growth-rgb) / 0)', '0 0 20px 5px rgb(var(--accent-growth-rgb) / 0.3)', '0 0 0 0 rgb(var(--accent-growth-rgb) / 0)'] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
                       <div className="w-3 h-3 rounded-full bg-[var(--background-primary)]" />
