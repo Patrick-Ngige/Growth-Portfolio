@@ -1,58 +1,57 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef, useState } from 'react';
 import { methodologySteps } from '@/lib/data';
 import SplitText from '@/components/anim/SplitText';
 import MagneticButton from '@/components/anim/MagneticButton';
-import { cn } from '@/lib/utils';
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 /**
- * Rebuilt per the shared services-list inspo: a big rounded pill per step,
- * number + title + a row of tag words on the left, a coloured icon capsule
- * on the right. Combined with trionn-rebuild's about/process.js: steps sit
- * dim and dropped until the section pins, then each pill lifts into focus
- * in its own scrub time-slot. Icon capsules use the site's own line icons
- * on a generative gradient rather than the inspo's stock 3D renders, per
- * the standing no-stock-illustration decision.
+ * Sticky-stack version (option B): intro column on the left, cards on
+ * the right that each pin with a small staggered offset while the next
+ * one slides up over them. Covered cards scale down and dim; the seated
+ * card holds the lighter gray. All of it is driven by scroll position
+ * (one scroll listener writing styles directly, no re-render per
+ * frame), so it scrubs both directions. Every card keeps the same fixed
+ * height. Gray, not white, and no AI-default palette.
  */
 const iconComponents = {
   search: (
-    <svg className="h-5 w-5 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   ),
   lightbulb: (
-    <svg className="h-5 w-5 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
     </svg>
   ),
   code: (
-    <svg className="h-5 w-5 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
     </svg>
   ),
   rocket: (
-    <svg className="h-5 w-5 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13 10V3L4 14h7v7l9-11h-7z" />
     </svg>
   ),
   chart: (
-    <svg className="h-5 w-5 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
     </svg>
   ),
   refresh: (
-    <svg className="h-5 w-5 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
     </svg>
   ),
 };
+
+const ArrowUpRight = (
+  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H8m9 0v9" />
+  </svg>
+);
 
 const TAGS: Record<number, string[]> = {
   1: ['Analytics Audit', 'Competitive Research', 'Customer Insight'],
@@ -72,126 +71,159 @@ const CAPSULE_GRADIENT: Record<number, string> = {
   6: 'linear-gradient(135deg, #A78BFA, #6D28D9)',
 };
 
+const STICK_STEP = 14;
+const COVER_RANGE = 300;
+const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
+const hexToRgb = (hex: string) => {
+  const h = hex.trim().replace('#', '');
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+};
+const mix = (t: number, base: number[], active: number[]) =>
+  `rgb(${base.map((b, i) => Math.round(b + (active[i] - b) * t)).join(",")})`;
+
 export default function Methodology() {
-  const pinTrackRef = useRef<HTMLDivElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
-  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const track = pinTrackRef.current;
-    const sticky = stickyRef.current;
-    if (!track || !sticky || reduced) return;
+    const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+    if (!cards.length) return;
 
-    const steps = stepRefs.current.filter(Boolean) as HTMLDivElement[];
-    gsap.set(steps, { opacity: 0.18, y: 26 });
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: track,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: true,
-        pin: sticky,
-        anticipatePin: 1,
-      },
-    });
+    let lastActive = 0;
 
-    steps.forEach((step, i) => {
-      tl.to(step, { opacity: 1, y: 0, ease: 'power2.out', duration: 0.7 }, i * 0.9);
-    });
+    const update = () => {
+      const rootStyle = getComputedStyle(document.documentElement);
+      const baseRgb = hexToRgb(rootStyle.getPropertyValue('--card-base'));
+      const activeRgb = hexToRgb(rootStyle.getPropertyValue('--card-active'));
+      const tops = cards.map((c) => c.getBoundingClientRect().top);
+      const stuck = cards.map((c) => parseFloat(getComputedStyle(c).top) || 0);
 
+      // arrival[i]: how far card i has travelled into its stuck position (0 far below, 1 seated)
+      const arrival = cards.map((_, i) => (i === 0 ? 1 : clamp(1 - (tops[i] - stuck[i]) / COVER_RANGE)));
+
+      let active = 0;
+      arrival.forEach((a, i) => {
+        if (a >= 0.98) active = i;
+      });
+      if (active !== lastActive) {
+        lastActive = active;
+        setActiveIdx(active);
+      }
+
+      cards.forEach((card, i) => {
+        let depth = 0;
+        for (let k = i + 1; k < cards.length; k++) depth += arrival[k];
+        const d = Math.min(depth, 3);
+        const own = i === 0 ? 1 : arrival[i];
+        const next = i < cards.length - 1 ? arrival[i + 1] : 0;
+        const highlight = clamp(own * (1 - next));
+        card.style.transform = `scale(${(1 - 0.045 * d).toFixed(3)})`;
+        card.style.opacity = (1 - 0.14 * d).toFixed(3);
+        card.style.background = mix(highlight, baseRgb, activeRgb);
+      });
+    };
+
+    const onScroll = () => {
+      update();
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    const themeObserver = new MutationObserver(update);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     return () => {
-      tl.scrollTrigger?.kill();
-      tl.kill();
+      themeObserver.disconnect();
+
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
     };
   }, []);
 
   return (
-    <section id="approach" className="relative w-full bg-[var(--background-primary)]">
-      <div className="container-main pt-24 lg:pt-32">
-        <div className="mx-auto mb-16 flex max-w-2xl flex-col items-center justify-center text-center">
-          <SplitText
-            text="How the work gets done"
-            as="h2"
-            className="text-section font-display font-semibold mb-4 text-[var(--text-primary)]"
-            animation="slideUp"
-            delay={0}
-          />
-          <SplitText
-            text="Six steps, repeated: test ideas, measure results, keep improving. Simple and focused on real outcomes."
-            as="p"
-            className="text-body text-[var(--text-secondary)]"
-            animation="fadeIn"
-            delay={0.2}
-          />
-        </div>
-      </div>
-
-      {/* Pinned sequential reveal, ported from trionn-rebuild's about/process.js.
-          `flex-col justify-center` here (not row + items-center) matters: a
-          row-direction flex container never stretches its child to full
-          width by default (flex-grow:0), so the pill rows were rendering at
-          their own shrink-to-fit content width instead of filling the
-          section - column direction gives the child align-items:stretch for
-          free, which combined with the explicit `w-full` below is what
-          actually makes the pills span the container. */}
-      <div ref={pinTrackRef} className="relative" style={{ height: `${methodologySteps.length * 60}vh` }}>
-        <div ref={stickyRef} className="flex h-screen w-full flex-col justify-center pt-28 pb-4">
-          <div className="container-main w-full">
-            <div className="mx-auto w-full flex max-w-6xl flex-col gap-3">
-              {methodologySteps.map((step, i) => (
-                <div
-                  key={step.step}
-                  ref={(el) => {
-                    stepRefs.current[i] = el;
-                  }}
-                  className={cn(
-                    'group flex w-[96%] items-center justify-between gap-5 rounded-full border border-[var(--border-color)]/50 bg-[var(--background-surface)] py-2.5 pl-7 pr-3 transition-colors hover:border-accent-growth/40 sm:w-[94%]',
-                    i % 2 === 0 ? 'self-start' : 'self-end'
-                  )}
+    <section id="approach" className="relative w-full bg-[var(--background-primary)] py-24 lg:py-32">
+      <div className="container-main">
+        <div className="grid gap-12 lg:grid-cols-[360px_1fr] lg:gap-16">
+          <div className="flex flex-col items-center text-center lg:sticky lg:top-1/2 lg:-translate-y-1/2 lg:self-start">
+            <SplitText
+              text="How the work gets done"
+              as="h2"
+              className="text-section font-display font-semibold mb-4 text-[var(--text-primary)]"
+              animation="slideUp"
+              delay={0}
+            />
+            <SplitText
+              text="Six steps, repeated: test ideas, measure results, keep improving. Simple and focused on real outcomes."
+              as="p"
+              className="text-body text-[var(--text-secondary)]"
+              animation="fadeIn"
+              delay={0.2}
+            />
+            <div className="mt-8">
+              <MagneticButton>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 rounded-full bg-[var(--background-surface)] border border-[var(--border-color)] px-6 py-3 font-medium text-[var(--text-primary)] transition-colors hover:border-accent-growth/50"
                 >
-                  <div className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-secondary)]">
-                      {String(step.step).padStart(2, '0')}
-                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </span>
-                    <h3 className="mt-1 truncate font-display text-lg font-bold uppercase tracking-tight text-[var(--text-primary)] transition-colors group-hover:text-accent-growth sm:text-2xl">
-                      {step.title}
-                    </h3>
-                    <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-[var(--text-secondary)] sm:text-[10px]">
-                      {TAGS[step.step].join('  •  ')}
-                    </p>
-                  </div>
-                  <div
-                    className="flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-full text-white sm:h-16 sm:w-28"
-                    style={{ background: CAPSULE_GRADIENT[step.step] }}
-                  >
-                    {iconComponents[step.icon as keyof typeof iconComponents]}
-                  </div>
-                </div>
-              ))}
+                  <span>Work with me</span>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </a>
+              </MagneticButton>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="container-main pb-24 lg:pb-32">
-        <div className="text-center">
-          <p className="mb-4 text-body text-[var(--text-secondary)]">Ready to work together?</p>
-          <MagneticButton>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-full bg-accent-growth px-6 py-3 font-medium text-[var(--background-primary)] transition-colors hover:bg-accent-growth/90"
-            >
-              <span>Get in touch</span>
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
-          </MagneticButton>
+          <div className="flex flex-col gap-[26vh] pb-[24vh]">
+            {methodologySteps.map((step, i) => {
+              const isActive = i === activeIdx;
+              return (
+                <div
+                  key={step.step}
+                  data-step={step.step}
+                  ref={(el) => {
+                    cardRefs.current[i] = el;
+                  }}
+                  className="sticky w-full origin-top rounded-[28px] border border-[var(--border-color)]/50 px-7 py-7 will-change-transform sm:px-9 sm:py-8"
+                  style={{
+                    top: `calc(20vh + ${i * STICK_STEP}px)`,
+                    zIndex: i + 1,
+                    background: "var(--card-base)",
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-5">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-mono text-[11px] text-[var(--text-secondary)]">
+                        {String(step.step).padStart(2, '0')}
+                      </span>
+                      <h3 className="mt-1 truncate font-display text-xl font-bold uppercase tracking-tight text-[var(--text-primary)] sm:text-2xl">
+                        {step.title}
+                      </h3>
+                    </div>
+                    <div
+                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-white sm:h-12 sm:w-12"
+                      style={{ background: CAPSULE_GRADIENT[step.step] }}
+                    >
+                      {isActive ? ArrowUpRight : iconComponents[step.icon as keyof typeof iconComponents]}
+                    </div>
+                  </div>
+
+                  <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">{step.description}</p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {TAGS[step.step].map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-[var(--chip-bg)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--text-primary)]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

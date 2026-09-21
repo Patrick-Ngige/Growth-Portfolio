@@ -54,11 +54,16 @@ const FRAGMENT = /* glsl */ `
   }
 
   // Domain-warped fbm: noise fed back into itself so the field flows
-  // instead of just shimmering in place.
+  // instead of just shimmering in place. 3 octaves, not 5 - measured
+  // live at 2-3fps with 5 octaves at devicePixelRatio 2 (three calls to
+  // this per pixel, each doing octaves*4 hash evaluations, on top of
+  // 4x the pixel count from an uncapped DPR - catastrophically over
+  // budget for a fullscreen fragment shader). Still reads as the same
+  // flowing field at this octave count, just costs far less per pixel.
   float fbm(vec2 p) {
     float sum = 0.0;
     float amp = 0.5;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 3; i++) {
       sum += amp * noise(p);
       p *= 2.02;
       amp *= 0.5;
@@ -103,8 +108,13 @@ export default function HeroCanvas() {
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // antialias:false and a capped pixel ratio - MSAA plus a full
+    // devicePixelRatio (up to 4x the logical pixel count on a Retina
+    // display) was most of the remaining cost once the octave count
+    // came down. The fragment shader already reads as smooth without
+    // MSAA at this resolution.
+    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
     mount.appendChild(renderer.domElement);
 
     const uniforms = {
@@ -152,15 +162,39 @@ export default function HeroCanvas() {
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
 
+    // The render loop previously ran for as long as this component was
+    // mounted, full cost, even scrolled two chapters past the hero -
+    // measured live at 2-3fps regardless of scroll position, which
+    // explained the whole page feeling slow, not just the hero itself.
+    // Only render while the canvas is actually in (or near) the
+    // viewport, and cap the render rate itself (a flowing noise field
+    // reads the same at 30fps as 60) rather than calling render() on
+    // every rAF tick - this halves however many render() calls happen
+    // per second regardless of what the per-call cost turns out to be
+    // on a given device.
     let raf = 0;
+    let visible = true;
+    let lastRender = 0;
+    const frameInterval = 1000 / 30;
     const start = performance.now();
-    const tick = () => {
-      uniforms.uTime.value = (performance.now() - start) / 1000;
-      uniforms.uMouse.value.lerp(targetMouse, 0.04);
-      renderer.render(scene, camera);
+    const tick = (now: number) => {
+      if (visible && now - lastRender >= frameInterval) {
+        lastRender = now;
+        uniforms.uTime.value = (now - start) / 1000;
+        uniforms.uMouse.value.lerp(targetMouse, 0.08);
+        renderer.render(scene, camera);
+      }
       raf = requestAnimationFrame(tick);
     };
-    tick();
+    raf = requestAnimationFrame(tick);
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        visible = entries[0]?.isIntersecting ?? true;
+      },
+      { rootMargin: '200px 0px' }
+    );
+    io.observe(mount);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -168,6 +202,7 @@ export default function HeroCanvas() {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('scroll', onScroll);
       ro.disconnect();
+      io.disconnect();
       geometry.dispose();
       material.dispose();
       renderer.dispose();

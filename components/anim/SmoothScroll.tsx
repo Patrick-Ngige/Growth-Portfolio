@@ -19,7 +19,10 @@ import { ReactLenis } from '@studio-freight/react-lenis';
  * other route this renders as a no-op passthrough, native scroll,
  * unchanged.
  */
-const ENABLED_PREFIX = '/work';
+// Paused: at lerp 0.1 the /work pages felt like they dragged behind the
+// wheel. Empty list means every route gets native scroll. Re-add '/work'
+// (and raise lerp) to bring it back.
+const ENABLED_PREFIXES: string[] = [];
 
 interface SmoothScrollProps {
   children: ReactNode;
@@ -51,7 +54,7 @@ export default function SmoothScroll({
     setMounted(true);
   }, []);
 
-  const enabled = mounted && !!pathname && pathname.startsWith(ENABLED_PREFIX);
+  const enabled = mounted && !!pathname && ENABLED_PREFIXES.some((p) => pathname.startsWith(p));
 
   if (!enabled) {
     return <>{children}</>;
