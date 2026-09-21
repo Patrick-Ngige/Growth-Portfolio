@@ -26,33 +26,35 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = `
       inline-flex items-center justify-center font-medium
       transition-all duration-300 ease-out
-      focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth-dark focus-visible:ring-offset-2
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2
       disabled:opacity-50 disabled:cursor-not-allowed
     `;
 
+    // Every other themed component in this codebase reads colour off the
+    // CSS custom properties in globals.css (var(--background-primary) etc,
+    // which already flip per theme) rather than separate dark: overrides -
+    // this component previously referenced bare Tailwind classes
+    // (background-primary, surface-dark, accent-growth-dark) that were
+    // never defined anywhere, so none of these buttons had real styling.
     const variants = {
       primary: `
-        bg-accent-growth-dark text-background-primary
-        hover:bg-accent-growth-light hover:scale-[1.02]
+        bg-accent-growth text-[var(--background-primary)]
+        hover:bg-accent-growth/90 hover:scale-[1.02]
         active:scale-[0.98]
-        dark:bg-accent-growth-dark dark:text-background-primary
       `,
       secondary: `
-        bg-surface-dark text-text-primary-dark
-        hover:bg-gray-600 hover:scale-[1.02]
+        bg-[var(--surface-color)] text-[var(--text-primary)]
+        hover:bg-[var(--border-color)] hover:scale-[1.02]
         active:scale-[0.98]
-        dark:bg-surface-dark dark:text-text-primary-dark
       `,
       outline: `
-        border-2 border-accent-growth-dark text-accent-growth-dark
-        bg-transparent hover:bg-accent-growth-dark hover:text-background-primary
+        border-2 border-accent-growth text-accent-growth
+        bg-transparent hover:bg-accent-growth hover:text-[var(--background-primary)]
         active:scale-[0.98]
-        dark:border-accent-growth-dark dark:text-accent-growth-dark
       `,
       ghost: `
-        text-text-secondary hover:text-text-primary hover:bg-surface-dark/50
+        text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-color)]/50
         active:scale-[0.98]
-        dark:text-text-secondary-dark dark:hover:bg-surface-dark/50
       `,
     };
 

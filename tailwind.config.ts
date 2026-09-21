@@ -11,15 +11,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Accent Colors
+        // Accent Colors - growth delegates to the theme-aware CSS custom
+        // property in globals.css (orange, #EA580C light / #FB923C dark)
+        // rather than a second, independent hex value. The two had drifted
+        // apart: this file previously hardcoded a lime green (#CCFF00)
+        // that every text-accent-growth/bg-accent-growth utility resolved
+        // to, silently overriding the intended orange everywhere those
+        // Tailwind classes were used instead of var(--accent-growth)
+        // directly - about a dozen live components, not a one-off.
         accent: {
           technical: {
             DEFAULT: '#00F0FF',
             light: '#0099FF',
           },
           growth: {
-            DEFAULT: '#CCFF00',
-            light: '#66CC00',
+            DEFAULT: 'var(--accent-growth)',
+            light: 'var(--accent-growth)',
           },
         },
       },

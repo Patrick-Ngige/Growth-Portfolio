@@ -18,7 +18,7 @@ export default function MagneticButton({
   duration = 0.4,
   onClick
 }: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
   const x = useMotionValue(0);
@@ -77,10 +77,16 @@ export default function MagneticButton({
     };
   }, [x, y, isHovered]);
 
+  // motion.div, not motion.button: every real call site wraps this around
+  // its own <Button> (or a plain <a>), so a motion.button here nested a
+  // real <button> element inside another one - invalid HTML, and browsers
+  // handle it inconsistently. The actual click handling and button
+  // semantics belong to the child; this wrapper only owns the magnetic
+  // transform.
   return (
-    <motion.button
+    <motion.div
       ref={ref}
-      className={`relative ${className}`}
+      className={`relative inline-block ${className}`}
       style={{
         transform,
         cursor: 'pointer'
@@ -94,6 +100,6 @@ export default function MagneticButton({
       }}
     >
       {children}
-    </motion.button>
+    </motion.div>
   );
 }
