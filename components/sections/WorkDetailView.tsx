@@ -146,6 +146,34 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             </div>
           </section>
 
+          {/* Gallery - real screenshots when study.images exists, three
+              placeholder frames otherwise. Kept as its own step so wiring
+              in real images later is a one-line data change, not a
+              layout change. */}
+          <section id="gallery" className="pb-16 lg:pb-24">
+            <div className="container-main">
+              <motion.div {...revealProps} className="grid grid-cols-1 gap-3.5 sm:grid-cols-3 sm:gap-4">
+                {[0, 1, 2].map((i) => {
+                  const src = study.images?.[i];
+                  return (
+                    <div
+                      key={i}
+                      className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)]"
+                    >
+                      {src ? (
+                        <img src={src} alt={`${study.company} screenshot ${i + 1}`} className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="px-3 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
+                          Image pending
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </motion.div>
+            </div>
+          </section>
+
           {/* 01 / Challenge - a pull-quote, not a paragraph: this chapter
               is one tension to sit with, so it gets the biggest type of
               any chapter and a side accent instead of a label-over-text

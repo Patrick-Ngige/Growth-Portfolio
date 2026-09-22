@@ -14,6 +14,7 @@ export interface CaseStudy {
   result: string;
   technicalExecution: string[];
   featuredImage?: string;
+  images?: string[];
   tags: string[];
 }
 
