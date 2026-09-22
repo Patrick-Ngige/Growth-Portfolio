@@ -26,6 +26,17 @@ import MagneticButton from '@/components/anim/MagneticButton';
  * for now at the user's request while other parts of the page are
  * still being reworked, not removed. components/motion/SectionRail.tsx
  * is untouched and ready to re-enable.
+ *
+ * Backgrounds are theme-reactive from here down (Overview through Build
+ * use the site's CSS variable tokens), per a live teardown of
+ * arpeggio.framer.website's own case-study page: that page stays white
+ * for nearly every ordinary section and spends its only two full-black
+ * bands on Credits and the closing CTA, a hard-edged cut with no
+ * gradient or crossfade, not an alternating light/dark rhythm. Result +
+ * More work is our equivalent closing beat, kept permanently dark the
+ * same way Footer.tsx is always dark regardless of the site theme
+ * ("the one place that's always dark") - so it reuses that literal
+ * fixed-dark palette rather than a CSS variable.
  */
 
 const CATEGORY_LABEL: Record<CaseStudy['category'], string> = {
@@ -52,15 +63,16 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
     <>
       <article className="w-full">
         {/* Hero - static gradient for now (WebGL backdrop paused, see the
-            note above), product-as-hero framing otherwise unchanged */}
+            note above), theme-reactive: eases between the surface and
+            primary background tokens instead of a fixed warm-dark stop. */}
         <header
           className="relative flex min-h-[72vh] w-full flex-col justify-end overflow-hidden px-[clamp(20px,5vw,64px)] pb-14 pt-32"
-          style={{ background: 'linear-gradient(160deg, #18120a 0%, #09090B 60%)' }}
+          style={{ background: 'linear-gradient(160deg, var(--background-surface) 0%, var(--background-primary) 60%)' }}
         >
           <div className="relative z-10 mb-auto">
             <Link
               href="/#work"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#F4F4F5]"
+              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -70,29 +82,26 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
           </div>
 
           <div className="relative z-10">
-            <span className="mb-5 block font-mono text-xs uppercase tracking-[0.14em] text-[#A1A1AA]">
+            <span className="mb-5 block font-mono text-xs uppercase tracking-[0.14em] text-[var(--text-secondary)]">
               Work / {study.industry}
             </span>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-4xl font-display text-5xl font-bold leading-[0.98] text-[#F4F4F5] sm:text-6xl lg:text-7xl"
+              className="max-w-4xl font-display text-5xl font-bold leading-[0.98] text-[var(--text-primary)] sm:text-6xl lg:text-7xl"
             >
               {study.company}
             </motion.h1>
 
-            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#D4D4D8] lg:text-xl">{study.context}</p>
+            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[var(--text-primary)] lg:text-xl">{study.context}</p>
           </div>
         </header>
 
-        {/* One continuous dark canvas from here to the end - deliberately
-            fixed, not theme-reactive, same precedent already set by
-            Footer.tsx and FeaturedWorkReel elsewhere on this site ("the
-            one place that's always dark"). No border between sections;
-            each chapter gets its own layout instead of a divider line to
-            tell them apart. */}
-        <div className="bg-[#09090B]">
+        {/* Overview through Build follow the site's light/dark tokens.
+            No border between sections; each chapter gets its own layout
+            instead of a divider line to tell them apart. */}
+        <div className="bg-[var(--background-primary)]">
 
           {/* Facts + headline metric, the proof-first opener borrowed from
               Kora's case pages: who/what/with-what on the left, the one
@@ -101,18 +110,18 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
           <section id="overview" className="py-16 lg:py-24">
             <div className="container-main">
               <motion.div {...revealProps} className="grid gap-3.5 sm:gap-4 lg:grid-cols-[1.4fr_1fr]">
-                <div className="rounded-2xl border border-white/10 bg-[#0d0d0c] p-6 sm:p-8">
+                <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 sm:p-8">
                   <dl className="grid gap-5 sm:grid-cols-[120px_1fr] sm:gap-y-6">
-                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[#71717A]">Industry</dt>
-                    <dd className="text-base text-[#F4F4F5]">{study.industry}</dd>
-                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[#71717A]">Type</dt>
-                    <dd className="text-base text-[#F4F4F5]">{CATEGORY_LABEL[study.category]}</dd>
-                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[#71717A]">Stack</dt>
+                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Industry</dt>
+                    <dd className="text-base text-[var(--text-primary)]">{study.industry}</dd>
+                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Type</dt>
+                    <dd className="text-base text-[var(--text-primary)]">{CATEGORY_LABEL[study.category]}</dd>
+                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Stack</dt>
                     <dd className="flex flex-wrap gap-2">
                       {study.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full border border-white/10 px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-[#A1A1AA]"
+                          className="rounded-full border border-[var(--border-color)] px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-[var(--text-secondary)]"
                         >
                           {tag}
                         </span>
@@ -120,8 +129,8 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                     </dd>
                   </dl>
                 </div>
-                <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0d0d0c] p-6 sm:p-8">
-                  <span className="font-mono text-xs uppercase tracking-[0.12em] text-[#71717A]">Headline result</span>
+                <div className="flex flex-col justify-between rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 sm:p-8">
+                  <span className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Headline result</span>
                   <div className="mt-8">
                     <span className="block break-words font-display text-5xl font-bold leading-none text-accent-growth sm:text-6xl">
                       {isNaN(numericMetric) ? (
@@ -130,7 +139,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                         <Counter value={numericMetric} prefix={metricPrefix} suffix={metricSuffix} duration={1.6} delay={0.2} />
                       )}
                     </span>
-                    <span className="mt-3 block text-sm text-[#A1A1AA]">{study.metricLabel}</span>
+                    <span className="mt-3 block text-sm text-[var(--text-secondary)]">{study.metricLabel}</span>
                   </div>
                 </div>
               </motion.div>
@@ -144,12 +153,12 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
           <motion.section {...revealProps} id="challenge" className="py-24 lg:py-32">
             <div className="container-main">
               <div className="flex gap-6 lg:gap-10">
-                <span className="hidden flex-shrink-0 font-display text-[10vw] font-bold leading-none text-white/[0.04] lg:block lg:text-[7rem]">
+                <span className="hidden flex-shrink-0 font-display text-[10vw] font-bold leading-none text-[var(--text-primary)] opacity-[0.05] lg:block lg:text-[7rem]">
                   01
                 </span>
                 <div className="border-l-2 border-accent-growth/40 pl-6 lg:pl-10">
                   <span className="mb-4 block font-mono text-xs uppercase tracking-[0.14em] text-accent-growth lg:hidden">01 / Challenge</span>
-                  <p className="max-w-3xl font-display text-3xl font-semibold leading-[1.25] text-[#F4F4F5] lg:text-4xl">
+                  <p className="max-w-3xl font-display text-3xl font-semibold leading-[1.25] text-[var(--text-primary)] lg:text-4xl">
                     {study.challenge}
                   </p>
                 </div>
@@ -165,11 +174,11 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             <div className="container-main">
               <div className="grid gap-8 lg:grid-cols-[160px_1fr] lg:gap-16">
                 <div>
-                  <span className="font-display text-5xl font-bold text-white/10">02</span>
-                  <span className="mt-2 block font-mono text-xs uppercase tracking-[0.14em] text-[#71717A]">Approach</span>
+                  <span className="font-display text-5xl font-bold text-[var(--text-primary)] opacity-10">02</span>
+                  <span className="mt-2 block font-mono text-xs uppercase tracking-[0.14em] text-[var(--text-secondary)]">Approach</span>
                 </div>
                 <div>
-                  <p className="max-w-2xl text-lg leading-relaxed text-[#D4D4D8] lg:text-xl">{study.approach}</p>
+                  <p className="max-w-2xl text-lg leading-relaxed text-[var(--text-primary)] lg:text-xl">{study.approach}</p>
                 </div>
               </div>
             </div>
@@ -185,19 +194,24 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                 {study.technicalExecution.map((item, i) => (
                   <div
                     key={item}
-                    className="rounded-2xl border border-white/10 bg-[#0d0d0c] p-6"
+                    className="rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6"
                   >
                     <span className="mb-3 block font-mono text-xs text-accent-growth">{String(i + 1).padStart(2, '0')}</span>
-                    <p className="text-base leading-snug text-[#F4F4F5]">{item}</p>
+                    <p className="text-base leading-snug text-[var(--text-primary)]">{item}</p>
                   </div>
                 ))}
               </div>
             </div>
           </motion.section>
 
-          {/* 04 / Result - the closing statement, biggest and plainest
-              beat on the page: just the outcome and the ask, nothing
-              competing for attention. */}
+        </div>
+
+        {/* Result + More work - the closing beat, kept permanently dark
+            like Footer.tsx regardless of the site theme (see the header
+            note above). Full-bleed, hard-edged, no gradient into it: the
+            arpeggio.framer.website teardown found the same, a clean cut
+            into its two black sections rather than a crossfade. */}
+        <div className="bg-[#09090B]">
           <motion.section {...revealProps} id="result" className="py-24 lg:py-36">
             <div className="container-main">
               <span className="mb-6 block font-mono text-xs uppercase tracking-[0.14em] text-accent-growth">04 / Result</span>
