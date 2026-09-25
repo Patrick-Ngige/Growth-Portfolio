@@ -232,7 +232,7 @@ export default function UnfairAdvantage() {
         {
           index: '01',
           title: 'Build',
-          body: 'Production front-ends and CMS systems: Next.js, WordPress, Statamic, Drupal, wired for real content teams, not just demos.',
+          body: 'Production front-ends built with Next.js, React, and Tailwind, wired to headless CMS platforms like WordPress, Statamic, Drupal, and Strapi, for real content teams, not just demos.',
         },
         {
           index: '02',

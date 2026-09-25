@@ -8,18 +8,18 @@
      earlier warm-cream palette - neutral gray ground, neutral near-black
      text, no warm tint, consistent with the neutral direction the rest of
      the site's fixed-dark sections already moved to. */
-  --background-primary: #C3C3C3;
-  --background-surface: #D4D4D4;
+  --background-primary: #F8F8F8;
+  --background-surface: #EFEFEF;
   --text-primary: #1A1A1A;
   --text-secondary: #5C5C5C;
   --accent-growth: #EA580C;
   --accent-growth-rgb: 234 88 12;
   --accent-technical: #0284C7;
-  --border-color: #A8A8A8;
-  --surface-color: #B0B0B0;
-  --card-base: #D4D4D4;
-  --card-active: #EFEFEF;
-  --chip-bg: rgba(0, 0, 0, 0.08);
+  --border-color: #E0E0E0;
+  --surface-color: #EDEDED;
+  --card-base: #F2F2F2;
+  --card-active: #FFFFFF;
+  --chip-bg: rgba(0, 0, 0, 0.05);
 }
 
 .dark {

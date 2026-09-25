@@ -47,12 +47,6 @@ const iconComponents = {
   ),
 };
 
-const ArrowUpRight = (
-  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H8m9 0v9" />
-  </svg>
-);
-
 const TAGS: Record<number, string[]> = {
   1: ['Analytics Audit', 'Competitive Research', 'Customer Insight'],
   2: ['Testable Assumptions', 'Prioritization', 'Growth Potential'],
@@ -177,7 +171,6 @@ export default function Methodology() {
 
           <div className="flex flex-col gap-[26vh] pb-[24vh]">
             {methodologySteps.map((step, i) => {
-              const isActive = i === activeIdx;
               return (
                 <div
                   key={step.step}
@@ -205,7 +198,7 @@ export default function Methodology() {
                       className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-white sm:h-12 sm:w-12"
                       style={{ background: CAPSULE_GRADIENT[step.step] }}
                     >
-                      {isActive ? ArrowUpRight : iconComponents[step.icon as keyof typeof iconComponents]}
+                      {iconComponents[step.icon as keyof typeof iconComponents]}
                     </div>
                   </div>
 

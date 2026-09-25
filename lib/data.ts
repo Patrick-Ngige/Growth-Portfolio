@@ -16,6 +16,7 @@ export interface CaseStudy {
   featuredImage?: string;
   images?: string[];
   tags: string[];
+  inProgress?: boolean;
 }
 
 export interface Capability {
@@ -65,27 +66,106 @@ export const capabilities: Capability[] = [
 
 export const caseStudies: CaseStudy[] = [
   {
-    id: 'enterprise-cms',
-    company: 'KCB Bank, I&M Bank, TotalEnergies Kenya, Prime Bank',
+    id: 'kcb-bank',
+    company: 'KCB Bank',
     industry: 'Enterprise / Finance',
     category: 'web',
-    metricValue: '4',
-    metricLabel: 'Enterprise & Bank Sites Built',
+    metricValue: '8',
+    metricLabel: 'Regional Sites on Statamic',
     context:
-      'As part of the Creative Edge / FCB Nairobi team, building websites for banks and enterprise clients, each matching that client\'s existing CMS infrastructure',
+      'As part of the Creative Edge / FCB Nairobi team: rebuilding KCB Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda/BPR, South Sudan, Bancassurance, Insurance) on Statamic.',
     challenge:
-      'Each organization needed a modern, secure, well-structured website on the CMS their team already standardized on, not a one-size-fits-all rebuild.',
+      'A regional banking group needed a consistent, modern CMS platform across its Kenya headquarters site and every subsidiary market, without each country site drifting into its own one-off build.',
     approach:
-      'Rebuilt KCB Bank\'s website on Statamic, focused on Core Web Vitals and information architecture as part of a broader SEO-driven redesign. Built a WordPress site for I&M Bank and a Drupal site for TotalEnergies Kenya, each matching the client\'s existing CMS. Currently building a website for Prime Bank.',
+      'Rebuilt KCB Bank\'s website and its regional subsidiary sites on Statamic, focused on Core Web Vitals and information architecture as part of a broader SEO-driven redesign.',
     result:
-      'Three sites shipped (KCB, I&M, TotalEnergies); Prime Bank in development. Work delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
+      'Group site and regional subsidiary sites shipped and live on Statamic. Work delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
     technicalExecution: [
-      'Statamic build for KCB Bank',
-      'WordPress build for I&M Bank',
-      'Drupal build for TotalEnergies Kenya',
-      'Prime Bank build in progress',
+      'Statamic CMS build, shared across KCB Group and its regional subsidiaries',
+      'Core Web Vitals and information architecture focus as part of an SEO-driven redesign',
     ],
-    tags: ['Enterprise', 'CMS', 'Statamic', 'WordPress', 'Drupal'],
+    images: [
+      '/images/work/kcb-bank/kcb-ke.png',
+      '/images/work/kcb-bank/kcb-group.png',
+      '/images/work/kcb-bank/kcb-insurance.png',
+      '/images/work/kcb-bank/kcb-bi.png',
+      '/images/work/kcb-bank/kcb-ss.png',
+      '/images/work/kcb-bank/kcb-bpr-rwanda.png',
+      '/images/work/kcb-bank/kcb-tanzania.png',
+      '/images/work/kcb-bank/kcb-uganda.png',
+    ],
+    tags: ['Enterprise', 'CMS', 'Statamic', 'Banking'],
+  },
+  {
+    id: 'im-bank',
+    company: 'I&M Bank',
+    industry: 'Enterprise / Finance',
+    category: 'web',
+    metricValue: '5',
+    metricLabel: 'Regional Sites Maintained',
+    context:
+      'As part of the Creative Edge / FCB Nairobi team: ongoing maintenance and additional development across I&M Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda), a WordPress build inherited from a prior team, not built from scratch.',
+    challenge:
+      'A live, multi-country banking group site needed continuous upkeep and new feature work across five markets without disrupting an existing WordPress setup built before this engagement started.',
+    approach:
+      'Ongoing maintenance and additional development on the existing WordPress builds for I&M Group and its Kenya, Uganda, Tanzania, and Rwanda subsidiary sites.',
+    result:
+      'All five sites kept current and extended with new development as requirements come in, across the group and regional subsidiary sites.',
+    technicalExecution: [
+      'WordPress maintenance across I&M Group and its regional subsidiaries',
+      'Additional feature development on the existing WordPress builds',
+    ],
+    images: [
+      '/images/work/im-bank/im-group.png',
+      '/images/work/im-bank/im-kenya.png',
+      '/images/work/im-bank/im-tanzania.png',
+      '/images/work/im-bank/im-uganda.png',
+      '/images/work/im-bank/im-rwanda.png',
+    ],
+    tags: ['Enterprise', 'CMS', 'WordPress', 'Maintenance', 'Banking'],
+  },
+  {
+    id: 'totalenergies-kenya',
+    company: 'TotalEnergies Kenya',
+    industry: 'Enterprise / Energy',
+    category: 'web',
+    metricValue: '1',
+    metricLabel: 'Site Maintained',
+    context:
+      'As part of the Creative Edge / FCB Nairobi team: mainly maintenance on TotalEnergies Kenya\'s Drupal site, not a from-scratch build.',
+    challenge:
+      'A live enterprise Drupal site needed reliable upkeep for an energy brand running ongoing campaigns and content updates.',
+    approach:
+      'Mainly maintenance work on TotalEnergies Kenya\'s existing Drupal site.',
+    result:
+      'Site kept current and stable on Drupal.',
+    technicalExecution: [
+      'Drupal maintenance for TotalEnergies Kenya',
+    ],
+    images: ['/images/work/totalenergies-kenya/totalenergies-home.png'],
+    tags: ['Enterprise', 'CMS', 'Drupal', 'Maintenance'],
+  },
+  {
+    id: 'prime-bank',
+    company: 'Prime Bank',
+    industry: 'Enterprise / Finance',
+    category: 'web',
+    metricValue: '1',
+    metricLabel: 'Site in Development',
+    context:
+      'As part of the Creative Edge / FCB Nairobi team: building a new website for Prime Bank, currently in development.',
+    challenge:
+      'Prime Bank needed a modern, secure, well-structured website matching the bank\'s own standards.',
+    approach:
+      'Currently building a website for Prime Bank as part of the Creative Edge / FCB Nairobi team.',
+    result:
+      'In development. Result to be added once shipped.',
+    technicalExecution: [
+      'Build in progress',
+    ],
+    images: ['/images/work/prime-bank/prime-bank.png'],
+    tags: ['Enterprise', 'Banking', 'In Development'],
+    inProgress: true,
   },
   {
     id: 'strathmore-foundation',
@@ -107,6 +187,7 @@ export const caseStudies: CaseStudy[] = [
       'Events relayed to GA4, Meta CAPI, and Google Ads',
       'foundation.strathmore.edu and alumni.strathmore.edu built and shipped',
     ],
+    images: ['/images/work/strathmore-foundation/alumni-strathmore.png'],
     tags: ['Analytics', 'Server-Side Tracking', 'GA4', 'Nonprofit'],
   },
   {
@@ -129,6 +210,7 @@ export const caseStudies: CaseStudy[] = [
       'Supabase backend',
       'M-Pesa Daraja, Paystack, and Stripe payment integration',
     ],
+    images: ['/images/work/ngige-growth-audit/audit-tool.jpg'],
     tags: ['AI', 'Solo Product', 'Next.js', 'Payments'],
   },
   {
@@ -269,20 +351,29 @@ export const caseStudies: CaseStudy[] = [
     metricValue: '8',
     metricLabel: 'Product Areas Designed & Built',
     context:
-      'A solo-designed and built SaaS concept: an influencer-campaign management platform for the Kenyan market, built Kenya-first rather than adapted from a Western tool',
+      'A solo-designed and built influencer marketing intelligence platform for the Kenyan and broader East African market, built Kenya-first with a from-scratch design system, not adapted from a Western tool',
     challenge:
-      'Kenyan agencies were running influencer campaigns through WhatsApp groups, spreadsheets, and manual M-Pesa transfers. International tools like Grin and AspireIQ ignored M-Pesa, KRA tax compliance, and local market specifics entirely.',
+      'Kenya\'s influencer economy is growing fast but stays fragmented: brands and agencies coordinate creator discovery, deal flow, and payments across spreadsheets, WhatsApp threads, M-Pesa confirmations, and manual analytics exports. International tools like Grin and AspireIQ ignore M-Pesa, KRA tax compliance, and local market specifics entirely, and no dedicated local platform filled that gap.',
     approach:
-      'Designed and built a Kenya-first platform end to end: influencer discovery with AI match scoring, campaign assignment with real-time budget tracking, a collaboration hub with Swahili support, KRA-compliant contracts, and M-Pesa-first payouts with automatic withholding tax.',
+      'Designed and built a Kenya-first platform end to end across 8 modules: a live campaign-health Dashboard, Campaigns management, creator Discovery with niche/tier/platform filtering, deep-metrics Analytics, a brand-creator Hub, digital-signing Contracts, Payments scheduling and disbursement tracking, and AI Insights for recommendations and anomaly detection. Built a design system from scratch rather than relying on default Tailwind styling: a 6-level depth stack (--bg through --raised) for visual hierarchy on dark layouts without leaning on shadows, and colour-coded section accents (blue for metrics, teal for analytics, amber for alerts, green for live feed, purple for AI/sentiment) so the eye can jump straight to a section without reading labels. Dark mode is the default, not an afterthought, since the primary user is a marketing manager reviewing performance data for extended sessions, and charts read more legibly against a dark canvas.',
     result:
-      'Shipped as a complete MVP across 8 product areas (dashboard, discovery, campaigns, analytics, collaboration, contracts, payments, AI insights), with a typed data layer built to mirror real API shapes for a low-friction swap to live data once integrations are wired in.',
+      'Shipped as a fully navigable prototype across all 8 modules, demo-ready for stakeholders and investors: a clean production build with zero TypeScript errors (tsc --noEmit), 12 statically generated routes, and a consistent design language throughout.',
     technicalExecution: [
-      'Next.js 14 + TypeScript + Tailwind CSS',
-      'Chart.js analytics visualizations',
+      'Next.js 14 App Router (React Server Components + Client Components), TypeScript in strict mode',
+      'Tailwind CSS plus a custom design-token system via CSS variables, chosen over Tailwind alone for runtime theming and contextual depth changes (e.g. a card elevating only on hover)',
+      'Chart.js analytics visualizations, full dark mode, mobile-responsive layout with a collapsible sidebar',
       'Kenya-first product decisions: M-Pesa-first payouts, KRA withholding tax, EAT timezone, Swahili UI support',
       'API-shaped data layer designed for a one-file swap to live integrations',
     ],
-    tags: ['Personal Project', 'SaaS', 'Next.js', 'Product Design'],
+    images: [
+      '/images/work/pulseke/campaign-dashboard.jpg',
+      '/images/work/pulseke/talent-discovery.jpg',
+      '/images/work/pulseke/ai-insights.jpg',
+      '/images/work/pulseke/advanced-analytics.jpg',
+      '/images/work/pulseke/payments-compliance.jpg',
+      '/images/work/pulseke/contracts-agreements.jpg',
+    ],
+    tags: ['Personal Project', 'SaaS', 'Next.js', 'Design System'],
   },
   {
     id: 'sentinel-ai',
@@ -350,7 +441,7 @@ export const methodologySteps = [
 
 export const metricsSnapshot: MetricSnapshot[] = [
   { label: 'Years Building', value: 4, suffix: '' },
-  { label: 'Enterprise & Bank Sites', value: 4, suffix: '' },
+  { label: 'Enterprise & Bank Clients', value: 4, suffix: '' },
   { label: 'Public GitHub Repos', value: 50, suffix: '+' },
   { label: 'Languages Localized', value: 20, suffix: '+' },
 ];

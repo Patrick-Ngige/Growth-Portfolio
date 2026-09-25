@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { caseStudies, type CaseStudy } from '@/lib/data';
@@ -44,6 +45,102 @@ const CATEGORY_LABEL: Record<CaseStudy['category'], string> = {
   'paid-media': 'Paid Media',
   strategy: 'Growth Strategy',
 };
+
+// Icon-tagged meta rows and chapter pills, borrowed from Kora's case-study
+// pages (kora.framer.media/cases/sitemark): small icon next to each label
+// instead of bare mono text.
+function IndustryIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4" />
+    </svg>
+  );
+}
+function TypeIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5h16M4 12h10M4 19h16" />
+    </svg>
+  );
+}
+function StackIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3l9 5-9 5-9-5 9-5zm-9 9l9 5 9-5m-18 5l9 5 9-5" />
+    </svg>
+  );
+}
+function ChallengeIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86l-8.18 14.18A1 1 0 003 19.5h18a1 1 0 00.89-1.46L13.71 3.86a1 1 0 00-1.72 0z" />
+    </svg>
+  );
+}
+function ApproachIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" strokeWidth={2} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 9l-4.5 6L9 12.5" />
+    </svg>
+  );
+}
+function BuildIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.27 6.96L12 12l8.73-5.04M12 22.08V12" />
+    </svg>
+  );
+}
+function ResultIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 17l6-6 4 4 8-8m0 0h-5m5 0v5" />
+    </svg>
+  );
+}
+function CheckIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+function ClockIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" strokeWidth={2} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 7v5l3 3" />
+    </svg>
+  );
+}
+
+function ChapterPill({ icon, label, dark }: { icon: ReactNode; label: string; dark?: boolean }) {
+  return (
+    <span
+      className={
+        dark
+          ? 'mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-accent-growth'
+          : 'mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--background-surface)] px-3 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-accent-growth lg:mb-6'
+      }
+    >
+      {icon}
+      {label}
+    </span>
+  );
+}
+
+// Splits a result sentence/paragraph into individual claims for the
+// checklist below, borrowed from Kora's "Results" chapter (a list of
+// checkmarked wins, not one paragraph). No new facts invented - same
+// text, just broken at sentence boundaries.
+function splitResultHighlights(result: string): string[] {
+  return result
+    .split(/(?<=[.!?])\s+(?=[A-Z])/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 const revealProps = {
   initial: { opacity: 0, y: 28 },
@@ -112,11 +209,20 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               <motion.div {...revealProps} className="grid gap-3.5 sm:gap-4 lg:grid-cols-[1.4fr_1fr]">
                 <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 sm:p-8">
                   <dl className="grid gap-5 sm:grid-cols-[120px_1fr] sm:gap-y-6">
-                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Industry</dt>
+                    <dt className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                      <IndustryIcon />
+                      Industry
+                    </dt>
                     <dd className="text-base text-[var(--text-primary)]">{study.industry}</dd>
-                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Type</dt>
+                    <dt className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                      <TypeIcon />
+                      Type
+                    </dt>
                     <dd className="text-base text-[var(--text-primary)]">{CATEGORY_LABEL[study.category]}</dd>
-                    <dt className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Stack</dt>
+                    <dt className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                      <StackIcon />
+                      Stack
+                    </dt>
                     <dd className="flex flex-wrap gap-2">
                       {study.tags.map((tag) => (
                         <span
@@ -146,14 +252,12 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             </div>
           </section>
 
-          {/* Gallery - real screenshots when study.images exists, three
-              placeholder frames otherwise. Kept as its own step so wiring
-              in real images later is a one-line data change, not a
-              layout change. */}
+          {/* Gallery - real screenshots when study.images exists (any count,
+              not capped at 3), three placeholder frames otherwise. */}
           <section id="gallery" className="pb-16 lg:pb-24">
             <div className="container-main">
               <motion.div {...revealProps} className="grid grid-cols-1 gap-3.5 sm:grid-cols-3 sm:gap-4">
-                {[0, 1, 2].map((i) => {
+                {(study.images && study.images.length > 0 ? study.images.map((_, i) => i) : [0, 1, 2]).map((i) => {
                   const src = study.images?.[i];
                   return (
                     <div
@@ -185,7 +289,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                   01
                 </span>
                 <div className="border-l-2 border-accent-growth/40 pl-6 lg:pl-10">
-                  <span className="mb-4 block font-mono text-xs uppercase tracking-[0.14em] text-accent-growth lg:hidden">01 / Challenge</span>
+                  <ChapterPill icon={<ChallengeIcon />} label="The Challenge" />
                   <p className="max-w-3xl font-display text-3xl font-semibold leading-[1.25] text-[var(--text-primary)] lg:text-4xl">
                     {study.challenge}
                   </p>
@@ -203,7 +307,9 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               <div className="grid gap-8 lg:grid-cols-[160px_1fr] lg:gap-16">
                 <div>
                   <span className="font-display text-5xl font-bold text-[var(--text-primary)] opacity-10">02</span>
-                  <span className="mt-2 block font-mono text-xs uppercase tracking-[0.14em] text-[var(--text-secondary)]">Approach</span>
+                  <div className="mt-2">
+                    <ChapterPill icon={<ApproachIcon />} label="The Approach" />
+                  </div>
                 </div>
                 <div>
                   <p className="max-w-2xl text-lg leading-relaxed text-[var(--text-primary)] lg:text-xl">{study.approach}</p>
@@ -217,7 +323,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               checklist. */}
           <motion.section {...revealProps} id="build" className="py-20 lg:py-28">
             <div className="container-main">
-              <span className="mb-8 block font-mono text-xs uppercase tracking-[0.14em] text-accent-growth">03 / Build</span>
+              <ChapterPill icon={<BuildIcon />} label="The Build" />
               <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
                 {study.technicalExecution.map((item, i) => (
                   <div
@@ -242,10 +348,50 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
         <div className="bg-[#09090B]">
           <motion.section {...revealProps} id="result" className="py-24 lg:py-36">
             <div className="container-main">
-              <span className="mb-6 block font-mono text-xs uppercase tracking-[0.14em] text-accent-growth">04 / Result</span>
-              <p className="max-w-3xl font-display text-3xl font-semibold leading-[1.25] text-[#F4F4F5] lg:text-4xl">
-                {study.result}
-              </p>
+              <ChapterPill icon={<ResultIcon />} label="The Results" dark />
+
+              {(() => {
+                if (study.inProgress) {
+                  return (
+                    <div className="max-w-2xl rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-7 py-8 sm:px-9 sm:py-10">
+                      <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#F4F4F5]">
+                        <ClockIcon />
+                      </span>
+                      <p className="font-display text-2xl font-semibold leading-[1.3] text-[#A1A1AA] sm:text-3xl">
+                        {study.result}
+                      </p>
+                    </div>
+                  );
+                }
+                const highlights = splitResultHighlights(study.result);
+                if (highlights.length < 2) {
+                  return (
+                    <div className="max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-7 py-8 sm:px-9 sm:py-10">
+                      <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
+                        <CheckIcon />
+                      </span>
+                      <p className="font-display text-2xl font-semibold leading-[1.3] text-[#F4F4F5] sm:text-3xl">
+                        {study.result}
+                      </p>
+                    </div>
+                  );
+                }
+                return (
+                  <ul className="max-w-2xl space-y-3">
+                    {highlights.map((line) => (
+                      <li
+                        key={line}
+                        className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5"
+                      >
+                        <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
+                          <CheckIcon />
+                        </span>
+                        <span className="text-base leading-snug text-[#F4F4F5] sm:text-lg">{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
 
               <div className="mt-14">
                 <MagneticButton strength={30}>

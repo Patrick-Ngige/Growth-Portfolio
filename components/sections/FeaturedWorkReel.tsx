@@ -46,7 +46,9 @@ if (typeof window !== 'undefined') {
  * `overflow-hidden` on an ancestor - that broke a previous GSAP pin (see
  * PinnedPillars fix, 2026-09-13 commit).
  */
-const FEATURED = caseStudies.slice(0, 6);
+// 13, not 6: bumped so PulseKE (index 12) is reachable from the homepage
+// reel, not just the /work index page.
+const FEATURED = caseStudies.slice(0, 13);
 
 const BAND_BG = '#000000';
 const INK = '#F5F5F5';
@@ -155,18 +157,30 @@ export default function FeaturedWorkReel() {
               style={{ willChange: 'transform' }}
             >
               {/* trionn's .wc-shot: flex:1, radius 8px, padding 30px, mono
-                  label pinned top-left. Gradient placeholder stands in for
-                  a real screenshot Patrick doesn't have yet. */}
+                  label pinned top-left. Real screenshot when study.images
+                  has one, gradient placeholder otherwise. */}
               <div
                 className="relative flex flex-1 flex-col justify-end overflow-hidden rounded-lg p-[30px] text-white"
-                style={{ background: SHOT_GRADIENTS[i % SHOT_GRADIENTS.length] }}
+                style={study.images?.[0] ? undefined : { background: SHOT_GRADIENTS[i % SHOT_GRADIENTS.length] }}
               >
-                <span className="absolute left-[30px] top-[30px] font-mono text-[11px] uppercase tracking-[0.14em] text-white/70">
+                {study.images?.[0] && (
+                  <>
+                    <img
+                      src={study.images[0]}
+                      alt={`${study.company} screenshot`}
+                      className="absolute inset-0 h-full w-full object-cover object-top"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  </>
+                )}
+                <span className="absolute left-[30px] top-[30px] z-10 font-mono text-[11px] uppercase tracking-[0.14em] text-white/70">
                   {study.industry}
                 </span>
-                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/70">
-                  Screenshot pending
-                </span>
+                {!study.images?.[0] && (
+                  <span className="relative z-10 font-mono text-[11px] uppercase tracking-[0.14em] text-white/70">
+                    Screenshot pending
+                  </span>
+                )}
               </div>
               {/* trionn's .wc-meta: flex:0 0 auto, gap 10px, h3 1.7rem/600, p 14px/40ch */}
               <div className="flex flex-none flex-col gap-[10px]">

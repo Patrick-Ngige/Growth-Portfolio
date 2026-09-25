@@ -355,6 +355,14 @@ export default function PinnedPillars({
           top: 0,
           left: 0,
           display: "flex",
+          // boxSizing + paddingTop rather than a plain height so this stays
+          // truly full-bleed (background, overflow clip) while centering the
+          // content in the space actually visible BELOW the fixed header -
+          // 96px matches the h-24 spacer Header.tsx reserves for itself
+          // elsewhere. Without this the plate/cards centre on the raw 100vh
+          // and read as sitting too high, half-hidden behind the header pill.
+          boxSizing: "border-box",
+          paddingTop: "96px",
           height: "100vh",
           width: "100vw",
           alignItems: "center",

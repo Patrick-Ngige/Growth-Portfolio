@@ -45,8 +45,12 @@ export default function Header() {
       >
         <div
           className={cn(
-            'flex items-center justify-between rounded-full border border-[var(--border-color)]/70 bg-[var(--background-surface)]/90 px-6 backdrop-blur-lg transition-shadow duration-300 h-16',
-            isScrolled ? 'shadow-lg shadow-black/5' : 'shadow-sm shadow-black/[0.02]'
+            // A crisp, near-opaque pill (not a translucent tint of the page
+            // background) so it stays legible whether it's floating over a
+            // near-white section or one of the site's fixed-dark panels
+            // (PinnedPillars, WorkDetailView's closing sections, Footer).
+            'flex items-center justify-between rounded-full border border-black/10 bg-white/95 px-6 backdrop-blur-lg transition-shadow duration-300 h-16 dark:border-white/10 dark:bg-[#18181B]/95',
+            isScrolled ? 'shadow-lg shadow-black/10' : 'shadow-sm shadow-black/5'
           )}
         >
             {/* Logo */}
