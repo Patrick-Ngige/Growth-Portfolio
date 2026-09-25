@@ -1,7 +1,7 @@
 'use client';
 
 import StripReveal from '@/components/motion/StripReveal';
-import { MetricBlock } from '@/components/ui/CaseStudyCard';
+import MetricsGrid from './MetricsGrid';
 
 /**
  * The featured-metrics band, split out of the old CaseStudies section when
@@ -36,12 +36,7 @@ export default function FeaturedMetrics() {
           separate one stacked on top was redundant, the same reasoning
           that dropped AnimatedSection's fade from GrowthStack. */}
       <div className="container-main">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricBlock value="+280%" label="Checkout CR" />
-          <MetricBlock value="4" label="Bank & Enterprise Sites" />
-          <MetricBlock value="14" label="Growth Dimensions Analyzed" />
-          <MetricBlock value="4" label="Years Building" />
-        </div>
+        <MetricsGrid />
       </div>
 
       {/* Hands off into Methodology - colour-matched to its background
