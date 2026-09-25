@@ -388,7 +388,16 @@ export default function PinnedPillars({
           // reliably centring it (the plate, and the word labels drawn onto
           // its canvas, were rendering from the panel's top-left instead,
           // clipping behind the floating header on tall/narrow viewports).
-          style={{ position: "absolute", inset: 0, margin: "auto", aspectRatio: "1 / 1", width: "55.6vw", willChange: "filter, opacity" }}
+          // min(55.6vw, 82vh): on a wide-but-short real browser window (a
+          // maximised 1920x1080 window has an actual viewport closer to
+          // 1920x950 once browser chrome is subtracted), 55.6vw alone can
+          // compute TALLER than the viewport itself - e.g. 1067px on a
+          // 1920px-wide window with only 963px of height - so the diagram
+          // clips at both the top (behind the header) and the bottom
+          // regardless of how well it's centred. Capping by vh too means it
+          // always fits vertically, with the vw term still driving the size
+          // on normal (taller-than-wide-relative) viewports.
+          style={{ position: "absolute", inset: 0, margin: "auto", aspectRatio: "1 / 1", width: "min(55.6vw, 82vh)", willChange: "filter, opacity" }}
         >
           <div ref={plateRef} style={{ height: "100%", width: "100%", willChange: "transform", transform: "scale(12.5) rotate(90deg)" }}>
             <PillarPlate lobes={lobes} ink={ink} fill={plateFill} style={{ height: "100%", width: "100%" }} />
@@ -406,7 +415,7 @@ export default function PinnedPillars({
           // tween.
           style={{ position: "relative", zIndex: 10, marginTop: "20vh", display: "flex", width: "100%", alignItems: "center", justifyContent: "center", willChange: "transform" }}
         >
-          <div ref={dialRef} className="pp-dial" style={{ position: "relative", display: "grid", placeItems: "center", width: "47vw", height: "47vw" }}>
+          <div ref={dialRef} className="pp-dial" style={{ position: "relative", display: "grid", placeItems: "center", width: "min(47vw, 70vh)", height: "min(47vw, 70vh)" }}>
             {Array.from({ length: TICKS }, (_, i) => {
               const deg = (i / TICKS) * 360;
               const rad = (deg * Math.PI) / 180;
@@ -461,7 +470,7 @@ export default function PinnedPillars({
       <style>{`
         .pp-dial-title { font-size: 3.3vw; }
         @media (max-width: 1024px) {
-          .pp-plate-wrap { width: 80vw; }
+          .pp-plate-wrap { width: min(80vw, 78vh); }
           .pp-dial-title { font-size: 6vw; }
           .pp-cards { flex-direction: column; gap: 1.6vh; padding-left: 8vw; padding-right: 8vw; }
           .pp-card { width: 100% !important; gap: 0.5rem !important; margin-top: 0 !important; margin-bottom: 0 !important; padding: 1rem !important; }

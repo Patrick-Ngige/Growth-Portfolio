@@ -214,6 +214,38 @@ export const caseStudies: CaseStudy[] = [
     tags: ['AI', 'Solo Product', 'Next.js', 'Payments'],
   },
   {
+    id: 'pulseke',
+    company: 'PulseKE (personal project, solo product)',
+    industry: 'SaaS / MarTech',
+    category: 'strategy',
+    metricValue: '8',
+    metricLabel: 'Product Areas Designed & Built',
+    context:
+      'A solo-designed and built influencer marketing intelligence platform for the Kenyan and broader East African market, built Kenya-first with a from-scratch design system, not adapted from a Western tool',
+    challenge:
+      'Kenya\'s influencer economy is growing fast but stays fragmented: brands and agencies coordinate creator discovery, deal flow, and payments across spreadsheets, WhatsApp threads, M-Pesa confirmations, and manual analytics exports. International tools like Grin and AspireIQ ignore M-Pesa, KRA tax compliance, and local market specifics entirely, and no dedicated local platform filled that gap.',
+    approach:
+      'Designed and built a Kenya-first platform end to end across 8 modules: a live campaign-health Dashboard, Campaigns management, creator Discovery with niche/tier/platform filtering, deep-metrics Analytics, a brand-creator Hub, digital-signing Contracts, Payments scheduling and disbursement tracking, and AI Insights for recommendations and anomaly detection. Built a design system from scratch rather than relying on default Tailwind styling: a 6-level depth stack (--bg through --raised) for visual hierarchy on dark layouts without leaning on shadows, and colour-coded section accents (blue for metrics, teal for analytics, amber for alerts, green for live feed, purple for AI/sentiment) so the eye can jump straight to a section without reading labels. Dark mode is the default, not an afterthought, since the primary user is a marketing manager reviewing performance data for extended sessions, and charts read more legibly against a dark canvas.',
+    result:
+      'Shipped as a fully navigable prototype across all 8 modules, demo-ready for stakeholders and investors: a clean production build with zero TypeScript errors (tsc --noEmit), 12 statically generated routes, and a consistent design language throughout.',
+    technicalExecution: [
+      'Next.js 14 App Router (React Server Components + Client Components), TypeScript in strict mode',
+      'Tailwind CSS plus a custom design-token system via CSS variables, chosen over Tailwind alone for runtime theming and contextual depth changes (e.g. a card elevating only on hover)',
+      'Chart.js analytics visualizations, full dark mode, mobile-responsive layout with a collapsible sidebar',
+      'Kenya-first product decisions: M-Pesa-first payouts, KRA withholding tax, EAT timezone, Swahili UI support',
+      'API-shaped data layer designed for a one-file swap to live integrations',
+    ],
+    images: [
+      '/images/work/pulseke/campaign-dashboard.jpg',
+      '/images/work/pulseke/talent-discovery.jpg',
+      '/images/work/pulseke/ai-insights.jpg',
+      '/images/work/pulseke/advanced-analytics.jpg',
+      '/images/work/pulseke/payments-compliance.jpg',
+      '/images/work/pulseke/contracts-agreements.jpg',
+    ],
+    tags: ['Personal Project', 'SaaS', 'Next.js', 'Design System'],
+  },
+  {
     id: 'phoina-beauty',
     company: 'Phoina Beauty',
     industry: 'E-commerce',
@@ -342,38 +374,6 @@ export const caseStudies: CaseStudy[] = [
       'Deployed on Cloudflare Pages via next-on-pages, with edge AI routes',
     ],
     tags: ['Personal Project', 'Next.js', 'Brand Concept', 'Gamification'],
-  },
-  {
-    id: 'pulseke',
-    company: 'PulseKE (personal project, solo product)',
-    industry: 'SaaS / MarTech',
-    category: 'strategy',
-    metricValue: '8',
-    metricLabel: 'Product Areas Designed & Built',
-    context:
-      'A solo-designed and built influencer marketing intelligence platform for the Kenyan and broader East African market, built Kenya-first with a from-scratch design system, not adapted from a Western tool',
-    challenge:
-      'Kenya\'s influencer economy is growing fast but stays fragmented: brands and agencies coordinate creator discovery, deal flow, and payments across spreadsheets, WhatsApp threads, M-Pesa confirmations, and manual analytics exports. International tools like Grin and AspireIQ ignore M-Pesa, KRA tax compliance, and local market specifics entirely, and no dedicated local platform filled that gap.',
-    approach:
-      'Designed and built a Kenya-first platform end to end across 8 modules: a live campaign-health Dashboard, Campaigns management, creator Discovery with niche/tier/platform filtering, deep-metrics Analytics, a brand-creator Hub, digital-signing Contracts, Payments scheduling and disbursement tracking, and AI Insights for recommendations and anomaly detection. Built a design system from scratch rather than relying on default Tailwind styling: a 6-level depth stack (--bg through --raised) for visual hierarchy on dark layouts without leaning on shadows, and colour-coded section accents (blue for metrics, teal for analytics, amber for alerts, green for live feed, purple for AI/sentiment) so the eye can jump straight to a section without reading labels. Dark mode is the default, not an afterthought, since the primary user is a marketing manager reviewing performance data for extended sessions, and charts read more legibly against a dark canvas.',
-    result:
-      'Shipped as a fully navigable prototype across all 8 modules, demo-ready for stakeholders and investors: a clean production build with zero TypeScript errors (tsc --noEmit), 12 statically generated routes, and a consistent design language throughout.',
-    technicalExecution: [
-      'Next.js 14 App Router (React Server Components + Client Components), TypeScript in strict mode',
-      'Tailwind CSS plus a custom design-token system via CSS variables, chosen over Tailwind alone for runtime theming and contextual depth changes (e.g. a card elevating only on hover)',
-      'Chart.js analytics visualizations, full dark mode, mobile-responsive layout with a collapsible sidebar',
-      'Kenya-first product decisions: M-Pesa-first payouts, KRA withholding tax, EAT timezone, Swahili UI support',
-      'API-shaped data layer designed for a one-file swap to live integrations',
-    ],
-    images: [
-      '/images/work/pulseke/campaign-dashboard.jpg',
-      '/images/work/pulseke/talent-discovery.jpg',
-      '/images/work/pulseke/ai-insights.jpg',
-      '/images/work/pulseke/advanced-analytics.jpg',
-      '/images/work/pulseke/payments-compliance.jpg',
-      '/images/work/pulseke/contracts-agreements.jpg',
-    ],
-    tags: ['Personal Project', 'SaaS', 'Next.js', 'Design System'],
   },
   {
     id: 'sentinel-ai',
