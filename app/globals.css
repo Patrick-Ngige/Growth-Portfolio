@@ -158,3 +158,59 @@
   }
 }
 
+/* WorkGallery's full-bleed hero: a curtain-style clip-path reveal that
+   plays forward on scroll-in and reverses on scroll-out (driven by
+   framer-motion's whileInView with once:false in WorkGallery.tsx, which
+   toggles .gallery-hero--in), a one-shot diagonal light sweep replayed on
+   each entrance, and a slow Ken Burns drift while visible. Kept as plain
+   CSS/keyframes rather than GSAP since it's a simple two-state reveal, not
+   a scroll-scrubbed timeline. */
+.gallery-hero {
+  clip-path: inset(0 38% 0 38% round 20px);
+  transform: scale(1.08);
+  transition: clip-path 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gallery-hero--in {
+  clip-path: inset(0 0% 0 0% round 20px);
+  transform: scale(1);
+}
+.gallery-hero__img {
+  transform-origin: center;
+}
+.gallery-hero--in .gallery-hero__img {
+  animation: gallery-hero-kenburns 14s ease-in-out infinite alternate;
+}
+@keyframes gallery-hero-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+.gallery-hero__sweep {
+  transform: translateX(-140%);
+}
+.gallery-hero--sweep .gallery-hero__sweep {
+  animation: gallery-hero-sweep 1.3s ease-out 0.2s 1;
+}
+@keyframes gallery-hero-sweep {
+  to { transform: translateX(140%); }
+}
+.gallery-hero__cap {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease 0.5s, transform 0.6s ease 0.5s;
+}
+.gallery-hero--in .gallery-hero__cap {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-hero,
+  .gallery-hero__img,
+  .gallery-hero__cap {
+    transition: none !important;
+    animation: none !important;
+    clip-path: inset(0 0% 0 0% round 20px) !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { caseStudies, type CaseStudy } from '@/lib/data';
 import Counter from '@/components/anim/Counter';
 import MagneticButton from '@/components/anim/MagneticButton';
+import WorkGallery from '@/components/sections/WorkGallery';
 
 /**
  * Client half of the work-detail page (the server half in
@@ -252,28 +253,13 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             </div>
           </section>
 
-          {/* Gallery - real screenshots when study.images exists (any count,
-              not capped at 3), three placeholder frames otherwise. */}
+          {/* Gallery - see WorkGallery.tsx for the tiered hero/coverflow/
+              fanned-stack composition and why each tier only renders when
+              there's enough real material for it. */}
           <section id="gallery" className="pb-16 lg:pb-24">
             <div className="container-main">
-              <motion.div {...revealProps} className="grid grid-cols-1 gap-3.5 sm:grid-cols-3 sm:gap-4">
-                {(study.images && study.images.length > 0 ? study.images.map((_, i) => i) : [0, 1, 2]).map((i) => {
-                  const src = study.images?.[i];
-                  return (
-                    <div
-                      key={i}
-                      className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)]"
-                    >
-                      {src ? (
-                        <img src={src} alt={`${study.company} screenshot ${i + 1}`} className="h-full w-full object-cover" />
-                      ) : (
-                        <span className="px-3 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-                          Image pending
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
+              <motion.div {...revealProps}>
+                <WorkGallery images={study.images} company={study.company} />
               </motion.div>
             </div>
           </section>
