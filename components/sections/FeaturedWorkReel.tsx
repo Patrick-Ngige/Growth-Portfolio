@@ -68,13 +68,13 @@ const SHOT_GRADIENTS = [
 ];
 
 export default function FeaturedWorkReel() {
-  const sectionRef = useRef(null);
-  const pinRef = useRef(null);
-  const stageRef = useRef(null);
-  const rowRef = useRef(null);
-  const introRef = useRef(null);
-  const statsLayerRef = useRef(null);
-  const cardRefs = useRef([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const introRef = useRef<HTMLDivElement>(null);
+  const statsLayerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -84,7 +84,7 @@ export default function FeaturedWorkReel() {
     const statsLayer = statsLayerRef.current;
     if (!pin || !stage || !row || !statsLayer || reduced) return;
 
-    const cards = cardRefs.current.filter(Boolean);
+    const cards = cardRefs.current.filter((c): c is HTMLAnchorElement => c !== null);
     const dist = () => Math.max(0, row.scrollWidth - window.innerWidth);
     // Second leg of the scroll: once the last card has docked, the whole
     // reel (not just that card) slides fully off-screen left while the
@@ -154,7 +154,11 @@ export default function FeaturedWorkReel() {
           </div>
         </div>
 
-        <div ref={stageRef} className="absolute inset-0 z-10" style={{ willChange: 'transform' }}>
+        {/* Opaque background is load-bearing: without it, this layer is
+            transparent wherever there's no card/text, letting the static
+            stats layer behind it (z-0) show through prematurely during the
+            card-scroll phase instead of staying hidden until the reveal. */}
+        <div ref={stageRef} className="absolute inset-0 z-10" style={{ background: BAND_BG, willChange: 'transform' }}>
           <div
             ref={introRef}
             className="absolute left-0 top-0 z-10 flex h-[70vh] w-[34vw] flex-col justify-center gap-[22px] pointer-events-none"
