@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useInView } from 'framer-motion';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 
 /**
  * Three image tiers for WorkDetailView, replacing the old equal-weight
@@ -72,6 +72,24 @@ export function GalleryPlaceholder() {
 
 export function GalleryHero({ src, company, count }: { src: string; company: string; count: number }) {
   const ref = useRef<HTMLDivElement>(null);
+
+  // Continuous scroll-scrubbed scale, not a discrete two-state reveal: the
+  // hero sits at 80% (visibly smaller/zoomed out) while it's still entering
+  // or leaving the viewport, and grows to its full 100% exactly when it's
+  // centred - i.e. in focus. Symmetric on the way out, so scrolling past it
+  // shrinks it back down the same way it grew, mirroring the entrance.
+  // offset anchors: "start end" = the hero's top just touching the
+  // viewport's bottom (fully offscreen below), "center center" = the
+  // hero's centre aligned with the viewport's centre (fully in focus),
+  // "end start" = the hero's bottom just touching the viewport's top
+  // (fully offscreen above).
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center', 'end start'] });
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  useEffect(() => {
+    setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }, []);
+
   // amount:0 + a shrunk root (margin) rather than a percentage `amount`
   // threshold: a percentage-of-element trigger stopped firing reliably
   // once the hero's height was capped below (a tall near-4:3 screenshot
@@ -89,15 +107,16 @@ export function GalleryHero({ src, company, count }: { src: string; company: str
   }, [inView]);
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={`gallery-hero relative max-h-[78vh] overflow-hidden rounded-2xl border border-[var(--border-color)] ${inView ? 'gallery-hero--in' : ''}`}
+      style={{ scale: reducedMotion ? 1 : scale }}
+      className={`relative max-h-[78vh] overflow-hidden rounded-2xl border border-[var(--border-color)] ${inView ? 'gallery-hero--in' : ''}`}
     >
       {/* max-h above caps the box itself; object-cover here is what lets a
           near-4:3 screenshot (PulseKE's are 1600x1227) still fill that box
           edge-to-edge instead of leaving letterboxing or forcing its own
           native aspect ratio to dictate a hero taller than the viewport. */}
-      <img src={src} alt={`${company} screenshot 1`} className="gallery-hero__img h-[78vh] w-full object-cover" />
+      <img src={src} alt={`${company} screenshot 1`} className="h-[78vh] w-full object-cover" />
       <div
         key={sweepKey}
         className={`gallery-hero__sweep pointer-events-none absolute inset-0 z-[3] ${inView ? 'gallery-hero--sweep' : ''}`}
@@ -112,7 +131,7 @@ export function GalleryHero({ src, company, count }: { src: string; company: str
         </span>
         <span className="text-base font-semibold text-white sm:text-lg">{company}</span>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
