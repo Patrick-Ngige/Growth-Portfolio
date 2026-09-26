@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { caseStudies, type CaseStudy } from '@/lib/data';
 import Counter from '@/components/anim/Counter';
 import MagneticButton from '@/components/anim/MagneticButton';
-import WorkGallery from '@/components/sections/WorkGallery';
+import { useGalleryTiers, GalleryHero, GalleryPlaceholder, Coverflow, FannedStack } from '@/components/sections/WorkGallery';
 
 /**
  * Client half of the work-detail page (the server half in
@@ -156,6 +156,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
   const numericMetric = metricParts ? parseFloat(metricParts[2]) : NaN;
   const metricSuffix = metricParts?.[3] ?? '';
   const moreWork = caseStudies.filter((c) => c.id !== study.id).slice(0, 3);
+  const gallery = useGalleryTiers(study.images);
 
   return (
     <>
@@ -253,13 +254,19 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             </div>
           </section>
 
-          {/* Gallery - see WorkGallery.tsx for the tiered hero/coverflow/
-              fanned-stack composition and why each tier only renders when
-              there's enough real material for it. */}
+          {/* Gallery hero - the lead shot, right after the facts. See
+              WorkGallery.tsx for the coverflow and fanned-stack tiers,
+              which are spaced out between the later chapters below instead
+              of bunched here, so screenshots punctuate the narrative
+              rather than being dumped in one block before it starts. */}
           <section id="gallery" className="pb-16 lg:pb-24">
             <div className="container-main">
               <motion.div {...revealProps}>
-                <WorkGallery images={study.images} company={study.company} />
+                {gallery.hero ? (
+                  <GalleryHero src={gallery.hero} company={study.company} count={gallery.count} />
+                ) : (
+                  <GalleryPlaceholder />
+                )}
               </motion.div>
             </div>
           </section>
@@ -283,6 +290,18 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               </div>
             </div>
           </motion.section>
+
+          {/* Coverflow tier - a visual breather right after the tension of
+              the Challenge statement, before Approach explains how it was
+              solved. Only renders when there's real material for it (3+
+              images left after the hero). */}
+          {gallery.coverflowImages && (
+            <motion.section {...revealProps} className="pb-20 lg:pb-28">
+              <div className="container-main">
+                <Coverflow images={gallery.coverflowImages} company={study.company} />
+              </div>
+            </motion.section>
+          )}
 
           {/* 02 / Approach - asymmetric two-column: number+label held to a
               narrow left rail, the approach text and the tools it used
@@ -323,6 +342,18 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               </div>
             </div>
           </motion.section>
+
+          {/* Fanned-stack tier - whatever screenshots are left after the
+              hero and coverflow claim theirs, placed as a last visual beat
+              right before the Results chapter closes the story out. Only
+              renders when there's material left for it. */}
+          {gallery.stackImages.length > 0 && (
+            <motion.section {...revealProps} className="pb-20 lg:pb-28">
+              <div className="container-main">
+                <FannedStack images={gallery.stackImages} company={study.company} />
+              </div>
+            </motion.section>
+          )}
 
         </div>
 

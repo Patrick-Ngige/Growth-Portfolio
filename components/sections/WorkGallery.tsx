@@ -4,10 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { useInView } from 'framer-motion';
 
 /**
- * WorkDetailView's image section, replacing the old equal-weight 3-column
- * grid. Three tiers depending on how many screenshots a case study has
- * (most have exactly one, a couple have two, PulseKE has six - the data
- * decides which tiers render, nothing is padded out to fill a layout):
+ * Three image tiers for WorkDetailView, replacing the old equal-weight
+ * 3-column grid. Deliberately exported as separate pieces (not one bundled
+ * gallery block) so WorkDetailView can space them out between its
+ * narrative chapters - hero after Overview, coverflow after Challenge,
+ * fanned stack after Build - rather than dumping every screenshot in one
+ * spot before the text even starts. Tiers depend on how many screenshots a
+ * case study actually has (most have exactly one, a couple have two,
+ * PulseKE has six - nothing is padded out to fill a layout):
  *
  * 1. Full-bleed hero (any count >= 1) - the lead shot, with a curtain-style
  *    clip-path reveal that plays forward on scroll-in and reverses on
@@ -30,6 +34,23 @@ import { useInView } from 'framer-motion';
  * landing here.
  */
 
+export interface GalleryTiers {
+  hero: string | null;
+  count: number;
+  coverflowImages: [string, string, string] | null;
+  stackImages: string[];
+}
+
+export function useGalleryTiers(images?: string[]): GalleryTiers {
+  if (!images || images.length === 0) {
+    return { hero: null, count: 0, coverflowImages: null, stackImages: [] };
+  }
+  const [hero, ...rest] = images;
+  const coverflowImages = rest.length >= 3 ? (rest.slice(0, 3) as [string, string, string]) : null;
+  const stackImages = rest.length >= 3 ? rest.slice(3) : rest;
+  return { hero, count: images.length, coverflowImages, stackImages };
+}
+
 function fanTransform(i: number, n: number) {
   if (n === 1) return { xVw: 0, rest: -4, hover: 4 };
   const t = i / (n - 1);
@@ -39,7 +60,17 @@ function fanTransform(i: number, n: number) {
   return { xVw, rest, hover };
 }
 
-function GalleryHero({ src, company, count }: { src: string; company: string; count: number }) {
+export function GalleryPlaceholder() {
+  return (
+    <div className="flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)]">
+      <span className="px-3 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
+        Image pending
+      </span>
+    </div>
+  );
+}
+
+export function GalleryHero({ src, company, count }: { src: string; company: string; count: number }) {
   const ref = useRef<HTMLDivElement>(null);
   // amount:0 + a shrunk root (margin) rather than a percentage `amount`
   // threshold: a percentage-of-element trigger stopped firing reliably
@@ -85,7 +116,7 @@ function GalleryHero({ src, company, count }: { src: string; company: string; co
   );
 }
 
-function Coverflow({ images, company }: { images: [string, string, string]; company: string }) {
+export function Coverflow({ images, company }: { images: [string, string, string]; company: string }) {
   return (
     <div className="flex items-center justify-center py-4" style={{ perspective: '1400px' }}>
       <div
@@ -133,7 +164,7 @@ function Coverflow({ images, company }: { images: [string, string, string]; comp
   );
 }
 
-function FannedStack({ images, company }: { images: string[]; company: string }) {
+export function FannedStack({ images, company }: { images: string[]; company: string }) {
   return (
     <div className="relative mx-auto flex h-[280px] w-full max-w-3xl items-center justify-center sm:h-[360px] lg:h-[420px]">
       {images.map((src, i) => {
@@ -163,30 +194,6 @@ function FannedStack({ images, company }: { images: string[]; company: string })
           </div>
         );
       })}
-    </div>
-  );
-}
-
-export default function WorkGallery({ images, company }: { images?: string[]; company: string }) {
-  if (!images || images.length === 0) {
-    return (
-      <div className="flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)]">
-        <span className="px-3 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-          Image pending
-        </span>
-      </div>
-    );
-  }
-
-  const [hero, ...rest] = images;
-  const coverflowImages = rest.length >= 3 ? (rest.slice(0, 3) as [string, string, string]) : null;
-  const stackImages = rest.length >= 3 ? rest.slice(3) : rest;
-
-  return (
-    <div className="flex flex-col gap-14 lg:gap-20">
-      <GalleryHero src={hero} company={company} count={images.length} />
-      {coverflowImages && <Coverflow images={coverflowImages} company={company} />}
-      {stackImages.length > 0 && <FannedStack images={stackImages} company={company} />}
     </div>
   );
 }
