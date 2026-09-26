@@ -283,7 +283,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                 </span>
                 <div className="border-l-2 border-accent-growth/40 pl-6 lg:pl-10">
                   <ChapterPill icon={<ChallengeIcon />} label="The Challenge" />
-                  <p className="max-w-3xl font-display text-3xl font-semibold leading-[1.25] text-[var(--text-primary)] lg:text-4xl">
+                  <p className="max-w-3xl font-display text-2xl font-semibold leading-[1.3] text-[var(--text-primary)] lg:text-3xl">
                     {study.challenge}
                   </p>
                 </div>
@@ -374,7 +374,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                       <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#F4F4F5]">
                         <ClockIcon />
                       </span>
-                      <p className="font-display text-2xl font-semibold leading-[1.3] text-[#A1A1AA] sm:text-3xl">
+                      <p className="font-display text-xl font-semibold leading-[1.35] text-[#A1A1AA] sm:text-2xl">
                         {study.result}
                       </p>
                     </div>
@@ -387,7 +387,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                       <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
                         <CheckIcon />
                       </span>
-                      <p className="font-display text-2xl font-semibold leading-[1.3] text-[#F4F4F5] sm:text-3xl">
+                      <p className="font-display text-xl font-semibold leading-[1.35] text-[#F4F4F5] sm:text-2xl">
                         {study.result}
                       </p>
                     </div>
