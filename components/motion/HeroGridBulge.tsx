@@ -60,13 +60,24 @@ export default function HeroGridBulge({ className, style }: Props) {
     const ro = new ResizeObserver(resize);
     ro.observe(section);
 
-    // Resolve `currentColor` once to real rgb components so the stroke can
-    // stay a fixed, subtle alpha (matching the previous grid's opacity-5)
-    // with zero brightness change anywhere in the pattern.
-    const resolved = getComputedStyle(canvas).color;
-    const match = resolved.match(/\d+/g);
-    const [r, g, b] = match ? match.map(Number) : [128, 128, 128];
-    const stroke = `rgba(${r}, ${g}, ${b}, 0.07)`;
+    // Resolve `currentColor` to real rgb components so the stroke can stay
+    // a fixed, subtle alpha (matching the previous grid's opacity-5) with
+    // zero brightness change anywhere in the pattern. Re-read on every
+    // theme toggle (a MutationObserver on <html>'s class, same pattern as
+    // Methodology.tsx) - resolving it once at mount froze whichever
+    // color was current at first paint, which read as invisible after
+    // toggling to dark (a light-mode near-black stroke at 0.07 alpha over
+    // a near-black background).
+    let stroke = 'rgba(128, 128, 128, 0.07)';
+    const resolveStroke = () => {
+      const resolved = getComputedStyle(canvas).color;
+      const match = resolved.match(/\d+/g);
+      const [r, g, b] = match ? match.map(Number) : [128, 128, 128];
+      stroke = `rgba(${r}, ${g}, ${b}, 0.07)`;
+    };
+    resolveStroke();
+    const themeObserver = new MutationObserver(resolveStroke);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
@@ -151,6 +162,7 @@ export default function HeroGridBulge({ className, style }: Props) {
 
     return () => {
       ro.disconnect();
+      themeObserver.disconnect();
       section.removeEventListener('pointermove', onMove);
       section.removeEventListener('pointerleave', onLeave);
       if (raf) cancelAnimationFrame(raf);
