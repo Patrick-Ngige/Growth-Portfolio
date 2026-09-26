@@ -48,9 +48,12 @@ if (typeof window !== 'undefined') {
  * `overflow-hidden` on an ancestor - that broke a previous GSAP pin (see
  * PinnedPillars fix, 2026-09-13 commit).
  */
-// 13, not 6: bumped so PulseKE is reachable from the homepage reel, not
-// just the /work index page.
-const FEATURED = caseStudies.slice(0, 13);
+// A curated set of the most important work, not every case study - the
+// full 19-project list lives on /work. Picked by id (not a slice) so this
+// stays a deliberate shortlist as more case studies get added, rather than
+// silently growing with the array.
+const FEATURED_IDS = ['kcb-bank', 'im-bank', 'totalenergies-kenya', 'prime-bank', 'ngige-growth-audit', 'pulseke'];
+const FEATURED = FEATURED_IDS.map((id) => caseStudies.find((c) => c.id === id)).filter((c): c is (typeof caseStudies)[number] => Boolean(c));
 
 const BAND_BG = '#000000';
 const INK = '#F5F5F5';
