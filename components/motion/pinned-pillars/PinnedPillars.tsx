@@ -44,6 +44,10 @@ export type PillarCard = { index: string; title: string; body: string };
  *                 whatever follows just scrolls up into view.
  */
 const TRACK_VH = 545;
+// Nudges the resolved plate + cards down from dead-centre, clearing the
+// fixed header on wide-short viewports without shrinking the diagram (see
+// the note on .pp-plate-wrap for why padding can't do this job).
+const PLATE_NUDGE_Y = 40;
 
 const HOLD_START = 0.87;
 const HOLD_DURATION = 0.1;
@@ -355,12 +359,10 @@ export default function PinnedPillars({
           top: 0,
           left: 0,
           display: "flex",
-          // boxSizing + paddingTop rather than a plain height so this stays
-          // truly full-bleed (background, overflow clip) while centering the
-          // content in the space actually visible BELOW the fixed header -
-          // 96px matches the h-24 spacer Header.tsx reserves for itself
-          // elsewhere. Without this the plate/cards centre on the raw 100vh
-          // and read as sitting too high, half-hidden behind the header pill.
+          // boxSizing + paddingTop centres the DIAL/TITLE phase (a normal
+          // flex child, so padding does shift it) in the space actually
+          // visible below the fixed header. This does NOT reach the plate
+          // or the cards below, though - see the note on .pp-plate-wrap.
           boxSizing: "border-box",
           paddingTop: "96px",
           height: "100vh",
@@ -388,16 +390,19 @@ export default function PinnedPillars({
           // reliably centring it (the plate, and the word labels drawn onto
           // its canvas, were rendering from the panel's top-left instead,
           // clipping behind the floating header on tall/narrow viewports).
-          // min(55.6vw, 82vh): on a wide-but-short real browser window (a
-          // maximised 1920x1080 window has an actual viewport closer to
-          // 1920x950 once browser chrome is subtracted), 55.6vw alone can
-          // compute TALLER than the viewport itself - e.g. 1067px on a
-          // 1920px-wide window with only 963px of height - so the diagram
-          // clips at both the top (behind the header) and the bottom
-          // regardless of how well it's centred. Capping by vh too means it
-          // always fits vertically, with the vw term still driving the size
-          // on normal (taller-than-wide-relative) viewports.
-          style={{ position: "absolute", inset: 0, margin: "auto", aspectRatio: "1 / 1", width: "min(55.6vw, 82vh)", willChange: "filter, opacity" }}
+          // 55.6vw, not capped by vh: an earlier attempt to fix top/bottom
+          // clipping on wide-short viewports by capping this with min(vw,vh)
+          // shrank the plate relative to the dial/title group and cards,
+          // which don't share that cap - reverted per explicit instruction.
+          // Nudged down with an explicit translateY instead of the panel's
+          // paddingTop: this element is absolutely positioned with inset:0,
+          // and for an absolutely positioned box the containing block is the
+          // parent's PADDING box regardless of the padding value - padding
+          // never actually moves an inset:0 child. (Confirmed: the plate's
+          // measured position was identical whether the panel's paddingTop
+          // was 96px or 140px.) A direct transform is the mechanism that
+          // actually works here.
+          style={{ position: "absolute", inset: 0, margin: "auto", aspectRatio: "1 / 1", width: "55.6vw", transform: `translateY(${PLATE_NUDGE_Y}px)`, willChange: "filter, opacity, transform" }}
         >
           <div ref={plateRef} style={{ height: "100%", width: "100%", willChange: "transform", transform: "scale(12.5) rotate(90deg)" }}>
             <PillarPlate lobes={lobes} ink={ink} fill={plateFill} style={{ height: "100%", width: "100%" }} />
@@ -415,7 +420,7 @@ export default function PinnedPillars({
           // tween.
           style={{ position: "relative", zIndex: 10, marginTop: "20vh", display: "flex", width: "100%", alignItems: "center", justifyContent: "center", willChange: "transform" }}
         >
-          <div ref={dialRef} className="pp-dial" style={{ position: "relative", display: "grid", placeItems: "center", width: "min(47vw, 70vh)", height: "min(47vw, 70vh)" }}>
+          <div ref={dialRef} className="pp-dial" style={{ position: "relative", display: "grid", placeItems: "center", width: "47vw", height: "47vw" }}>
             {Array.from({ length: TICKS }, (_, i) => {
               const deg = (i / TICKS) * 360;
               const rad = (deg * Math.PI) / 180;
@@ -460,7 +465,7 @@ export default function PinnedPillars({
             diagonal becomes a centred column - NOT hidden: these three cards
             are the section's content, and hiding them would leave small
             screens scrolling a tall pin that resolves into an empty panel. */}
-        <div ref={cardsRef} className="pp-cards" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: "5.5vw" }}>
+        <div ref={cardsRef} className="pp-cards" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: "5.5vw", transform: `translateY(${PLATE_NUDGE_Y}px)` }}>
           {cardEls}
         </div>
       </section>
@@ -470,7 +475,7 @@ export default function PinnedPillars({
       <style>{`
         .pp-dial-title { font-size: 3.3vw; }
         @media (max-width: 1024px) {
-          .pp-plate-wrap { width: min(80vw, 78vh); }
+          .pp-plate-wrap { width: 80vw; }
           .pp-dial-title { font-size: 6vw; }
           .pp-cards { flex-direction: column; gap: 1.6vh; padding-left: 8vw; padding-right: 8vw; }
           .pp-card { width: 100% !important; gap: 0.5rem !important; margin-top: 0 !important; margin-bottom: 0 !important; padding: 1rem !important; }

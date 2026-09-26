@@ -74,7 +74,7 @@ export default function StripReveal({
     const section = cover?.parentElement;
     if (!cover || !section || reduced) return;
 
-    let tween: gsap.core.Tween | null = null;
+    let ctx: gsap.Context | null = null;
 
     // Deferred one frame, deliberately: React fires a CHILD component's own
     // effects (this one) before its PARENT's (whatever section renders
@@ -90,9 +90,20 @@ export default function StripReveal({
     // ScrollTrigger to re-measure. One rAF is enough to run after every
     // effect in the current commit (including parent effects) has fired.
     const raf = requestAnimationFrame(() => {
-      const strips = Array.from(cover.children) as HTMLElement[];
+      // gsap.context() + ctx.revert() (not just tween/scrollTrigger.kill())
+      // is load-bearing for `pin: true` (mode: 'cover' here): pinning
+      // physically wraps the pinned element in an auto-generated
+      // pin-spacer, relocating it in the DOM. Next.js unmounts this
+      // component on every client-side navigation, and a bare .kill() left
+      // a real race against React's own unmount reconciliation - React
+      // trying to removeChild a node GSAP had already moved, crashing the
+      // destination page with "Failed to execute 'removeChild': the node
+      // to be removed is not a child of this node." Same root cause fixed
+      // in FeaturedWorkReel.tsx, which has the other pin:true on the home
+      // page.
+      ctx = gsap.context(() => {
+        const strips = Array.from(cover.children) as HTMLElement[];
 
-      tween =
         mode === 'cover'
           ? gsap.fromTo(
               strips,
@@ -139,12 +150,12 @@ export default function StripReveal({
                     },
               }
             );
+      }, section);
     });
 
     return () => {
       cancelAnimationFrame(raf);
-      tween?.scrollTrigger?.kill();
-      tween?.kill();
+      ctx?.revert();
     };
   }, [mode, each, overlap, from, pin]);
 

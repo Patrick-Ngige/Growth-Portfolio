@@ -24,10 +24,15 @@ if (typeof window !== 'undefined') {
  * fade - trionn's own `rise()` never touches opacity, only transform).
  *
  * Extended with a second scroll leg: once the card row finishes scrolling,
- * the whole reel (stage) continues sliding fully off-screen to the left
- * while the stats section (rendered as a layer behind it, off-screen to the
- * right) slides into the same space in sync - one continuous wipe rather
- * than a card-scroll followed by a separate vertical hand-off.
+ * the whole reel (stage) continues sliding fully off-screen to the left,
+ * uncovering the stats layer that's been sitting static underneath it the
+ * whole time. This stats layer IS the site's impact section now - it used
+ * to be a preview of a separate FeaturedMetrics section further down the
+ * page that rendered the same numbers again after this pin released, which
+ * read as two different stats blocks instead of one. That section (and the
+ * GSAP `pin:true` StripReveal it used to hand off into Methodology) has
+ * been removed; this reveal is the only appearance now, and normal scroll
+ * carries straight from here into Methodology once the pin releases.
  *
  * Card geometry matches trionn's `.work-row`/`.work-card`/`.wc-shot`/
  * `.wc-meta` CSS exactly: row gap 3vw, card flex-basis 46vw x 74vh, image
@@ -52,7 +57,7 @@ if (typeof window !== 'undefined') {
 // full 19-project list lives on /work. Picked by id (not a slice) so this
 // stays a deliberate shortlist as more case studies get added, rather than
 // silently growing with the array.
-const FEATURED_IDS = ['kcb-bank', 'im-bank', 'totalenergies-kenya', 'prime-bank', 'ngige-growth-audit', 'pulseke'];
+const FEATURED_IDS = ['kcb-bank', 'im-bank', 'totalenergies-kenya', 'prime-bank', 'strathmore-foundation', 'ngige-growth-audit', 'pulseke'];
 const FEATURED = FEATURED_IDS.map((id) => caseStudies.find((c) => c.id === id)).filter((c): c is (typeof caseStudies)[number] => Boolean(c));
 
 const BAND_BG = '#000000';
@@ -107,36 +112,50 @@ export default function FeaturedWorkReel() {
     const D = dist();
     const R = revealPx();
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: pin,
-        start: 'top top',
-        end: () => '+=' + (dist() + revealPx()),
-        scrub: 1,
-        pin: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: rise,
-        onRefresh: rise,
-      },
-    });
+    // gsap.context() + ctx.revert() (not just tl.kill()) is load-bearing:
+    // ScrollTrigger's pin:true wraps the pinned element in an auto-generated
+    // pin-spacer, physically relocating it in the DOM. Next.js App Router
+    // unmounts this component on every client-side navigation (clicking any
+    // card's Link), and without a context to revert first, React's own
+    // unmount reconciliation and GSAP's pin-spacer teardown race each other -
+    // React tries to removeChild a node GSAP has already moved/removed,
+    // throwing "Failed to execute 'removeChild': the node to be removed is
+    // not a child of this node" and crashing the destination page with a
+    // client-side exception. PinnedPillars.tsx already uses this pattern for
+    // the same reason; this component didn't, and it's the one with pin:true
+    // (PinnedPillars pins via plain CSS position:sticky, not GSAP's pin).
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: pin,
+          start: 'top top',
+          end: () => '+=' + (dist() + revealPx()),
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: rise,
+          onRefresh: rise,
+        },
+      });
 
-    const intro = introRef.current;
-    if (intro) {
-      tl.to(intro, { autoAlpha: 0, duration: D * 0.25, ease: 'power1.in' }, 0);
-    }
+      const intro = introRef.current;
+      if (intro) {
+        tl.to(intro, { autoAlpha: 0, duration: D * 0.25, ease: 'power1.in' }, 0);
+      }
 
-    tl.to(row, { x: () => -dist(), ease: 'none', duration: D }, 0);
-    // Stats layer is never animated - it sits static the whole time, behind
-    // the stage (z-0 vs the stage's z-10). Only the stage moves, sliding
-    // fully off-screen left to uncover it - not two things sliding in sync.
-    tl.to(stage, { x: () => -revealPx(), ease: 'none', duration: R }, D);
+      tl.to(row, { x: () => -dist(), ease: 'none', duration: D }, 0);
+      // Stats layer is never animated - it sits static the whole time,
+      // behind the stage (z-0 vs the stage's z-10). Only the stage moves,
+      // sliding fully off-screen left to uncover it - not two things
+      // sliding in sync.
+      tl.to(stage, { x: () => -revealPx(), ease: 'none', duration: R }, D);
+    }, pin);
 
     rise();
 
     return () => {
-      tl.scrollTrigger && tl.scrollTrigger.kill();
-      tl.kill();
+      ctx.revert();
     };
   }, []);
 
@@ -149,7 +168,19 @@ export default function FeaturedWorkReel() {
           style={{ willChange: 'transform' }}
           aria-hidden="true"
         >
-          <div className="container-main w-full">
+          <div className="container-main grid w-full items-center gap-10 lg:grid-cols-[minmax(0,26rem)_1fr] lg:gap-16">
+            <div className="flex flex-col gap-4">
+              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                Impact
+              </span>
+              <h2 className="text-section font-display font-semibold text-[var(--text-primary)]">
+                Numbers behind the work
+              </h2>
+              <p className="max-w-[42ch] text-sm leading-relaxed text-[var(--text-secondary)]">
+                A handful of the outcomes above translate to, across the enterprise builds, regional
+                rollouts, and growth systems shipped so far.
+              </p>
+            </div>
             <MetricsGrid />
           </div>
         </div>
@@ -229,6 +260,17 @@ export default function FeaturedWorkReel() {
               </Link>
             ))}
           </div>
+
+          {/* Softens the next card's edge peeking into view at the right
+              edge of the viewport - without this the peek reads as a raw
+              overflow bug rather than an intentional "more to scroll"
+              affordance. Purely a visual fade, not a scroll clip - the row
+              itself already has no real page-level overflow. */}
+          <div
+            className="pointer-events-none absolute right-0 top-0 z-20 h-full w-[12vw]"
+            style={{ background: `linear-gradient(to right, transparent, ${BAND_BG})` }}
+            aria-hidden="true"
+          />
         </div>
       </div>
     </section>

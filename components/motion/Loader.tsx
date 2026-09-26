@@ -83,38 +83,58 @@ export default function Loader() {
       // ignore
     }
 
-    gsap.set(mark, { opacity: 0, scale: 0.86 });
-    gsap.to(mark, { opacity: 1, scale: 1, duration: 1.4, ease: 'power2.out', delay: 0.15 });
+    // gsap.context() is load-bearing here, not just tidiness: this effect had
+    // NO cleanup at all, so its tweens (including one driving `.pl-frame` via
+    // a raw global string selector, not a ref) kept running/holding DOM
+    // references with no way to stop them. Loader lives in the root layout
+    // and unmounts itself (gone -> true, returning null) the instant its own
+    // completion timeline finishes - if that unmount landed while a click
+    // elsewhere on the page (e.g. a nav Link) triggered React's OWN unmount
+    // of a different subtree in the same commit window, two independent,
+    // un-cancelled GSAP timelines racing React's reconciler is exactly the
+    // shape of bug that throws "Failed to execute 'removeChild': the node to
+    // be removed is not a child of this node" and crashes the destination
+    // page. Same root cause already fixed in FeaturedWorkReel.tsx and
+    // StripReveal.tsx for their own pin:true timelines; this is the third
+    // and most consequential instance since it runs on every single page.
+    const ctx = gsap.context(() => {
+      gsap.set(mark, { opacity: 0, scale: 0.86 });
+      gsap.to(mark, { opacity: 1, scale: 1, duration: 1.4, ease: 'power2.out', delay: 0.15 });
 
-    const state = { n: 0 };
-    let lastWordIndex = -1;
-    gsap.to(state, {
-      n: 100,
-      duration: 1.9,
-      ease: 'power2.inOut',
-      onUpdate: () => {
-        counter.textContent = String(Math.round(state.n)).padStart(3, '0').split('').join(' ');
-        const wi = Math.min(2, Math.floor(state.n / 34));
-        if (wi !== lastWordIndex) {
-          lastWordIndex = wi;
-          gsap.fromTo(word, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35 });
-          word.textContent = WORDS[wi];
-        }
-      },
-      onComplete: () => {
-        gsap
-          .timeline({
-            onComplete: () => {
-              setGone(true);
-              ScrollTrigger.refresh();
-            },
-          })
-          .to(mark, { scale: 1.06, duration: 0.5 })
-          .to([counter, word], { opacity: 0, duration: 0.35 }, 0)
-          .to('.pl-frame', { opacity: 0, scale: 1.4, duration: 0.7, ease: 'power2.in' }, 0.25)
-          .to(panel, { yPercent: -100, duration: 1.0, ease: 'power4.inOut' }, 0.35);
-      },
-    });
+      const state = { n: 0 };
+      let lastWordIndex = -1;
+      gsap.to(state, {
+        n: 100,
+        duration: 1.9,
+        ease: 'power2.inOut',
+        onUpdate: () => {
+          counter.textContent = String(Math.round(state.n)).padStart(3, '0').split('').join(' ');
+          const wi = Math.min(2, Math.floor(state.n / 34));
+          if (wi !== lastWordIndex) {
+            lastWordIndex = wi;
+            gsap.fromTo(word, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35 });
+            word.textContent = WORDS[wi];
+          }
+        },
+        onComplete: () => {
+          gsap
+            .timeline({
+              onComplete: () => {
+                setGone(true);
+                ScrollTrigger.refresh();
+              },
+            })
+            .to(mark, { scale: 1.06, duration: 0.5 })
+            .to([counter, word], { opacity: 0, duration: 0.35 }, 0)
+            .to('.pl-frame', { opacity: 0, scale: 1.4, duration: 0.7, ease: 'power2.in' }, 0.25)
+            .to(panel, { yPercent: -100, duration: 1.0, ease: 'power4.inOut' }, 0.35);
+        },
+      });
+    }, panel);
+
+    return () => {
+      ctx.revert();
+    };
   }, []);
 
   if (gone) return null;
