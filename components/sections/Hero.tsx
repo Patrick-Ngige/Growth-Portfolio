@@ -5,25 +5,23 @@ import { useState, useEffect, useRef } from 'react';
 import Button, { AnimatedButton } from '@/components/ui/Button';
 import SplitText from '@/components/anim/SplitText';
 import MagneticButton from '@/components/anim/MagneticButton';
+import HeroGridBulge from '@/components/motion/HeroGridBulge';
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const spotlightRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Mouse-reactive parallax + spotlight: the grid pattern and the three
-  // floating dashboard cards drift at different rates as the cursor moves
-  // (classic layered-parallax depth cue, no 3D library needed), and a soft
-  // radial glow tracks the cursor over the grid. Pointer position is
-  // written straight to style/CSS-variables in an rAF-coalesced handler -
-  // same pattern as PinnedPillars' own cursor-ripple effect - so mouse
-  // movement never triggers a React re-render.
+  // Layered parallax for the three floating dashboard cards only - the grid
+  // itself now reacts to the cursor via HeroGridBulge's own canvas-drawn
+  // displacement (a real geometric bulge, not a transform on this div).
+  // Pointer position is written straight to style in an rAF-coalesced
+  // handler - same pattern as PinnedPillars' own cursor-ripple effect - so
+  // mouse movement never triggers a React re-render.
   useEffect(() => {
     if (!mounted) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -41,14 +39,6 @@ export default function Hero() {
       const nx = ((pending.x - rect.left) / rect.width - 0.5) * 2;
       const ny = ((pending.y - rect.top) / rect.height - 0.5) * 2;
 
-      if (gridRef.current) {
-        gridRef.current.style.transform = `translate3d(${(-nx * 10).toFixed(1)}px, ${(-ny * 10).toFixed(1)}px, 0)`;
-      }
-      if (spotlightRef.current) {
-        spotlightRef.current.style.setProperty('--spot-x', `${((pending.x - rect.left) / rect.width) * 100}%`);
-        spotlightRef.current.style.setProperty('--spot-y', `${((pending.y - rect.top) / rect.height) * 100}%`);
-        spotlightRef.current.style.opacity = '1';
-      }
       // Each floating card drifts at its own rate (a data-depth attribute
       // set per card below) for a layered, foreground-vs-background feel.
       cardRefs.current.forEach((card) => {
@@ -65,8 +55,6 @@ export default function Hero() {
     const onLeave = () => {
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
-      if (gridRef.current) gridRef.current.style.transform = 'translate3d(0, 0, 0)';
-      if (spotlightRef.current) spotlightRef.current.style.opacity = '0';
       cardRefs.current.forEach((card) => {
         if (card) card.style.transform = 'translate3d(0, 0, 0)';
       });
@@ -119,39 +107,16 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex items-center justify-center bg-[var(--background-primary)]"
     >
-      {/* Background Grid Pattern - top: -96px bleeds it up into the fixed
+      {/* Background grid mesh - top: -96px bleeds it up into the fixed
           header's own spacer gap (Header.tsx's h-24) so it reads as one
           continuous field all the way to the true top of the viewport,
           instead of stopping at this section's own box (which starts 96px
           down, after that spacer). Needs the section's overflow-hidden
           moved onto the dashboard-elements wrapper below instead, or this
           would just get clipped at the same boundary it's trying to bleed
-          past. */}
-      <div ref={gridRef} className="pointer-events-none absolute left-0 right-0 bottom-0 opacity-5" style={{ top: '-96px' }}>
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, currentColor 1px, transparent 1px),
-              linear-gradient(to bottom, currentColor 1px, transparent 1px)
-            `,
-            backgroundSize: '60px 60px',
-            willChange: 'transform',
-          }}
-        />
-      </div>
-
-      {/* Mouse-follow spotlight over the grid - a soft radial glow that
-          tracks the cursor, updated via CSS custom properties rather than
-          React state so moving the mouse never triggers a re-render. */}
-      <div
-        ref={spotlightRef}
-        className="pointer-events-none absolute left-0 right-0 bottom-0 opacity-0 transition-opacity duration-500"
-        style={{
-          top: '-96px',
-          background: 'radial-gradient(400px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgb(234 88 12 / 0.15), transparent 70%)',
-        }}
-      />
+          past. Drawn on canvas by HeroGridBulge so the mesh can genuinely
+          displace upward under the cursor - see that component for why. */}
+      <HeroGridBulge className="pointer-events-none absolute left-0 right-0 bottom-0" style={{ top: '-96px' }} />
 
       {/* Animated Dashboard Elements - Simple CSS animations for performance */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
