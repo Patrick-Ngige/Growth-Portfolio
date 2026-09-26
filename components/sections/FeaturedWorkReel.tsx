@@ -124,8 +124,10 @@ export default function FeaturedWorkReel() {
     }
 
     tl.to(row, { x: () => -dist(), ease: 'none', duration: D }, 0);
+    // Stats layer is never animated - it sits static the whole time, behind
+    // the stage (z-0 vs the stage's z-10). Only the stage moves, sliding
+    // fully off-screen left to uncover it - not two things sliding in sync.
     tl.to(stage, { x: () => -revealPx(), ease: 'none', duration: R }, D);
-    tl.fromTo(statsLayer, { x: R }, { x: 0, ease: 'none', duration: R }, D);
 
     rise();
 

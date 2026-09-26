@@ -49,10 +49,22 @@ export default function Header() {
             // background) so it stays legible whether it's floating over a
             // near-white section or one of the site's fixed-dark panels
             // (PinnedPillars, WorkDetailView's closing sections, Footer).
-            'flex items-center justify-between rounded-full border border-black/10 bg-white/95 px-6 backdrop-blur-lg transition-shadow duration-300 h-16 dark:border-white/10 dark:bg-[#18181B]/95',
+            // relative+overflow-hidden so the glass sheen below can clip to
+            // the pill's own rounded corners.
+            'relative flex items-center justify-between overflow-hidden rounded-full border border-black/10 bg-white/95 px-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] backdrop-blur-lg ring-1 ring-inset ring-white/40 transition-shadow duration-300 h-16 dark:border-white/10 dark:bg-[#18181B]/95 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:ring-white/10',
             isScrolled ? 'shadow-lg shadow-black/10' : 'shadow-sm shadow-black/5'
           )}
         >
+            {/* Glass sheen: a soft light-to-transparent gradient across the
+                top half of the pill, the tasteful side of "glossy" (a subtle
+                highlight, not a plastic-button shine). Pointer-events-none
+                and behind the real content, which paints over it in normal
+                DOM order. */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/50 via-white/0 to-transparent dark:from-white/[0.06] dark:via-transparent"
+            />
+
             {/* Logo */}
             <Link
               href="/"

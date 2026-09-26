@@ -1,17 +1,85 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Button, { AnimatedButton } from '@/components/ui/Button';
 import SplitText from '@/components/anim/SplitText';
 import MagneticButton from '@/components/anim/MagneticButton';
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Mouse-reactive parallax + spotlight: the grid pattern and the three
+  // floating dashboard cards drift at different rates as the cursor moves
+  // (classic layered-parallax depth cue, no 3D library needed), and a soft
+  // radial glow tracks the cursor over the grid. Pointer position is
+  // written straight to style/CSS-variables in an rAF-coalesced handler -
+  // same pattern as PinnedPillars' own cursor-ripple effect - so mouse
+  // movement never triggers a React re-render.
+  useEffect(() => {
+    if (!mounted) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const section = sectionRef.current;
+    if (!section || reduced) return;
+
+    let raf = 0;
+    let pending: { x: number; y: number } | null = null;
+
+    const apply = () => {
+      raf = 0;
+      if (!pending) return;
+      const rect = section.getBoundingClientRect();
+      // Normalised -1..1 from the section's centre.
+      const nx = ((pending.x - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((pending.y - rect.top) / rect.height - 0.5) * 2;
+
+      if (gridRef.current) {
+        gridRef.current.style.transform = `translate3d(${(-nx * 10).toFixed(1)}px, ${(-ny * 10).toFixed(1)}px, 0)`;
+      }
+      if (spotlightRef.current) {
+        spotlightRef.current.style.setProperty('--spot-x', `${((pending.x - rect.left) / rect.width) * 100}%`);
+        spotlightRef.current.style.setProperty('--spot-y', `${((pending.y - rect.top) / rect.height) * 100}%`);
+        spotlightRef.current.style.opacity = '1';
+      }
+      // Each floating card drifts at its own rate (a data-depth attribute
+      // set per card below) for a layered, foreground-vs-background feel.
+      cardRefs.current.forEach((card) => {
+        if (!card) return;
+        const depth = parseFloat(card.dataset.depth || '0');
+        card.style.transform = `translate3d(${(nx * depth).toFixed(1)}px, ${(ny * depth).toFixed(1)}px, 0)`;
+      });
+    };
+
+    const onMove = (e: PointerEvent) => {
+      pending = { x: e.clientX, y: e.clientY };
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    const onLeave = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      if (gridRef.current) gridRef.current.style.transform = 'translate3d(0, 0, 0)';
+      if (spotlightRef.current) spotlightRef.current.style.opacity = '0';
+      cardRefs.current.forEach((card) => {
+        if (card) card.style.transform = 'translate3d(0, 0, 0)';
+      });
+    };
+
+    section.addEventListener('pointermove', onMove);
+    section.addEventListener('pointerleave', onLeave);
+    return () => {
+      section.removeEventListener('pointermove', onMove);
+      section.removeEventListener('pointerleave', onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [mounted]);
 
   const scrollToSection = (href: string) => {
     const element = document.getElementById(href.slice(1));
@@ -47,11 +115,19 @@ export default function Hero() {
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[var(--background-primary)]"
+      className="relative min-h-screen flex items-center justify-center bg-[var(--background-primary)]"
     >
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 opacity-5">
+      {/* Background Grid Pattern - top: -96px bleeds it up into the fixed
+          header's own spacer gap (Header.tsx's h-24) so it reads as one
+          continuous field all the way to the true top of the viewport,
+          instead of stopping at this section's own box (which starts 96px
+          down, after that spacer). Needs the section's overflow-hidden
+          moved onto the dashboard-elements wrapper below instead, or this
+          would just get clipped at the same boundary it's trying to bleed
+          past. */}
+      <div ref={gridRef} className="pointer-events-none absolute left-0 right-0 bottom-0 opacity-5" style={{ top: '-96px' }}>
         <div
           className="absolute inset-0"
           style={{
@@ -60,15 +136,33 @@ export default function Hero() {
               linear-gradient(to bottom, currentColor 1px, transparent 1px)
             `,
             backgroundSize: '60px 60px',
+            willChange: 'transform',
           }}
         />
       </div>
+
+      {/* Mouse-follow spotlight over the grid - a soft radial glow that
+          tracks the cursor, updated via CSS custom properties rather than
+          React state so moving the mouse never triggers a re-render. */}
+      <div
+        ref={spotlightRef}
+        className="pointer-events-none absolute left-0 right-0 bottom-0 opacity-0 transition-opacity duration-500"
+        style={{
+          top: '-96px',
+          background: 'radial-gradient(400px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgb(234 88 12 / 0.15), transparent 70%)',
+        }}
+      />
 
       {/* Animated Dashboard Elements - Simple CSS animations for performance */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Floating Card 1 - ROAS */}
         <motion.div
+          ref={(el) => {
+            cardRefs.current[0] = el;
+          }}
+          data-depth="22"
           className="absolute top-1/4 right-[10%] glass rounded-xl p-4 w-48 hidden lg:block"
+          style={{ willChange: 'transform' }}
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
@@ -102,7 +196,12 @@ export default function Hero() {
 
         {/* Floating Card 2 - Active Pixels */}
         <motion.div
+          ref={(el) => {
+            cardRefs.current[1] = el;
+          }}
+          data-depth="14"
           className="absolute bottom-1/3 left-[8%] glass rounded-xl p-4 w-40 hidden lg:block"
+          style={{ willChange: 'transform' }}
           initial={{ opacity: 0, x: -100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
@@ -132,7 +231,12 @@ export default function Hero() {
 
         {/* Floating Card 3 - Conversion */}
         <motion.div
+          ref={(el) => {
+            cardRefs.current[2] = el;
+          }}
+          data-depth="18"
           className="absolute top-1/3 left-[5%] glass rounded-xl p-4 w-44 hidden lg:block"
+          style={{ willChange: 'transform' }}
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
