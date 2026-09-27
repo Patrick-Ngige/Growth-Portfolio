@@ -71,18 +71,18 @@ export const caseStudies: CaseStudy[] = [
     industry: 'Enterprise / Finance',
     category: 'web',
     metricValue: '8',
-    metricLabel: 'Regional Sites on Statamic',
+    metricLabel: 'Regional Sites Shipped',
     context:
-      'As part of the Creative Edge / FCB Nairobi team: rebuilding KCB Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda/BPR, South Sudan, Bancassurance, Insurance) on Statamic.',
+      'As part of the Creative Edge / FCB Nairobi team, spanning both the front-end build and the backend integration: KCB Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda/BPR, South Sudan, Bancassurance, Insurance) moved from the UI/UX team\'s designs to a hand-coded front-end in HTML, CSS, JavaScript, and jQuery, then into a headless WordPress build.',
     challenge:
-      'A regional banking group needed a consistent, modern CMS platform across its Kenya headquarters site and every subsidiary market, without each country site drifting into its own one-off build.',
+      'A regional banking group needed one consistent site across its Kenya headquarters and every subsidiary market, on a front-end built to plug cleanly into a headless CMS rather than each country drifting into its own one-off theme.',
     approach:
-      'Rebuilt KCB Bank\'s website and its regional subsidiary sites on Statamic, focused on Core Web Vitals and information architecture as part of a broader SEO-driven redesign.',
+      'Carried the UI/UX team\'s designs through the full build: a front-end in HTML, CSS, JavaScript, and jQuery, wired into a headless WordPress instance shared across KCB Group and its regional subsidiaries.',
     result:
-      'Group site and regional subsidiary sites shipped and live on Statamic. Work delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
+      'Group site and regional subsidiary sites shipped and live on headless WordPress. Delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
     technicalExecution: [
-      'Statamic CMS build, shared across KCB Group and its regional subsidiaries',
-      'Core Web Vitals and information architecture focus as part of an SEO-driven redesign',
+      'Front-end built in HTML, CSS, JavaScript, and jQuery from the UI/UX team\'s designs',
+      'Integrated into a headless WordPress instance shared across KCB Group and its regional subsidiaries',
     ],
     images: [
       '/images/work/kcb-bank/kcb-ke.png',
@@ -103,7 +103,7 @@ export const caseStudies: CaseStudy[] = [
       '/images/work/kcb-bank/kcb-diaspora-2.png',
       '/images/work/kcb-bank/kcb-uganda-credit-cards-2.png',
     ],
-    tags: ['Enterprise', 'CMS', 'Statamic', 'Banking'],
+    tags: ['Enterprise', 'CMS', 'WordPress', 'jQuery', 'Banking'],
   },
   {
     id: 'im-bank',
@@ -174,17 +174,18 @@ export const caseStudies: CaseStudy[] = [
     industry: 'Enterprise / Finance',
     category: 'web',
     metricValue: '1',
-    metricLabel: 'Site in Development',
+    metricLabel: 'Site Shipped & Live',
     context:
-      'As part of the Creative Edge / FCB Nairobi team: building a new website for Prime Bank, currently in development.',
+      'As part of the Creative Edge / FCB Nairobi team, spanning both the front-end build and the backend integration: Prime Bank\'s website moved from the UI/UX team\'s designs to a hand-coded front-end in HTML, CSS, JavaScript, and jQuery, then into a headless WordPress build.',
     challenge:
-      'Prime Bank needed a modern, secure, well-structured website matching the bank\'s own standards.',
+      'Prime Bank needed a website that matched the bank\'s own standards for security and structure, on a front-end built to plug cleanly into a headless CMS rather than starting from a generic theme.',
     approach:
-      'Currently building a website for Prime Bank as part of the Creative Edge / FCB Nairobi team.',
+      'Carried the UI/UX team\'s designs through the full build: a front-end in HTML, CSS, JavaScript, and jQuery, wired into headless WordPress as the site\'s CMS.',
     result:
-      'In development. Result to be added once shipped.',
+      'Shipped and live on headless WordPress.',
     technicalExecution: [
-      'Build in progress',
+      'Front-end built in HTML, CSS, JavaScript, and jQuery from the UI/UX team\'s designs',
+      'Integrated into headless WordPress as the site\'s CMS',
     ],
     images: [
       '/images/work/prime-bank/prime-bank.png',
@@ -197,8 +198,7 @@ export const caseStudies: CaseStudy[] = [
       '/images/work/prime-bank/prime-bank-lending-solutions.png',
       '/images/work/prime-bank/prime-bank-contact.png',
     ],
-    tags: ['Enterprise', 'Banking', 'In Development'],
-    inProgress: true,
+    tags: ['Enterprise', 'CMS', 'WordPress', 'jQuery', 'Banking'],
   },
   {
     id: 'strathmore-foundation',
