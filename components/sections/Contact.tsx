@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
 import Button from '@/components/ui/Button';
+import DotVortex from '@/components/motion/DotVortex';
 import { cn } from '@/lib/utils';
 
 const CONTACT_EMAIL = 'wakemanjajr@gmail.com';
@@ -93,10 +94,19 @@ export default function Contact() {
   };
 
   return (
-    <AnimatedSection id="contact" variant="dark" size="xl">
+    // Rounded top corners on the section boundary - the same hard
+    // color-block cut used elsewhere on the site, softened per the
+    // borrowed-elements artboard's recreation of axiom-power's stacked
+    // sections. overflow-hidden lives on this outer wrapper (not the
+    // <section> Section.tsx renders internally) since that's the element
+    // AnimatedSection's own `className` actually reaches - see
+    // Section.tsx: AnimatedSection consumes `className` for its own
+    // motion.div and never forwards it into the inner <section>.
+    <AnimatedSection id="contact" variant="dark" size="xl" className="overflow-hidden rounded-t-[2.5rem]">
       <div className="container-main">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <DotVortex className="absolute inset-0 h-full w-full opacity-70" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-growth/5 rounded-full blur-3xl" />
         </div>
 

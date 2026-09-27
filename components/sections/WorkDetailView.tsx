@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { caseStudies, type CaseStudy } from '@/lib/data';
 import Counter from '@/components/anim/Counter';
 import MagneticButton from '@/components/anim/MagneticButton';
-import { useGalleryTiers, GalleryHero, GalleryPlaceholder, Coverflow, FannedStack } from '@/components/sections/WorkGallery';
+import { useGalleryTiers, GalleryHero, GalleryPlaceholder, Coverflow, VerticalStack } from '@/components/sections/WorkGallery';
 
 /**
  * Client half of the work-detail page (the server half in
@@ -47,60 +47,6 @@ const CATEGORY_LABEL: Record<CaseStudy['category'], string> = {
   strategy: 'Growth Strategy',
 };
 
-// Icon-tagged meta rows and chapter pills, borrowed from Kora's case-study
-// pages (kora.framer.media/cases/sitemark): small icon next to each label
-// instead of bare mono text.
-function IndustryIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4" />
-    </svg>
-  );
-}
-function TypeIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5h16M4 12h10M4 19h16" />
-    </svg>
-  );
-}
-function StackIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3l9 5-9 5-9-5 9-5zm-9 9l9 5 9-5m-18 5l9 5 9-5" />
-    </svg>
-  );
-}
-function ChallengeIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86l-8.18 14.18A1 1 0 003 19.5h18a1 1 0 00.89-1.46L13.71 3.86a1 1 0 00-1.72 0z" />
-    </svg>
-  );
-}
-function ApproachIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9" strokeWidth={2} />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 9l-4.5 6L9 12.5" />
-    </svg>
-  );
-}
-function BuildIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.27 6.96L12 12l8.73-5.04M12 22.08V12" />
-    </svg>
-  );
-}
-function ResultIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 17l6-6 4 4 8-8m0 0h-5m5 0v5" />
-    </svg>
-  );
-}
 function CheckIcon() {
   return (
     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,19 +63,20 @@ function ClockIcon() {
   );
 }
 
-function ChapterPill({ icon, label, dark }: { icon: ReactNode; label: string; dark?: boolean }) {
-  return (
-    <span
-      className={
-        dark
-          ? 'mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-accent-growth'
-          : 'mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--background-surface)] px-3 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-accent-growth lg:mb-6'
-      }
-    >
-      {icon}
-      {label}
-    </span>
-  );
+// Plain mono-colour label, no border/background/icon - exactly the
+// ".chapter-pill" treatment approved in the "Case Study Structure"
+// artifact (pamidordesign.co/work/rise's structural language), not the
+// site's older bordered-badge ChapterPill this replaced.
+function RailLabel({ children }: { children: ReactNode }) {
+  return <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-accent-growth">{children}</span>;
+}
+
+// A thin full-width rule before every chapter, matching pamidordesign.co's
+// own convention (both Rise and Figcoms open every section - the meta grid,
+// each numbered Approach step, each named chapter - with the same
+// `h-[1.5px] w-full bg-rule` line, confirmed by inspecting their DOM live).
+function SectionRule({ dark }: { dark?: boolean }) {
+  return <div aria-hidden="true" className={`mb-8 h-px w-full lg:mb-10 ${dark ? 'bg-white/10' : 'bg-[var(--border-color)]'}`} />;
 }
 
 // Splits a result sentence/paragraph into individual claims for the
@@ -141,6 +88,16 @@ function splitResultHighlights(result: string): string[] {
     .split(/(?<=[.!?])\s+(?=[A-Z])/)
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+// Read off text already in the data rather than inventing a "Team" field:
+// most agency work says "Creative Edge / FCB Nairobi" directly in its
+// context sentence, and solo work says so in the company name itself
+// (e.g. "PulseKE (personal project, solo product)").
+function getTeamLabel(study: CaseStudy): string {
+  if (/creative edge\s*\/\s*fcb nairobi/i.test(study.context)) return 'Creative Edge / FCB Nairobi';
+  if (/personal project|solo-built|solo product/i.test(study.company)) return 'Solo';
+  return 'Independent';
 }
 
 const revealProps = {
@@ -194,6 +151,20 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             </motion.h1>
 
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[var(--text-primary)] lg:text-xl">{study.context}</p>
+
+            {/* Tag pills right under the title - borrowed from pamidordesign.co's
+                Rise case study (Product Design / Brand Design / UX|UI pills under
+                the H1), approved via the "Case Study Structure" artifact. */}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {study.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-[var(--border-color)] bg-[var(--chip-bg)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--text-secondary)]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         </header>
 
@@ -202,60 +173,65 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             instead of a divider line to tell them apart. */}
         <div className="bg-[var(--background-primary)]">
 
-          {/* Facts + headline metric, the proof-first opener borrowed from
-              Kora's case pages: who/what/with-what on the left, the one
-              number that matters on the right. Only fields that exist in
-              the data, no invented metrics. */}
-          <section id="overview" className="py-16 lg:py-24">
+          {/* Meta grid - Rise's Role/Timeline/Year/Team row, adapted to
+              fields this data model actually has: Industry, Type, Team
+              (read off the case study's own context text, not invented),
+              and Scope (the one metric, shown compactly here - it reappears
+              big in the closing Results chapter, not duplicated in between). */}
+          <section id="overview" className="py-14 lg:py-20">
             <div className="container-main">
-              <motion.div {...revealProps} className="grid gap-3.5 sm:gap-4 lg:grid-cols-[1.4fr_1fr]">
-                <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 sm:p-8">
-                  <dl className="grid gap-5 sm:grid-cols-[120px_1fr] sm:gap-y-6">
-                    <dt className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                      <IndustryIcon />
-                      Industry
-                    </dt>
-                    <dd className="text-base text-[var(--text-primary)]">{study.industry}</dd>
-                    <dt className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                      <TypeIcon />
-                      Type
-                    </dt>
-                    <dd className="text-base text-[var(--text-primary)]">{CATEGORY_LABEL[study.category]}</dd>
-                    <dt className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                      <StackIcon />
-                      Stack
-                    </dt>
-                    <dd className="flex flex-wrap gap-2">
-                      {study.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full border border-[var(--border-color)] px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-[var(--text-secondary)]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </dd>
-                  </dl>
+              <motion.dl
+                {...revealProps}
+                className="grid grid-cols-2 gap-x-6 gap-y-8 border-y border-[var(--border-color)] py-7 sm:grid-cols-4 sm:py-8"
+              >
+                <div>
+                  <dt className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-secondary)]">Industry</dt>
+                  <dd className="text-sm text-[var(--text-primary)] sm:text-base">{study.industry}</dd>
                 </div>
-                <div className="flex flex-col justify-between rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 sm:p-8">
-                  <span className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">Headline result</span>
-                  <div className="mt-8">
-                    <span className="block break-words font-display text-5xl font-bold leading-none text-accent-growth sm:text-6xl">
-                      {isNaN(numericMetric) ? (
-                        study.metricValue
-                      ) : (
-                        <Counter value={numericMetric} prefix={metricPrefix} suffix={metricSuffix} duration={1.6} delay={0.2} />
-                      )}
-                    </span>
-                    <span className="mt-3 block text-sm text-[var(--text-secondary)]">{study.metricLabel}</span>
-                  </div>
+                <div>
+                  <dt className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-secondary)]">Type</dt>
+                  <dd className="text-sm text-[var(--text-primary)] sm:text-base">{CATEGORY_LABEL[study.category]}</dd>
                 </div>
-              </motion.div>
+                <div>
+                  <dt className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-secondary)]">Team</dt>
+                  <dd className="text-sm text-[var(--text-primary)] sm:text-base">{getTeamLabel(study)}</dd>
+                </div>
+                <div>
+                  <dt className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-secondary)]">Scope</dt>
+                  <dd className="text-sm text-[var(--text-primary)] sm:text-base">
+                    {study.metricValue} {study.metricLabel}
+                  </dd>
+                </div>
+              </motion.dl>
             </div>
           </section>
 
-          {/* Gallery hero - the lead shot, right after the facts. See
-              WorkGallery.tsx for the coverflow and fanned-stack tiers,
+          {/* My Role - the same left-rail/right-content shape used for
+              every applicable chapter below, per the "Case Study Structure"
+              artifact. Pulls from technicalExecution rather than duplicating
+              it in a separate "Build" chapter further down (that chapter is
+              gone now - this is the one place this content appears). */}
+          <motion.section {...revealProps} id="role" className="pb-16 lg:pb-24">
+            <div className="container-main">
+              <SectionRule />
+              <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
+                <div>
+                  <RailLabel>My Role</RailLabel>
+                </div>
+                <ul className="flex flex-col gap-3.5">
+                  {study.technicalExecution.map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-base leading-relaxed text-[var(--text-primary)]">
+                      <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-growth" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Gallery hero - the lead shot, right after My Role. See
+              WorkGallery.tsx for the coverflow and pinned-slider tiers,
               which are spaced out between the later chapters below instead
               of bunched here, so screenshots punctuate the narrative
               rather than being dumped in one block before it starts. */}
@@ -271,22 +247,21 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             </div>
           </section>
 
-          {/* 01 / Challenge - a pull-quote, not a paragraph: this chapter
-              is one tension to sit with, so it gets the biggest type of
-              any chapter and a side accent instead of a label-over-text
-              layout. */}
-          <motion.section {...revealProps} id="challenge" className="py-24 lg:py-32">
+          {/* Part 01 / Challenge - left rail (part number + pill), content
+              on the right. Same rail shape as My Role and Approach below,
+              per the "Case Study Structure" artifact: one consistent layout
+              for every applicable chapter instead of a different treatment
+              each time. Heading size/weight (20px/500) tuned down from an
+              earlier, too-large 2xl/bold pass per direct feedback. */}
+          <motion.section {...revealProps} id="challenge" className="py-16 lg:py-24">
             <div className="container-main">
-              <div className="flex gap-6 lg:gap-10">
-                <span className="hidden flex-shrink-0 font-display text-[10vw] font-bold leading-none text-[var(--text-primary)] opacity-[0.05] lg:block lg:text-[7rem]">
-                  01
-                </span>
-                <div className="border-l-2 border-accent-growth/40 pl-6 lg:pl-10">
-                  <ChapterPill icon={<ChallengeIcon />} label="The Challenge" />
-                  <p className="max-w-3xl font-display text-2xl font-semibold leading-[1.3] text-[var(--text-primary)] lg:text-3xl">
-                    {study.challenge}
-                  </p>
+              <SectionRule />
+              <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
+                <div>
+                  <span className="mb-2 block font-display text-xs font-bold text-[var(--text-primary)] opacity-15">Part 01</span>
+                  <RailLabel>The Challenge</RailLabel>
                 </div>
+                <p className="text-xl font-medium leading-[1.4] text-[var(--text-primary)]">{study.challenge}</p>
               </div>
             </div>
           </motion.section>
@@ -303,54 +278,33 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
             </motion.section>
           )}
 
-          {/* 02 / Approach - asymmetric two-column: number+label held to a
-              narrow left rail, the approach text and the tools it used
-              together on the right, so "how" and "with what" read as one
-              beat instead of tags bolted onto the closing chapter. */}
-          <motion.section {...revealProps} id="approach" className="py-20 lg:py-28">
+          {/* Part 02 / Approach - same rail shape as Challenge and My Role. */}
+          <motion.section {...revealProps} id="approach" className="py-16 lg:py-24">
             <div className="container-main">
-              <div className="grid gap-8 lg:grid-cols-[160px_1fr] lg:gap-16">
+              <SectionRule />
+              <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
                 <div>
-                  <span className="font-display text-5xl font-bold text-[var(--text-primary)] opacity-10">02</span>
-                  <div className="mt-2">
-                    <ChapterPill icon={<ApproachIcon />} label="The Approach" />
-                  </div>
+                  <span className="mb-2 block font-display text-xs font-bold text-[var(--text-primary)] opacity-15">Part 02</span>
+                  <RailLabel>The Approach</RailLabel>
                 </div>
-                <div>
-                  <p className="max-w-2xl text-lg leading-relaxed text-[var(--text-primary)] lg:text-xl">{study.approach}</p>
-                </div>
+                <p className="text-lg leading-relaxed text-[var(--text-primary)] lg:text-xl">{study.approach}</p>
               </div>
             </div>
           </motion.section>
 
-          {/* 03 / Build - a grid of cards instead of a bulleted list, so
-              the technical execution reads as a system of parts, not a
-              checklist. */}
-          <motion.section {...revealProps} id="build" className="py-20 lg:py-28">
-            <div className="container-main">
-              <ChapterPill icon={<BuildIcon />} label="The Build" />
-              <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
-                {study.technicalExecution.map((item, i) => (
-                  <div
-                    key={item}
-                    className="rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6"
-                  >
-                    <span className="mb-3 block font-mono text-xs text-accent-growth">{String(i + 1).padStart(2, '0')}</span>
-                    <p className="text-base leading-snug text-[var(--text-primary)]">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.section>
-
-          {/* Fanned-stack tier - whatever screenshots are left after the
-              hero and coverflow claim theirs, placed as a last visual beat
-              right before the Results chapter closes the story out. Only
-              renders when there's material left for it. */}
+          {/* Vertical stack - whatever screenshots are left after the hero
+              and coverflow claim theirs, placed as a last visual beat right
+              before the Results chapter closes the story out. Only renders
+              when there's material left for it. Full-width, uncropped
+              portrait screenshots in normal document flow (see
+              WorkGallery.tsx) rather than the earlier GSAP-pinned
+              horizontal slider, which fought against this project's own
+              portrait screenshots by force-cropping them to 4:3. */}
           {gallery.stackImages.length > 0 && (
             <motion.section {...revealProps} className="pb-20 lg:pb-28">
               <div className="container-main">
-                <FannedStack images={gallery.stackImages} company={study.company} />
+                <SectionRule />
+                <VerticalStack images={gallery.stackImages} company={study.company} />
               </div>
             </motion.section>
           )}
@@ -365,63 +319,85 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
         <div className="bg-[#09090B]">
           <motion.section {...revealProps} id="result" className="py-24 lg:py-36">
             <div className="container-main">
-              <ChapterPill icon={<ResultIcon />} label="The Results" dark />
+              <SectionRule dark />
+              <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
+                <div>
+                  <RailLabel>Result</RailLabel>
+                </div>
+                <div>
+                  {/* The one number that matters, moved here from the old
+                      Overview facts row per the "Case Study Structure"
+                      artifact - shown once, big, right where the results
+                      text backs it up, instead of floating alone at the top
+                      of the page. */}
+                  <div className="mb-10">
+                    <span className="block break-words font-display text-6xl font-bold leading-none text-accent-growth sm:text-7xl">
+                      {isNaN(numericMetric) ? (
+                        study.metricValue
+                      ) : (
+                        <Counter value={numericMetric} prefix={metricPrefix} suffix={metricSuffix} duration={1.6} delay={0.2} />
+                      )}
+                    </span>
+                    <span className="mt-3 block text-sm text-[#A1A1AA]">{study.metricLabel}</span>
+                  </div>
 
-              {(() => {
-                if (study.inProgress) {
-                  return (
-                    <div className="max-w-2xl rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-7 py-8 sm:px-9 sm:py-10">
-                      <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#F4F4F5]">
-                        <ClockIcon />
-                      </span>
-                      <p className="font-display text-xl font-semibold leading-[1.35] text-[#A1A1AA] sm:text-2xl">
-                        {study.result}
-                      </p>
-                    </div>
-                  );
-                }
-                const highlights = splitResultHighlights(study.result);
-                if (highlights.length < 2) {
-                  return (
-                    <div className="max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-7 py-8 sm:px-9 sm:py-10">
-                      <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
-                        <CheckIcon />
-                      </span>
-                      <p className="font-display text-xl font-semibold leading-[1.35] text-[#F4F4F5] sm:text-2xl">
-                        {study.result}
-                      </p>
-                    </div>
-                  );
-                }
-                return (
-                  <ul className="max-w-2xl space-y-3">
-                    {highlights.map((line) => (
-                      <li
-                        key={line}
-                        className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5"
+                  {(() => {
+                    if (study.inProgress) {
+                      return (
+                        <div className="rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-7 py-8 sm:px-9 sm:py-10">
+                          <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#F4F4F5]">
+                            <ClockIcon />
+                          </span>
+                          <p className="font-display text-xl font-semibold leading-[1.35] text-[#A1A1AA] sm:text-2xl">
+                            {study.result}
+                          </p>
+                        </div>
+                      );
+                    }
+                    const highlights = splitResultHighlights(study.result);
+                    if (highlights.length < 2) {
+                      return (
+                        <div className="rounded-2xl border border-white/10 bg-white/5 px-7 py-8 sm:px-9 sm:py-10">
+                          <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
+                            <CheckIcon />
+                          </span>
+                          <p className="font-display text-xl font-semibold leading-[1.35] text-[#F4F4F5] sm:text-2xl">
+                            {study.result}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <ul className="space-y-3">
+                        {highlights.map((line) => (
+                          <li
+                            key={line}
+                            className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5"
+                          >
+                            <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
+                              <CheckIcon />
+                            </span>
+                            <span className="text-base leading-snug text-[#F4F4F5] sm:text-lg">{line}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  })()}
+
+                  <div className="mt-14">
+                    <MagneticButton strength={30}>
+                      <Link
+                        href="/#contact"
+                        className="inline-flex items-center gap-2 rounded-full bg-accent-growth px-6 py-3 font-medium text-[#09090B] transition-colors hover:bg-accent-growth/90"
                       >
-                        <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
-                          <CheckIcon />
-                        </span>
-                        <span className="text-base leading-snug text-[#F4F4F5] sm:text-lg">{line}</span>
-                      </li>
-                    ))}
-                  </ul>
-                );
-              })()}
-
-              <div className="mt-14">
-                <MagneticButton strength={30}>
-                  <Link
-                    href="/#contact"
-                    className="inline-flex items-center gap-2 rounded-full bg-accent-growth px-6 py-3 font-medium text-[#09090B] transition-colors hover:bg-accent-growth/90"
-                  >
-                    <span>Work with me</span>
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </Link>
-                </MagneticButton>
+                        <span>Work with me</span>
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </Link>
+                    </MagneticButton>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.section>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { methodologySteps } from '@/lib/data';
 import SplitText from '@/components/anim/SplitText';
 import MagneticButton from '@/components/anim/MagneticButton';
+import GhostHeading from '@/components/motion/GhostHeading';
 
 /**
  * Sticky-stack version (option B): intro column on the left, cards on
@@ -140,13 +141,15 @@ export default function Methodology() {
       <div className="container-main">
         <div className="grid gap-12 lg:grid-cols-[360px_1fr] lg:gap-16">
           <div className="flex flex-col items-center text-center lg:sticky lg:top-1/2 lg:-translate-y-1/2 lg:self-start">
-            <SplitText
-              text="How the work gets done"
-              as="h2"
-              className="text-section font-display font-semibold mb-4 text-[var(--text-primary)]"
-              animation="slideUp"
-              delay={0}
-            />
+            <GhostHeading ghost="APPROACH" align="center">
+              <SplitText
+                text="How the work gets done"
+                as="h2"
+                className="text-section font-display font-semibold mb-4 text-[var(--text-primary)]"
+                animation="slideUp"
+                delay={0}
+              />
+            </GhostHeading>
             <SplitText
               text="Six steps, repeated: test ideas, measure results, keep improving. Simple and focused on real outcomes."
               as="p"

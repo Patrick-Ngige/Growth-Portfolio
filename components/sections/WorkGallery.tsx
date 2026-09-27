@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { IMAGE_ASPECT } from '@/lib/imageAspect';
+import { SHORT_IMAGES } from '@/lib/shortImages';
 
 /**
  * Three image tiers for WorkDetailView, replacing the old equal-weight
@@ -23,15 +25,26 @@ import { motion, useInView, useScroll, useTransform } from 'framer-motion';
  *    real Apple Cover Flow technique (perspective + rotateY + translateZ on
  *    the side covers, not a flat blur trick), center cover sharp and
  *    pushed forward, sides rotated away in 3D and pushed back.
- * 3. Fanned stack (whatever's left after the hero and coverflow claim
- *    theirs) - cards resting in a flat, overlapping fan; hovering pops one
- *    up, scales it, and tilts it to a SHARPER angle rather than
- *    straightening it, so it reads as being pulled forward, not just
- *    enlarged in place.
+ * 3. Vertical stack (whatever's left after the hero and coverflow claim
+ *    theirs) - a sticky label in a narrow left column (plain CSS
+ *    `lg:sticky`, not a JS/GSAP pin) beside a strict two-up grid of
+ *    full-width, uncropped screenshots on the right. Modelled on
+ *    pamidordesign.co/work/figcoms's own "Marketing Material" section,
+ *    which turned out - after inspecting its DOM live - to have no
+ *    scroll-jacking or horizontal motion at all: the label column is
+ *    just `position: sticky`, and the taller image column scrolls past
+ *    it in normal document flow - that's the entire "images slide up
+ *    while the text holds still" effect. Replaced an earlier GSAP-pinned
+ *    horizontal slider that fought against this project's own portrait
+ *    screenshots by force-cropping them to 4:3, and an even earlier
+ *    "one big shot then pairs" composition that made long stacks (KCB
+ *    Bank, I&M Bank) taller than they needed to be.
  *
  * All three concepts and their exact numbers were prototyped and approved
  * in a standalone artifact against PulseKE's real screenshots before
- * landing here.
+ * landing here (the third tier went through two later swaps - fanned
+ * stack to pinned slider to this vertical stack - each approved against
+ * the "Case Study Structure" artifact and live reference sites in turn).
  */
 
 export interface GalleryTiers {
@@ -46,18 +59,30 @@ export function useGalleryTiers(images?: string[]): GalleryTiers {
     return { hero: null, count: 0, coverflowImages: null, stackImages: [] };
   }
   const [hero, ...rest] = images;
-  const coverflowImages = rest.length >= 3 ? (rest.slice(0, 3) as [string, string, string]) : null;
-  const stackImages = rest.length >= 3 ? rest.slice(3) : rest;
-  return { hero, count: images.length, coverflowImages, stackImages };
-}
+  const restShorts = rest.filter((src) => SHORT_IMAGES.has(src));
+  const restTalls = rest.filter((src) => !SHORT_IMAGES.has(src));
 
-function fanTransform(i: number, n: number) {
-  if (n === 1) return { xVw: 0, rest: -4, hover: 4 };
-  const t = i / (n - 1);
-  const xVw = -13 + t * 26;
-  const rest = -12 + t * 24;
-  const hover = rest + (rest >= -1 ? 8 : -8);
-  return { xVw, rest, hover };
+  // Fill Coverflow from short images first (its 3-up crop is exactly where
+  // they belong); only fall back to whatever's next in line if a case
+  // study doesn't have 3 short images to spare.
+  let coverflowImages: [string, string, string] | null = null;
+  if (restShorts.length >= 3) {
+    coverflowImages = restShorts.slice(0, 3) as [string, string, string];
+  } else if (rest.length >= 3) {
+    coverflowImages = rest.slice(0, 3) as [string, string, string];
+  }
+  const usedShorts = new Set(coverflowImages?.filter((src) => SHORT_IMAGES.has(src)) ?? []);
+  const leftoverShorts = restShorts.filter((src) => !usedShorts.has(src));
+
+  // Mixed case (a case study with both short and full-page screenshots,
+  // e.g. KCB Bank): keep the stack tall-only, so any shorts left over once
+  // Coverflow's taken its three simply don't appear in it. All-short case
+  // (e.g. Fearless Food Battles, which has no full-page shots at all):
+  // nothing to mix with, so the leftovers still go in the stack - a stack
+  // of uniformly-short images has no rhythm to break.
+  const stackImages = restTalls.length > 0 ? restTalls : leftoverShorts;
+
+  return { hero, count: images.length, coverflowImages, stackImages };
 }
 
 export function GalleryPlaceholder() {
@@ -183,36 +208,37 @@ export function Coverflow({ images, company }: { images: [string, string, string
   );
 }
 
-export function FannedStack({ images, company }: { images: string[]; company: string }) {
+export function VerticalStack({ images, company }: { images: string[]; company: string }) {
+  // The left label is genuinely CSS position:sticky (lg:sticky, not a
+  // JS/GSAP pin) - confirmed by inspecting figcoms's own "Marketing
+  // Material" section live: its label column is plain `lg:sticky`, and
+  // the taller image column beside it just scrolls past in normal
+  // document flow. That's the whole mechanic - no scroll-jacking. Images
+  // are a strict two-up grid throughout (not a first-full-width special
+  // case), per direct feedback.
+  //
+  // Sorted by aspect ratio (not left in their original data order) so
+  // that adjacent images - which land in the same grid row, side by side -
+  // are close in height. Sorting first and rendering in that order is the
+  // standard trick: it guarantees no pair is further apart in ratio than
+  // its neighbours in the full sorted list, which is exactly what stops a
+  // short screenshot landing next to a much longer one.
+  const ordered = useMemo(() => {
+    return [...images].sort((a, b) => (IMAGE_ASPECT[a] ?? 0.5) - (IMAGE_ASPECT[b] ?? 0.5));
+  }, [images]);
+
   return (
-    <div className="relative mx-auto flex h-[280px] w-full max-w-3xl items-center justify-center sm:h-[360px] lg:h-[420px]">
-      {images.map((src, i) => {
-        const { xVw, rest, hover } = fanTransform(i, images.length);
-        const restTransform = `translateX(${xVw}vw) rotate(${rest}deg)`;
-        const hoverTransform = `translateX(${xVw}vw) translateY(-40px) scale(1.22) rotate(${hover}deg)`;
-        return (
-          <div
-            key={src}
-            className="absolute cursor-pointer overflow-hidden rounded-[18px] border border-[var(--border-color)] transition-transform duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{
-              width: 'min(42vw, 380px)',
-              transform: restTransform,
-              zIndex: i + 1,
-              boxShadow: '0 20px 44px -16px rgba(0,0,0,0.65)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = hoverTransform;
-              e.currentTarget.style.zIndex = '10';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = restTransform;
-              e.currentTarget.style.zIndex = String(i + 1);
-            }}
-          >
-            <img src={src} alt={`${company} screenshot`} className="w-full" style={{ aspectRatio: '4/3', objectFit: 'cover' }} />
+    <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
+      <div className="lg:sticky lg:top-32 lg:self-start">
+        <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-accent-growth">More Screenshots</span>
+      </div>
+      <div className="grid grid-cols-2 gap-3.5 sm:gap-4">
+        {ordered.map((src) => (
+          <div key={src} className="overflow-hidden rounded-2xl border border-[var(--border-color)]">
+            <img src={src} alt={`${company} screenshot`} className="h-auto w-full" />
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 }

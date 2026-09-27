@@ -60,11 +60,36 @@ export const METRICS: Metric[] = [
   { value: '4', label: 'Years Building', icon: CalendarIcon },
 ];
 
-function MetricCard({ value, label, icon: Icon }: Metric) {
+function MetricCard({ value, label, icon: Icon, highlight }: Metric & { highlight?: boolean }) {
   const numericValue = parseFloat(value.replace(/[^0-9.-]/g, ''));
   const hasPlus = value.includes('+') && value.indexOf('+') === 0;
   const suffix = value.includes('%') ? '%' : /\+$/.test(value) ? '+' : '';
   const prefix = hasPlus ? '+' : '';
+
+  // One card carries a solid accent-growth fill instead of the neutral
+  // surface + tinted-icon treatment the other three use - the strongest
+  // number (checkout conversion lift) gets to read as the standout instead
+  // of blending in, and it's the only place on the site where accent-growth
+  // is used as a fill this large rather than for text, icons, or a border.
+  if (highlight) {
+    return (
+      <div className="flex flex-col gap-5 rounded-2xl bg-accent-growth p-6 sm:p-7">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--background-primary)]/15 text-[var(--background-primary)]">
+          <Icon />
+        </span>
+        <div>
+          <div className="font-mono text-4xl font-bold text-[var(--background-primary)] sm:text-5xl">
+            {isNaN(numericValue) ? (
+              value
+            ) : (
+              <Counter value={numericValue} prefix={prefix} suffix={suffix} duration={1.8} delay={0.15} />
+            )}
+          </div>
+          <p className="mt-2 text-sm text-[var(--background-primary)]/80">{label}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 sm:p-7">
@@ -88,8 +113,8 @@ function MetricCard({ value, label, icon: Icon }: Metric) {
 export default function MetricsGrid() {
   return (
     <div className="grid grid-cols-2 gap-4 sm:gap-5">
-      {METRICS.map((m) => (
-        <MetricCard key={m.label} {...m} />
+      {METRICS.map((m, i) => (
+        <MetricCard key={m.label} {...m} highlight={i === 1} />
       ))}
     </div>
   );

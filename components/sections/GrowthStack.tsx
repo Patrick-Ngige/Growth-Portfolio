@@ -1,8 +1,106 @@
 'use client';
 
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import Section from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
+
+// Horizontal scroll-linked capability cards, prototyped in the "borrowed
+// elements" artboard against daqconsulting.com's "Engineered for scale"
+// row: a giant ghost-number watermark per card, a tag row of real tools
+// (not invented ones - each maps to tools already listed in the marquee
+// above), and a tab bar whose underline tracks scroll position.
+const CAPABILITIES = [
+  { n: '01', tag: 'Next.js · Tailwind · Framer Motion', title: 'Frontend Engineering', body: 'Landing pages and product UI built and shipped without a separate dev queue.' },
+  { n: '02', tag: 'GA4 · GTM · Meta CAPI', title: 'Tracking & Attribution', body: 'Server-side events verified against real payment callbacks, not client pixels alone.' },
+  { n: '03', tag: 'GSAP · ScrollTrigger · Canvas', title: 'Motion & Interaction', body: 'Scroll-scrubbed reveals and cursor-driven effects built from real primitives, not a template.' },
+  { n: '04', tag: 'n8n · SQL · Automation', title: 'Growth Systems', body: 'Automated reporting pipelines that run themselves once they’re built.' },
+  { n: '05', tag: 'Next.js · Vercel · AI', title: 'Solo Products', body: 'PulseKE, the growth-audit tool: shipped end to end, no team behind them.' },
+];
+
+function CapabilityRow() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  const onScroll = () => {
+    const track = trackRef.current;
+    const progress = progressRef.current;
+    if (!track || !progress) return;
+    const max = track.scrollWidth - track.clientWidth;
+    const ratio = max > 0 ? track.scrollLeft / max : 0;
+    const idx = Math.min(CAPABILITIES.length - 1, Math.floor(ratio * CAPABILITIES.length));
+    tabRefs.current.forEach((tab, i) => tab?.classList.toggle('text-[var(--text-primary)]', i === idx));
+    progress.style.left = `${idx * (100 / CAPABILITIES.length)}%`;
+  };
+
+  const scrollToCard = (i: number) => {
+    const track = trackRef.current;
+    const card = track?.children[i] as HTMLElement | undefined;
+    if (track && card) track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="mb-16">
+      <div className="container-main mb-6">
+        <span className="data-label block text-accent-growth">Where the stack lands</span>
+      </div>
+      {/* Left padding matches container-main's own gutter so the first card
+          lines up with the section heading and tabs below instead of
+          touching the raw viewport edge - the marquee rows above are
+          deliberately edge-to-edge, but these cards read as page content,
+          not ambient decoration, so they should follow the page's margins.
+          Native scrollbar hidden since the tab bar below already serves as
+          the scroll-position indicator. */}
+      <div
+        ref={trackRef}
+        onScroll={onScroll}
+        className="flex gap-3.5 overflow-x-auto pb-2 pl-[clamp(20px,5vw,64px)] pr-6 [-ms-overflow-style:none] [scroll-snap-type:x_mandatory] [scrollbar-width:none] sm:gap-4 [&::-webkit-scrollbar]:hidden"
+      >
+        {CAPABILITIES.map((c) => (
+          <div
+            key={c.n}
+            className="relative flex min-h-[220px] w-[260px] flex-shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--background-surface)] p-6 [scroll-snap-align:start]"
+          >
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-[var(--text-secondary)]">{c.tag}</span>
+              <h4 className="mt-3 font-display text-xl font-semibold text-[var(--text-primary)]">{c.title}</h4>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{c.body}</p>
+            </div>
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-1 right-3 font-display text-7xl font-bold text-[var(--text-primary)] opacity-[0.05]"
+            >
+              {c.n}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="container-main relative mt-4 flex gap-6 border-t border-[var(--border-color)]">
+        <div
+          ref={progressRef}
+          className="absolute -top-px h-px bg-accent-growth transition-[left] duration-300"
+          style={{ width: `${100 / CAPABILITIES.length}%`, left: 0 }}
+        />
+        {CAPABILITIES.map((c, i) => (
+          <button
+            key={c.n}
+            ref={(el) => {
+              tabRefs.current[i] = el;
+            }}
+            onClick={() => scrollToCard(i)}
+            className={cn(
+              'py-3 font-mono text-[10px] uppercase tracking-[0.06em] transition-colors',
+              i === 0 ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
+            )}
+          >
+            {c.n} {c.title.split(' ')[0]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // Tool icons for the growth stack
 const toolIcons: Record<string, React.ReactNode> = {
@@ -176,6 +274,8 @@ export default function GrowthStack() {
         <MarqueeRow tools={rowOne} />
         <MarqueeRow tools={rowTwo} reverse />
       </div>
+
+      <CapabilityRow />
 
       <div className="container-main">
         {/* Bottom CTA */}
