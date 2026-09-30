@@ -27,12 +27,6 @@ export interface Capability {
   metrics?: string[];
 }
 
-export interface MetricSnapshot {
-  label: string;
-  value: number;
-  suffix?: string;
-}
-
 export const capabilities: Capability[] = [
   {
     id: 'strategy',
@@ -638,13 +632,6 @@ export const methodologySteps = [
     description: 'Learning aggregation and next-experiment prioritization based on data insights.',
     icon: 'refresh',
   },
-];
-
-export const metricsSnapshot: MetricSnapshot[] = [
-  { label: 'Years Building', value: 4, suffix: '' },
-  { label: 'Enterprise & Bank Clients', value: 4, suffix: '' },
-  { label: 'Public GitHub Repos', value: 50, suffix: '+' },
-  { label: 'Languages Localized', value: 20, suffix: '+' },
 ];
 
 export const aboutNarrative = {

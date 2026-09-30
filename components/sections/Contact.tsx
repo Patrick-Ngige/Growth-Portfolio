@@ -250,27 +250,6 @@ export default function Contact() {
             </div>
           </motion.form>
 
-          {/* Pre-qualification */}
-          <motion.div
-            className="p-6 rounded-xl bg-[var(--background-primary)]/50 border border-[var(--border-color)]/20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-accent-growth animate-pulse" />
-              <span className="data-label text-accent-growth">Currently Accepting Clients</span>
-            </div>
-            <p className="text-sm text-[var(--text-secondary)]">
-              <strong className="text-[var(--text-primary)]">
-                Limited availability for select projects.
-              </strong>{' '}
-              Alongside a full-time role, taking on a small number of engagements: landing page
-              builds, analytics and tracking setup, automation workflows, and CRO experiments.
-            </p>
-          </motion.div>
-
           {/* Alternative Contact */}
           <motion.div
             className="mt-10 flex items-center justify-center gap-6"

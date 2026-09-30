@@ -12,10 +12,11 @@ import Counter from '@/components/anim/Counter';
  * (and the GSAP pin it used to hand off into Methodology) has been removed,
  * folding everything into this single appearance.
  *
- * Curated down from an earlier 8-metric grid to the 4 strongest numbers -
- * enough to feel substantial without crowding the pinned viewport now that
- * a title and description sit above it. Every value traces back to a real
- * case study in lib/data.ts.
+ * These four numbers used to also appear a second time, in About.tsx's own
+ * "Impact at a Glance" mini-grid - now removed as a duplicate of this
+ * section, with its numbers (all still current, audited against lib/data.ts
+ * and the site's own case-study count) migrated here instead of kept in two
+ * places.
  */
 
 function CalendarIcon() {
@@ -33,17 +34,17 @@ function GlobeIcon() {
     </svg>
   );
 }
-function LayersIcon() {
+function BriefcaseIcon() {
   return (
     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3l9 5-9 5-9-5 9-5zm-9 9l9 5 9-5m-18 5l9 5 9-5" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 7v12a2 2 0 002 2h14a2 2 0 002-2V7M3 7l1.5-3h15L21 7M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2" />
     </svg>
   );
 }
-function TrendingUpIcon() {
+function CodeIcon() {
   return (
     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 17l6-6 4 4 8-8m0 0h-5m5 0v5" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
     </svg>
   );
 }
@@ -54,10 +55,10 @@ export interface Metric {
 }
 
 export const METRICS: Metric[] = [
-  { value: '14', label: 'Regional & Enterprise Sites', icon: GlobeIcon },
-  { value: '+280%', label: 'Checkout Conversion Rate', icon: TrendingUpIcon },
-  { value: '14', label: 'Case Studies Shipped', icon: LayersIcon },
   { value: '4', label: 'Years Building', icon: CalendarIcon },
+  { value: '4', label: 'Enterprise & Bank Clients', icon: BriefcaseIcon },
+  { value: '50+', label: 'Public GitHub Repos', icon: CodeIcon },
+  { value: '20+', label: 'Languages Localized', icon: GlobeIcon },
 ];
 
 function MetricCard({ value, label, icon: Icon, highlight }: Metric & { highlight?: boolean }) {
