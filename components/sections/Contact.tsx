@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
-import Button from '@/components/ui/Button';
+import MagicButton from '@/components/ui/MagicButton';
 import DotVortex from '@/components/motion/DotVortex';
 import { cn } from '@/lib/utils';
 
@@ -244,9 +244,9 @@ export default function Contact() {
               <p className="text-sm text-[var(--text-secondary)]">
                 Opens a prefilled email to me with your answers.
               </p>
-              <Button type="submit" size="lg">
+              <MagicButton type="submit" size="lg">
                 Send my details
-              </Button>
+              </MagicButton>
             </div>
           </motion.form>
 

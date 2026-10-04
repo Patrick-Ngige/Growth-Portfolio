@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { caseStudies, type CaseStudy } from '@/lib/data';
 import Counter from '@/components/anim/Counter';
 import MagneticButton from '@/components/anim/MagneticButton';
+import MagicButton from '@/components/ui/MagicButton';
 import { useGalleryTiers, GalleryHero, GalleryPlaceholder, Coverflow, VerticalStack } from '@/components/sections/WorkGallery';
 
 /**
@@ -67,8 +68,14 @@ function ClockIcon() {
 // ".chapter-pill" treatment approved in the "Case Study Structure"
 // artifact (pamidordesign.co/work/rise's structural language), not the
 // site's older bordered-badge ChapterPill this replaced.
-function RailLabel({ children }: { children: ReactNode }) {
-  return <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-accent-growth">{children}</span>;
+function RailLabel({ children, dark }: { children: ReactNode; dark?: boolean }) {
+  return (
+    <span
+      className={`font-mono text-[11px] uppercase tracking-[0.1em] ${dark ? 'text-[#009C4A]' : 'text-accent-growth'}`}
+    >
+      {children}
+    </span>
+  );
 }
 
 // A thin full-width rule before every chapter, matching pamidordesign.co's
@@ -76,7 +83,7 @@ function RailLabel({ children }: { children: ReactNode }) {
 // each numbered Approach step, each named chapter - with the same
 // `h-[1.5px] w-full bg-rule` line, confirmed by inspecting their DOM live).
 function SectionRule({ dark }: { dark?: boolean }) {
-  return <div aria-hidden="true" className={`mb-8 h-px w-full lg:mb-10 ${dark ? 'bg-white/10' : 'bg-[var(--border-color)]'}`} />;
+  return <div aria-hidden="true" className={`mb-8 h-px w-full lg:mb-10 ${dark ? 'bg-white/10' : 'bg-accent-growth/20'}`} />;
 }
 
 // Splits a result sentence/paragraph into individual claims for the
@@ -145,7 +152,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-4xl font-display text-5xl font-bold leading-[0.98] text-[var(--text-primary)] sm:text-6xl lg:text-7xl"
+              className="max-w-4xl font-display text-5xl font-bold leading-[0.98] text-accent-growth sm:text-6xl lg:text-7xl"
             >
               {study.company}
             </motion.h1>
@@ -159,7 +166,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               {study.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full border border-[var(--border-color)] bg-[var(--chip-bg)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--text-secondary)]"
+                  className="rounded-full border border-accent-growth/25 bg-accent-growth/10 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-accent-growth"
                 >
                   {tag}
                 </span>
@@ -258,7 +265,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               <SectionRule />
               <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
                 <div>
-                  <span className="mb-2 block font-display text-xs font-bold text-[var(--text-primary)] opacity-15">Part 01</span>
+                  <span className="mb-2 block font-display text-xs font-bold text-accent-growth opacity-40">Part 01</span>
                   <RailLabel>The Challenge</RailLabel>
                 </div>
                 <p className="text-xl font-medium leading-[1.4] text-[var(--text-primary)]">{study.challenge}</p>
@@ -284,7 +291,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
               <SectionRule />
               <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
                 <div>
-                  <span className="mb-2 block font-display text-xs font-bold text-[var(--text-primary)] opacity-15">Part 02</span>
+                  <span className="mb-2 block font-display text-xs font-bold text-accent-growth opacity-40">Part 02</span>
                   <RailLabel>The Approach</RailLabel>
                 </div>
                 <p className="text-lg leading-relaxed text-[var(--text-primary)] lg:text-xl">{study.approach}</p>
@@ -313,16 +320,22 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
 
         {/* Result + More work - the closing beat, kept permanently dark
             like Footer.tsx regardless of the site theme (see the header
-            note above). Full-bleed, hard-edged, no gradient into it: the
-            arpeggio.framer.website teardown found the same, a clean cut
-            into its two black sections rather than a crossfade. */}
-        <div className="bg-[#09090B]">
+            note above) - ink and accent colours here are hardcoded to the
+            dark-mode set rather than the theme-reactive classes used
+            elsewhere in this file, since --fixed-panel-bg (this band's
+            background) is itself the light-mode accent colour: a
+            theme-reactive accent-growth text/fill would vanish into its
+            own background in light mode. Full-bleed, hard-edged, no
+            gradient into it: the arpeggio.framer.website teardown found
+            the same, a clean cut into its two black sections rather than
+            a crossfade. */}
+        <div style={{ background: 'var(--fixed-panel-bg-soft)' }}>
           <motion.section {...revealProps} id="result" className="py-24 lg:py-36">
             <div className="container-main">
               <SectionRule dark />
               <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-16">
                 <div>
-                  <RailLabel>Result</RailLabel>
+                  <RailLabel dark>Result</RailLabel>
                 </div>
                 <div>
                   {/* The one number that matters, moved here from the old
@@ -331,7 +344,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                       text backs it up, instead of floating alone at the top
                       of the page. */}
                   <div className="mb-10">
-                    <span className="block break-words font-display text-6xl font-bold leading-none text-accent-growth sm:text-7xl">
+                    <span className="block break-words font-display text-6xl font-bold leading-none text-[#009C4A] sm:text-7xl">
                       {isNaN(numericMetric) ? (
                         study.metricValue
                       ) : (
@@ -358,7 +371,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                     if (highlights.length < 2) {
                       return (
                         <div className="rounded-2xl border border-white/10 bg-white/5 px-7 py-8 sm:px-9 sm:py-10">
-                          <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
+                          <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#009C4A] text-[#09090B]">
                             <CheckIcon />
                           </span>
                           <p className="font-display text-xl font-semibold leading-[1.35] text-[#F4F4F5] sm:text-2xl">
@@ -374,7 +387,7 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                             key={line}
                             className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5"
                           >
-                            <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent-growth text-[#09090B]">
+                            <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#009C4A] text-[#09090B]">
                               <CheckIcon />
                             </span>
                             <span className="text-base leading-snug text-[#F4F4F5] sm:text-lg">{line}</span>
@@ -386,15 +399,30 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
 
                   <div className="mt-14">
                     <MagneticButton strength={30}>
-                      <Link
+                      <MagicButton
                         href="/#contact"
-                        className="inline-flex items-center gap-2 rounded-full bg-accent-growth px-6 py-3 font-medium text-[#09090B] transition-colors hover:bg-accent-growth/90"
+                        colorsOverride={{
+                          base: 'bg-[#009C4A]',
+                          defaultText: 'text-[#09090B]',
+                          // Not the same dark the surrounding band uses
+                          // (--fixed-panel-bg-soft, #09090B in dark mode) -
+                          // a fill that matches its own backdrop exactly
+                          // becomes invisible once fully scaled, reading as
+                          // "the button never transformed" even though the
+                          // mechanics are working (this exact bug hit
+                          // Footer's button too, same root cause).
+                          hoverFill: 'bg-[#F4F4F5]',
+                          hoverText: 'text-[#09090B]',
+                          dot: 'bg-[#009C4A]',
+                        }}
                       >
-                        <span>Work with me</span>
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                      </Link>
+                        <span className="inline-flex items-center gap-2">
+                          Work with me
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </span>
+                      </MagicButton>
                     </MagneticButton>
                   </div>
                 </div>
@@ -415,12 +443,12 @@ export default function WorkDetailView({ study }: { study: CaseStudy }) {
                   <Link
                     key={item.id}
                     href={`/work/${item.id}`}
-                    className="group flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0d0d0c] p-6 transition-colors hover:border-accent-growth/40"
+                    className="group flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0d0d0c] p-6 transition-colors hover:border-[#009C4A]/40"
                   >
                     <span className="font-mono text-xs uppercase tracking-[0.12em] text-[#71717A]">{item.industry}</span>
                     <h3 className="mt-6 font-display text-xl font-semibold leading-snug text-[#F4F4F5]">{item.company}</h3>
                     <div className="mt-6 flex items-baseline gap-2 border-t border-white/10 pt-4">
-                      <span className="font-display text-2xl font-bold text-accent-growth">{item.metricValue}</span>
+                      <span className="font-display text-2xl font-bold text-[#009C4A]">{item.metricValue}</span>
                       <span className="text-xs text-[#A1A1AA]">{item.metricLabel}</span>
                     </div>
                   </Link>

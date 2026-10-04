@@ -23,16 +23,16 @@ export interface RailItem {
  * itself never gets a bold "active" treatment, matching the reference.
  *
  * Deliberately a fixed-palette device (dark neutral warming to accent
- * orange), not theme-reactive - the same choice already made for
+ * emerald), not theme-reactive - the same choice already made for
  * PinnedPillars' panel colour: a considered brand moment, not a themed
  * surface that flips with light/dark mode.
  */
 const BANDS = [
   { bg: '#1c1a17', text: '#F4F4F5' },
-  { bg: '#54381f', text: '#F4F4F5' },
-  { bg: '#8c5629', text: '#F4F4F5' },
-  { bg: '#c37432', text: '#F4F4F5' },
-  { bg: '#FB923C', text: '#09090B' },
+  { bg: '#153B24', text: '#F4F4F5' },
+  { bg: '#0E5B31', text: '#F4F4F5' },
+  { bg: '#077C3E', text: '#F4F4F5' },
+  { bg: '#009C4A', text: '#09090B' },
 ];
 
 const ROW_H = 74;

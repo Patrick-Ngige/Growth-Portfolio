@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-import Button, { AnimatedButton } from '@/components/ui/Button';
+import MagicButton from '@/components/ui/MagicButton';
 import SplitText from '@/components/anim/SplitText';
 import MagneticButton from '@/components/anim/MagneticButton';
 import HeroGridBulge from '@/components/motion/HeroGridBulge';
@@ -143,7 +143,7 @@ export default function Hero() {
             <motion.path
               d="M0,25 L10,22 L20,18 L30,20 L40,15 L50,12 L60,8 L70,10 L80,5 L90,3 L100,8"
               fill="none"
-              stroke="#EA580C"
+              stroke="var(--accent-growth)"
               strokeWidth="2"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
@@ -292,17 +292,14 @@ export default function Hero() {
             transition={{ delay: 0.9 }}
           >
             <MagneticButton onClick={() => scrollToSection('#work')}>
-              <AnimatedButton
-                size="lg"
-                containerClass="shadow-glow"
-              >
+              <MagicButton size="lg" className="shadow-glow" type="button">
                 View My Work
-              </AnimatedButton>
+              </MagicButton>
             </MagneticButton>
             <MagneticButton onClick={() => scrollToSection('#contact')}>
-              <Button size="lg" variant="outline">
+              <MagicButton size="lg" variant="inverse" type="button">
                 Get In Touch
-              </Button>
+              </MagicButton>
             </MagneticButton>
           </motion.div>
         </motion.div>

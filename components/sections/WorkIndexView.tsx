@@ -122,7 +122,7 @@ export default function WorkIndexView() {
           // background flips to a flat, fully-saturated brand green the
           // instant any row is hovered (header and filters included, not
           // just the list), no fade-out toward the base colour. Same
-          // mechanic here with our own accent-growth orange.
+          // mechanic here with our own accent-growth emerald.
           //
           // Overriding the token *values* rather than each element's
           // classes: every descendant already reads var(--text-primary)/

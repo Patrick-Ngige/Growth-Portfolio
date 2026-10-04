@@ -9,33 +9,59 @@
      text, no warm tint, consistent with the neutral direction the rest of
      the site's fixed-dark sections already moved to. */
   --background-primary: #F8F8F8;
+  /* RGB triplet alongside the hex value, same reason --accent-growth-rgb
+     exists next to --accent-growth: Tailwind's text-[var(--x)]/NN opacity
+     shorthand only works when --x is a space-separated triplet. Used with
+     var(--x) alone it silently produces invalid CSS, which the browser
+     drops - the element then falls back to its inherited colour instead
+     of erroring, so the bug is invisible until you notice near-black text
+     where a translucent white/light colour was intended. */
+  --background-primary-rgb: 248 248 248;
   --background-surface: #EFEFEF;
   --text-primary: #1A1A1A;
   --text-secondary: #5C5C5C;
-  --accent-growth: #EA580C;
-  --accent-growth-rgb: 234 88 12;
+  --accent-growth: #004D24;
+  --accent-growth-rgb: 0 77 36;
   --accent-technical: #0284C7;
   --border-color: #E0E0E0;
   --surface-color: #EDEDED;
   --card-base: #F2F2F2;
   --card-active: #FFFFFF;
   --chip-bg: rgba(0, 0, 0, 0.05);
+  /* Fixed-dark panels (Footer, FeaturedWorkReel, WorkDetailView's closing
+     band) were pure black/near-black regardless of theme. In light mode
+     that now reads as the accent green instead of black, so these panels
+     stop being the one spot on the page that's literally black; dark mode
+     keeps each panel's original literal shade (see .dark below). */
+  --fixed-panel-bg: #004D24;
+  --fixed-panel-bg-soft: #004D24;
+  /* Footer's own page background (not its two cards, which stay green) -
+     in light mode this is just the site's normal page colour, not a
+     dedicated dark/colour treatment: the green cards are the footer's one
+     accent moment, the page around them does not need its own colour too
+     (see Footer.tsx's own comment for the fuller reasoning). Dark mode
+     keeps the footer's original pure black regardless. */
+  --footer-bg: var(--background-primary);
 }
 
 .dark {
   /* Dark Mode Variables */
   --background-primary: #09090B;
+  --background-primary-rgb: 9 9 11;
   --background-surface: #18181B;
   --text-primary: #F4F4F5;
   --text-secondary: #A1A1AA;
-  --accent-growth: #FB923C;
-  --accent-growth-rgb: 251 146 60;
+  --accent-growth: #009C4A;
+  --accent-growth-rgb: 0 156 74;
   --accent-technical: #38BDF8;
   --border-color: #27272A;
   --surface-color: #27272A;
   --card-base: #18181B;
   --card-active: #37373D;
   --chip-bg: rgba(255, 255, 255, 0.1);
+  --fixed-panel-bg: #000000;
+  --fixed-panel-bg-soft: #09090B;
+  --footer-bg: #000000;
 }
 
 @layer base {
@@ -150,7 +176,7 @@
 
   /* Glow effects */
   .glow-accent-growth {
-    box-shadow: 0 0 20px rgba(234, 88, 12, 0.3);
+    box-shadow: 0 0 20px rgba(0, 156, 74, 0.3);
   }
 
   .glow-accent-technical {

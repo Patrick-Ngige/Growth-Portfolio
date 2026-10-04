@@ -8,7 +8,7 @@ import * as THREE from 'three';
  * field, not a stock particle swirl. Meant to read as "signal in the
  * noise": the case study is an AI tool that researches a business live
  * on the web, so the field is built from layered flow rather than a
- * decorative blob. Accent-orange-on-near-black, matching the site's own
+ * decorative blob. Accent-emerald-on-near-black, matching the site's own
  * dark palette exactly (no separate colour system for this one effect).
  *
  * Reacts to two real inputs, not just a time uniform: cursor position
@@ -87,7 +87,7 @@ const FRAGMENT = /* glsl */ `
     signal *= uIntensity;
 
     vec3 base = vec3(0.035, 0.035, 0.043);
-    vec3 accent = vec3(0.984, 0.576, 0.235); // #FB923C
+    vec3 accent = vec3(0.0, 0.612, 0.290); // #009C4A
     vec3 color = mix(base, accent, clamp(signal, 0.0, 1.0) * 0.85);
 
     float vignette = smoothstep(1.1, 0.2, length(uv));

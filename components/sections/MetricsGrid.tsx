@@ -75,7 +75,7 @@ function MetricCard({ value, label, icon: Icon, highlight }: Metric & { highligh
   if (highlight) {
     return (
       <div className="flex flex-col gap-5 rounded-2xl bg-accent-growth p-6 sm:p-7">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--background-primary)]/15 text-[var(--background-primary)]">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(var(--background-primary-rgb)/15%)] text-[var(--background-primary)]">
           <Icon />
         </span>
         <div>
@@ -86,7 +86,12 @@ function MetricCard({ value, label, icon: Icon, highlight }: Metric & { highligh
               <Counter value={numericValue} prefix={prefix} suffix={suffix} duration={1.8} delay={0.15} />
             )}
           </div>
-          <p className="mt-2 text-sm text-[var(--background-primary)]/80">{label}</p>
+          {/* text-[var(--x)]/80 silently fails here: --background-primary
+              is a plain hex value, not the space-separated RGB triplet
+              Tailwind's opacity shorthand needs, so the colour was invalid
+              and the browser fell back to the inherited near-black body
+              text - rgb(var(--background-primary-rgb)/80%) is the fix. */}
+          <p className="mt-2 text-sm text-[rgb(var(--background-primary-rgb)/80%)]">{label}</p>
         </div>
       </div>
     );

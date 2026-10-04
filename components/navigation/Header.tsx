@@ -1,17 +1,32 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { navigationLinks } from '@/lib/data';
+import { createSpring } from './spring';
+import MagicButton from '@/components/ui/MagicButton';
+
+type PillKey = 'x' | 'y' | 'w' | 's' | 'o';
+type PillPose = Record<PillKey, number>;
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [veil, setVeil] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
+
+  const navLinksRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const pill = useRef<{
+    spring: ReturnType<typeof createSpring<PillKey>>;
+    parked: () => PillPose;
+    hovered: (a: HTMLElement) => PillPose;
+    link: HTMLElement | null;
+  } | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -21,6 +36,73 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Spring-driven nav pill, ported from a hand-rolled reference
+  // implementation rather than Framer Motion's layoutId: a real spring
+  // keeps its velocity when the target changes mid-flight, so flicking
+  // the pointer between links continues smoothly instead of restarting
+  // the way layoutId's own FLIP animation does. The parked pose sits
+  // below and slightly left of the first link (40% scale, invisible) -
+  // hovering any link for the first time, or right after the pointer
+  // leaves the nav, springs UP from there, and that combined vertical +
+  // horizontal motion is what reads as a diagonal "entering from an
+  // angle" effect. Moving directly between adjacent links is a flat
+  // horizontal slide with no vertical component at all - confirmed by
+  // comparing both cases frame-by-frame against kora.framer.media's own
+  // nav before porting the mechanics here.
+  useEffect(() => {
+    const navEl = navLinksRef.current;
+    const pillEl = pillRef.current;
+    if (!navEl || !pillEl) return;
+
+    const firstLink = () => navEl.querySelector<HTMLElement>('a');
+    const parked = (): PillPose => {
+      const first = firstLink();
+      const h = first?.offsetHeight ?? 36;
+      return { x: first?.offsetLeft ?? 0, y: h * 1.35, w: first?.offsetWidth ?? 80, s: 0.4, o: 0 };
+    };
+    const hovered = (a: HTMLElement): PillPose => ({ x: a.offsetLeft, y: 0, w: a.offsetWidth, s: 1, o: 1 });
+    const apply = (v: PillPose) => {
+      pillEl.style.width = `${v.w}px`;
+      pillEl.style.opacity = String(Math.max(0, Math.min(1, v.o)));
+      pillEl.style.transform = `translate3d(${v.x}px, ${v.y}px, 0) scale(${v.s})`;
+    };
+
+    const spring = createSpring<PillKey>(parked(), apply);
+    pill.current = { spring, parked, hovered, link: null };
+    spring.jump(parked());
+
+    // On resize, re-measure without animating (link widths/positions
+    // change with viewport width, the pill shouldn't visibly relayout).
+    const ro = new ResizeObserver(() => {
+      const cur = pill.current;
+      if (!cur) return;
+      spring.jump(cur.link ? cur.hovered(cur.link) : cur.parked());
+    });
+    ro.observe(navEl);
+    return () => {
+      ro.disconnect();
+      spring.stop();
+      pill.current = null;
+    };
+  }, []);
+
+  /** Send the pill to link `a`, or back to its parked pose when `a` is null. */
+  const highlight = (a: Element | null) => {
+    const navEl = navLinksRef.current;
+    const p = pill.current;
+    if (!navEl || !p) return;
+    navEl.querySelectorAll<HTMLElement>('a[data-nav-link]').forEach((x) => {
+      x.style.color = '';
+    });
+    const link = a && window.matchMedia('(min-width: 768px)').matches ? (a as HTMLElement) : null;
+    p.link = link;
+    const target = link ? p.hovered(link) : p.parked();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) p.spring.jump(target);
+    else p.spring.to(target);
+    if (link) link.style.color = 'var(--background-primary)';
+    setVeil(!!link);
+  };
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
@@ -38,6 +120,23 @@ export default function Header() {
       >
         Skip to main content
       </a>
+
+      {/* Veil: dims + blurs the page behind the header while a nav link is
+          hovered. Deliberately a SIBLING of <header>, not nested inside it -
+          header has `-translate-x-1/2`, and a transformed ancestor becomes
+          the containing block for any `position: fixed` descendant (CSS
+          spec behaviour), so a veil nested inside header would size itself
+          against header's own small box instead of the viewport and never
+          visibly cover the page. z-40 (below header's z-50, above normal
+          page content) gets the same "above the page, below the bar"
+          layering without relying on nesting. */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none fixed inset-0 z-40 bg-[rgba(0,30,15,0.16)] opacity-0 backdrop-blur-[10px] transition-opacity duration-[400ms]',
+          veil && 'opacity-100'
+        )}
+      />
 
       <header
         className="fixed left-1/2 top-4 z-50 w-[min(1180px,calc(100%-2rem))] -translate-x-1/2"
@@ -79,20 +178,39 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <nav
-              className="hidden md:flex items-center gap-8"
+              className="hidden md:flex items-center gap-1"
               role="navigation"
               aria-label="Main navigation"
             >
-              {navigationLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-secondary)] dark:hover:text-[var(--text-primary)] transition-colors relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]"
-                >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-growth transition-all duration-300 group-hover:w-full" />
-                </Link>
-              ))}
+              {/* Pointer/focus handlers live on this inner wrapper, not the
+                  outer <nav>, so the theme toggle and CTA button (also
+                  inside <nav> but not real nav links) never trigger the
+                  pill - closest('a') would otherwise match the CTA too. */}
+              <div
+                ref={navLinksRef}
+                className="relative flex items-center gap-1"
+                onPointerOver={(e) => e.pointerType === 'mouse' && highlight((e.target as Element).closest('a'))}
+                onPointerLeave={() => highlight(null)}
+                onFocus={(e) => highlight((e.target as Element).closest('a'))}
+                onBlur={() => highlight(null)}
+              >
+                <span
+                  ref={pillRef}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-0 top-0 z-0 h-full w-0 rounded-full bg-accent-growth opacity-0"
+                  style={{ transformOrigin: '50% 50%', willChange: 'transform, opacity' }}
+                />
+                {navigationLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    data-nav-link
+                    className="relative z-10 rounded-full px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors delay-100 duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
 
               {/* Theme Toggle */}
               {mounted && (
@@ -141,12 +259,9 @@ export default function Header() {
               )}
 
               {/* CTA */}
-              <a
-                href="#contact"
-                className="hidden lg:inline-flex items-center px-4 py-2 text-sm font-medium text-[var(--background-primary)] bg-accent-growth rounded-full hover:bg-accent-growth/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]"
-              >
+              <MagicButton href="#contact" size="md" className="hidden lg:inline-flex">
                 Work with me
-              </a>
+              </MagicButton>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -316,7 +431,7 @@ export default function Header() {
                     </span>
                     <Link
                       href={link.href}
-                      className="font-display text-3xl font-semibold text-[var(--text-primary)] hover:text-accent-growth transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth rounded-lg"
+                      className="font-display text-3xl font-semibold text-[var(--text-primary)] transition-all duration-300 hover:translate-x-4 hover:text-accent-growth focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth rounded-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {link.label}
@@ -327,13 +442,14 @@ export default function Header() {
 
               {/* Mobile Footer */}
               <div className="relative z-10 p-6 border-t border-[var(--border-color)]/10">
-                <a
+                <MagicButton
                   href="#contact"
-                  className="flex items-center justify-center w-full py-4 text-lg font-medium text-[var(--background-primary)] bg-accent-growth rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-growth focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]"
+                  size="lg"
+                  className="w-full text-lg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Work with me
-                </a>
+                </MagicButton>
               </div>
             </div>
           </motion.div>

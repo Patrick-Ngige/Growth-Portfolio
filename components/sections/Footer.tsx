@@ -2,26 +2,49 @@
 
 import Link from 'next/link';
 import { navigationLinks, socialLinks } from '@/lib/data';
+import MagicButton from '@/components/ui/MagicButton';
 
 /**
  * Rebuilt per the "Pixcut Studio" reference screenshot: two bordered,
  * rounded panels side by side on a dark page - a narrow left card (brand
  * blurb + CTA) and a wider right card (Menu / Utility Pages / Contact Us
  * columns, then a divider and a bottom bar with copyright + icon-only
- * socials, all inside that same right panel). Colours match the reference
- * exactly - true neutral black/charcoal/white, not the warm brown-tinted
- * palette used elsewhere on the site. Fixed dark background regardless of
- * the site's light/dark toggle - the footer is the one place on the page
- * that's always dark, the same way trionn-rebuild alternates fixed
- * section themes rather than one flat background throughout.
+ * socials, all inside that same right panel). Ink colours match the
+ * reference exactly - true neutral charcoal/white, not the warm
+ * brown-tinted palette used elsewhere on the site. The green lives only on
+ * the two cards now - the page itself (--footer-bg) is pure black in dark
+ * mode (the footer is the one place that's always literally black there)
+ * and just the site's normal page colour in light mode, no dedicated dark
+ * or colour treatment of its own. Earlier this page background also went
+ * green, then slate/navy; both read as one colour decision too many once
+ * the cards themselves already carry the accent - a live teardown of
+ * kora.framer.media's section backgrounds found the same restraint (one
+ * green section, one black section, one cream footer, never the same
+ * colour move stacked twice in one place).
  */
-const PAGE_BG = '#000000';
-const CARD_BG = '#141414';
-const CARD_BORDER = '#2A2A2A';
+const PAGE_BG = 'var(--footer-bg)';
+const CARD_BG = '#06301C';
+const CARD_BORDER = '#1F5C3B';
 const INK = '#F5F5F5';
-const INK_MUTED = '#8A8A8A';
+const INK_MUTED = '#8FB89D';
 const INK_DIM = '#C7C7C7';
-const LINE = '#2A2A2A';
+const LINE = CARD_BORDER;
+
+// Same hover treatment as Header's nav links: ink brightens and a thin
+// accent bar grows in from the left under the text, rather than the
+// opacity-only hover this had before (which did nothing visible, since
+// the ink was already fully opaque).
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="group relative inline-block text-sm text-[#C7C7C7] transition-colors hover:text-[#F5F5F5]"
+    >
+      {children}
+      <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-[#009C4A] transition-all duration-300 group-hover:w-full" />
+    </Link>
+  );
+}
 
 const socialIcons: Record<string, React.ReactNode> = {
   LinkedIn: (
@@ -58,13 +81,23 @@ export default function Footer() {
               Developer-first Growth Engineer building the systems behind measurable growth.
             </p>
           </div>
-          <a
+          <MagicButton
             href="#contact"
-            className="inline-flex w-fit items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
-            style={{ background: INK, color: PAGE_BG }}
+            colorsOverride={{
+              base: 'bg-[#F5F5F5]',
+              defaultText: 'text-[#06301C]',
+              // Not CARD_BG (#06301C) - a fill matching the card it sits
+              // on exactly becomes invisible once fully scaled, reading as
+              // "the button never transformed" even though the mechanics
+              // are working correctly underneath.
+              hoverFill: 'bg-[#009C4A]',
+              hoverText: 'text-[#06301C]',
+              dot: 'bg-[#F5F5F5]',
+            }}
+            className="w-fit"
           >
             Get In Touch
-          </a>
+          </MagicButton>
         </div>
 
         {/* Right panel: link columns + bottom bar, all in one card */}
@@ -80,9 +113,7 @@ export default function Footer() {
               <ul className="mt-4 flex flex-col gap-2.5">
                 {navigationLinks.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-sm transition-colors hover:opacity-100" style={{ color: INK_DIM }}>
-                      {link.label}
-                    </Link>
+                    <FooterLink href={link.href}>{link.label}</FooterLink>
                   </li>
                 ))}
               </ul>
@@ -94,9 +125,7 @@ export default function Footer() {
               </h4>
               <ul className="mt-4 flex flex-col gap-2.5">
                 <li>
-                  <a href="#contact" className="text-sm" style={{ color: INK_DIM }}>
-                    Resume
-                  </a>
+                  <FooterLink href="#contact">Resume</FooterLink>
                 </li>
               </ul>
             </div>
@@ -106,7 +135,7 @@ export default function Footer() {
                 Contact Us
               </h4>
               <div className="mt-4 flex flex-col gap-2.5 text-sm" style={{ color: INK_DIM }}>
-                <a href="mailto:wakemanjajr@gmail.com">wakemanjajr@gmail.com</a>
+                <FooterLink href="mailto:wakemanjajr@gmail.com">wakemanjajr@gmail.com</FooterLink>
                 <p>Nairobi, Kenya</p>
                 <p>Available Worldwide</p>
               </div>

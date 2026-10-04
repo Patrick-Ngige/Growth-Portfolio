@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
@@ -23,6 +25,22 @@ const integratedWorkflow = [
 ];
 
 export default function UnfairAdvantage() {
+  // PinnedPillars parses panelBg/approachFrom as literal hex (for its GSAP
+  // colour-tint math), so they can't be CSS custom properties - resolved
+  // here instead, same light-mode-green/dark-mode-black pairing used by
+  // --fixed-panel-bg elsewhere. Defaults to the dark pair pre-mount to
+  // match the site's defaultTheme="dark" and avoid a flash.
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isLight = mounted && resolvedTheme === 'light';
+  const panelBg = isLight ? '#004D24' : '#09090B';
+  // The Venn intersection's fill, and the colour the page tints toward
+  // during the pre-pin approach ramp - was a flat near-black (#1A1A1A)
+  // regardless of theme, which read as a jarring black patch against the
+  // green panel in light mode. Same deep-green family as Footer's cards.
+  const plateFill = isLight ? '#06301C' : '#1A1A1A';
+
   return (
     <>
     <AnimatedSection
@@ -250,11 +268,11 @@ export default function UnfairAdvantage() {
         { symbol: 'In', word: 'Instrument', caption: 'Analytics | Tracking' },
         { symbol: 'Au', word: 'Automate', caption: 'Workflows | AI' },
       ]}
-      panelBg="#09090B"
+      panelBg={panelBg}
       ink="#F4F4F5"
       inkMuted="#A1A1AA"
-      plateFill="#1A1A1A"
-      approachFrom="#09090B"
+      plateFill={plateFill}
+      approachFrom={panelBg}
     />
     </>
   );

@@ -12,7 +12,7 @@ const config: Config = {
     extend: {
       colors: {
         // Accent Colors - growth delegates to the theme-aware CSS custom
-        // property in globals.css (orange, #EA580C light / #FB923C dark)
+        // property in globals.css (emerald, #004D24 light / #009C4A dark)
         // rather than a second, independent hex value. The two had drifted
         // apart: this file previously hardcoded a lime green (#CCFF00)
         // that every text-accent-growth/bg-accent-growth utility resolved

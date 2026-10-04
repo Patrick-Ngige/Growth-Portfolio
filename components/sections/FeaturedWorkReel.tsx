@@ -42,12 +42,15 @@ if (typeof window !== 'undefined') {
  * one; otherwise a gradient placeholder with an honest "Screenshot pending"
  * label stands in.
  *
- * Deliberately given its own FIXED dark colour band (not the theme's
- * flipping --background-primary/--text-primary tokens) so that in light
- * mode this section reads as a distinct panel against the cream page
- * around it, the same way trionn alternates light/dark sections rather
- * than using one flat background throughout. Colours are the same true
- * neutral black/charcoal/white set as Footer.tsx - no warm tint.
+ * Deliberately given its own FIXED colour band (not the theme's flipping
+ * --background-primary/--text-primary tokens) so that in light mode this
+ * section reads as a distinct panel against the cream page around it, the
+ * same way trionn alternates light/dark sections rather than using one flat
+ * background throughout. Ink colours are the same true neutral
+ * charcoal/white set as Footer.tsx - no warm tint. The band itself is
+ * --fixed-panel-bg: pure black in dark mode, the accent green in light mode
+ * (same pairing as Footer.tsx), so light-mode visitors don't hit a literal
+ * black panel with no relation to the rest of the page's palette.
  *
  * Deliberately NOT wrapped in AnimatedSection or any container with
  * `overflow-hidden` on an ancestor - that broke a previous GSAP pin (see
@@ -57,10 +60,10 @@ if (typeof window !== 'undefined') {
 // full 19-project list lives on /work. Picked by id (not a slice) so this
 // stays a deliberate shortlist as more case studies get added, rather than
 // silently growing with the array.
-const FEATURED_IDS = ['kcb-bank', 'im-bank', 'totalenergies-kenya', 'prime-bank', 'strathmore-foundation', 'ngige-growth-audit', 'pulseke'];
+const FEATURED_IDS = ['im-bank', 'totalenergies-kenya', 'prime-bank', 'strathmore-foundation', 'ngige-growth-audit', 'pulseke'];
 const FEATURED = FEATURED_IDS.map((id) => caseStudies.find((c) => c.id === id)).filter((c): c is (typeof caseStudies)[number] => Boolean(c));
 
-const BAND_BG = '#000000';
+const BAND_BG = 'var(--fixed-panel-bg)';
 const INK = '#F5F5F5';
 const INK_MUTED = '#8A8A8A';
 

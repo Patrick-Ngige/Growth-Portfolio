@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 
 /**
  * Ambient canvas-drawn data-visualization motif: overlapping tilted rings
- * of dots, rotating slowly, perspective-scaled with orange-to-grey depth
+ * of dots, rotating slowly, perspective-scaled with emerald-to-grey depth
  * colour. Prototyped in the "borrowed elements" artboard as a recreation
  * of boonglobal.io's dot-field motif (their own version is a WebGL
  * particle system reading real simulation data - this is a canvas
@@ -67,7 +67,7 @@ export default function DotVortex({ className }: { className?: string }) {
           const depthT = (rotZ / baseR + 1) / 2;
           const size = 1 + depthT * 2.4;
           const alpha = 0.1 + depthT * 0.45;
-          ctx.fillStyle = depthT > 0.5 ? `rgba(234, 88, 12, ${alpha})` : `rgba(140, 140, 140, ${alpha * 0.7})`;
+          ctx.fillStyle = depthT > 0.5 ? `rgba(0, 156, 74, ${alpha})` : `rgba(140, 140, 140, ${alpha * 0.7})`;
           ctx.beginPath();
           ctx.arc(px, py, size, 0, Math.PI * 2);
           ctx.fill();
