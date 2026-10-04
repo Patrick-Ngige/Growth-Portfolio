@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import Header from '@/components/navigation/Header';
-import Footer from '@/components/sections/Footer';
+import ConditionalFooter from '@/components/sections/ConditionalFooter';
 import Loader from '@/components/motion/Loader';
 import SmoothScroll from '@/components/anim/SmoothScroll';
 import './globals.css';
@@ -87,7 +87,7 @@ export default function RootLayout({
             <main id="main-content" className="relative" role="main">
               {children}
             </main>
-            <Footer />
+            <ConditionalFooter />
           </SmoothScroll>
         </ThemeProvider>
       </body>

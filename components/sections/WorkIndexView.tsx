@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { caseStudies, categoryFilters, type CaseStudy } from '@/lib/data';
+import { visibleCaseStudies, categoryFilters, type CaseStudy } from '@/lib/data';
 import GhostHeading from '@/components/motion/GhostHeading';
 import { SHORT_IMAGES } from '@/lib/shortImages';
 
@@ -47,31 +47,77 @@ function ProjectPreview({ study, active }: { study: CaseStudy; active: boolean }
   );
 }
 
-// Rows shown before the list is truncated behind the Archive toggle -
-// matches wearefred.co.uk/work's own split (7 visible, the rest revealed by
-// its up/down arrow pair).
+// Rows visible without scrolling the list - above this count the up/down
+// arrows appear, matching wearefred.co.uk/work's own split (7 visible, the
+// rest revealed by its up/down arrow pair). The difference here: fred's
+// arrows show/hide the rest (growing the page), ours scroll a fixed-height
+// list instead, so the page itself never grows - only the list does.
 const VISIBLE_COUNT = 7;
+// One row is 23px vertical padding top+bottom plus the ~39px title line
+// height at the lg breakpoint - matches the row's own py-[23px] + the
+// lg:text-[39px] title exactly, so a scroll step lands on a row boundary
+// instead of stopping mid-row.
+const ROW_HEIGHT = 85;
 
 export default function WorkIndexView() {
   const [active, setActive] = useState('all');
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  // Featured/Archive, not a single reveal toggle - matches
+  // wearefred.co.uk/work's own two-state nav (confirmed live: "Archive" is
+  // a real second view there, not a show/hide on the same list). Featured
+  // shows the first VISIBLE_COUNT rows only and never needs to scroll;
+  // Archive swaps in the full list, which may then overflow and scroll -
+  // still within the same contained box, not growing the page (the page
+  // itself stays locked to the viewport regardless of which state this is in).
   const [showArchive, setShowArchive] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(
-    () => (active === 'all' ? caseStudies : caseStudies.filter((s) => s.category === active)),
+    () => (active === 'all' ? visibleCaseStudies : visibleCaseStudies.filter((s) => s.category === active)),
     [active]
   );
 
   const visible = showArchive ? filtered : filtered.slice(0, VISIBLE_COUNT);
   const hasArchive = filtered.length > VISIBLE_COUNT;
 
+  const scrollList = (direction: 1 | -1) => {
+    listRef.current?.scrollBy({ top: direction * ROW_HEIGHT * 3, behavior: 'smooth' });
+  };
+
   // Falls back to the first visible row whenever nothing's hovered - the
-  // preview panel always shows something, and switching filters can't
-  // leave it stuck on a project that just got filtered out.
+  // preview panel always shows something, and switching filters or views
+  // can't leave it stuck on a project that just got filtered/collapsed out.
   const activeId = hoveredId ?? visible[0]?.id ?? null;
   const activeStudy = visible.find((s) => s.id === activeId) ?? null;
+
+  // The hover-green fill needs to reach the strip of page behind the fixed
+  // header pill too (not the pill itself, which stays its normal white/
+  // dark glass). That strip is <body>'s own background
+  // (bg-[var(--background-primary)] in layout.tsx) showing through the
+  // invisible spacer Header.tsx renders above <main> - outside this
+  // component's subtree, so a plain inline style on this component's own
+  // wrapper can't reach it.
+  //
+  // This sets body's inline style.backgroundColor directly (which wins
+  // over its own Tailwind class) rather than overriding the shared
+  // --background-primary *token* on <html> - that token is read by other
+  // things besides body's background, e.g. MagicButton's primary variant
+  // uses text-[var(--background-primary)] for its own text colour, which
+  // went invisible (green-on-green) the first time this redefined the
+  // token itself instead of just body's rendered colour. Cleared on
+  // unmount so leaving /work can't strand the page mid-hover-state.
+  useEffect(() => {
+    const { body } = document;
+    if (hoveredId) {
+      body.style.backgroundColor = 'var(--accent-growth)';
+    } else {
+      body.style.removeProperty('background-color');
+    }
+    return () => {
+      body.style.removeProperty('background-color');
+    };
+  }, [hoveredId]);
 
   // Custom cursor "View" ring, rAF-coalesced like Hero.tsx's own
   // pointermove handler - direct style writes, no re-render per frame.
@@ -114,7 +160,12 @@ export default function WorkIndexView() {
 
   return (
     <div
-      className="w-full transition-colors duration-500"
+      // lg:h-[calc(100vh-6rem)], not lg:h-screen: Header.tsx renders a
+      // 96px (h-24) spacer above <main> sitewide to offset its own fixed
+      // positioning, so a plain 100vh here double-counts that already-
+      // reserved space and leaves exactly 96px of page-level scroll even
+      // though this component's own height is correctly locked.
+      className="flex w-full flex-col transition-colors duration-500 lg:h-[calc(100vh-6rem)] lg:overflow-hidden"
       style={
         {
           // A solid colour-block fill, not a tinted gradient - confirmed by
@@ -128,9 +179,11 @@ export default function WorkIndexView() {
           // classes: every descendant already reads var(--text-primary)/
           // var(--text-secondary)/var(--border-color) for light/dark theme
           // reactivity, so redefining those three variables here cascades
-          // the hover palette to the whole subtree for free - text, borders,
-          // and the "Image pending" placeholder all flip together, the same
-          // way fred's page turns entirely white-on-green at once.
+          // the hover palette to the whole subtree for free. Scoped to
+          // this wrapper only (not <html>, unlike --background-primary
+          // above) so it never reaches the header pill's own text - that
+          // pill stays white, so white-on-white would make its text
+          // disappear if these reached it too.
           background: hoveredId ? 'var(--accent-growth)' : 'var(--background-primary)',
           ...(hoveredId
             ? {
@@ -143,138 +196,149 @@ export default function WorkIndexView() {
         } as React.CSSProperties
       }
     >
-      <header className="container-main pb-12 pt-32 lg:pb-16 lg:pt-40">
-        <span className="mb-4 block font-mono text-xs uppercase tracking-[0.14em] text-accent-growth">
-          Work
-        </span>
-        <GhostHeading ghost="WORK">
-          <h1 className="max-w-2xl font-display text-4xl font-semibold leading-[1.1] text-[var(--text-primary)] sm:text-5xl">
-            Selected work &amp; systems
-          </h1>
-        </GhostHeading>
-        <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
-          {caseStudies.length} projects: production builds, growth systems, and a few things I
-          shipped just to prove I could.
-        </p>
-      </header>
-
-      {/* Numbered pills - the same circular-number treatment prototyped in
-          the borrowed-elements artboard (from thirdway.com), so filters
-          read as part of one numbering language with the rest of the
-          site rather than a one-off pill style. */}
-      <div className="container-main mb-10 flex flex-wrap gap-2 lg:mb-14">
-        {categoryFilters.map((filter, i) => (
-          <button
-            key={filter.id}
-            onClick={() => {
-              setActive(filter.id);
-              setHoveredId(null);
-              setShowArchive(false);
-            }}
-            className={`flex items-center gap-2 rounded-full border pl-2 pr-4 py-2 font-mono text-xs uppercase tracking-[0.06em] transition-colors ${
-              active === filter.id
-                ? hoveredId
-                  ? // Solid accent-growth would blend invisibly into the
-                    // hover background (same colour) - outlined instead, so
-                    // the selected filter is still legible while a row's
-                    // hovered.
-                    'border-white bg-transparent text-white'
-                  : 'border-accent-growth bg-accent-growth text-[var(--background-primary)]'
-                : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:border-accent-growth/50 hover:text-[var(--text-primary)]'
-            }`}
-          >
-            <span
-              className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border text-[9px] ${
-                active === filter.id ? 'border-[var(--background-primary)]' : 'border-accent-growth text-accent-growth'
+      {/* No headline block - a bare filter row sits directly under the
+          header, nothing above the list competing for attention. */}
+      <div className="container-main w-full flex items-center justify-between pb-6 pt-32 lg:shrink-0 lg:pb-8 lg:pt-28">
+        <nav aria-label="Work filters" className="flex flex-wrap items-center gap-6">
+          {categoryFilters.map((filter) => (
+            <button
+              key={filter.id}
+              onClick={() => {
+                setActive(filter.id);
+                setHoveredId(null);
+                setShowArchive(false);
+              }}
+              className={`font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${
+                active === filter.id
+                  ? hoveredId
+                    ? 'text-white'
+                    : 'text-accent-growth'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
-              {String(i + 1).padStart(2, '0')}
-            </span>
-            {filter.label} <span className="opacity-60">({filter.count})</span>
-          </button>
-        ))}
+              {filter.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      <div className="container-main pb-24 lg:pb-32">
+      <div className="container-main w-full min-h-0 pb-24 lg:flex-1 lg:pb-10">
         {/* Column proportions matched to wearefred.co.uk/work's own layout
-            (confirmed by measuring its live DOM): a narrow ~325px list
-            column flush left, not the wider ~55/45 split this had before,
-            with the preview floating in the remaining space rather than
-            filling a fixed 420px column edge-to-edge. */}
-        <div className="grid gap-10 lg:grid-cols-[49vw_1fr] lg:items-start">
-          <div ref={listRef} className="relative">
-            {visible.map((study, i) => {
-              const isActive = activeId === study.id;
-              return (
-                <Link
-                  key={study.id}
-                  href={`/work/${study.id}`}
-                  onMouseEnter={() => setHoveredId(study.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  className={`flex items-baseline gap-3 border-b border-[var(--border-color)] py-[23px] transition-opacity duration-300 ${
-                    activeId && !isActive ? 'opacity-40' : 'opacity-100'
-                  }`}
-                >
-                  <span className="flex-shrink-0 font-mono text-xs text-accent-growth">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span
-                    className={`truncate font-display text-2xl font-semibold leading-none transition-colors sm:text-3xl lg:text-[39px] ${
-                      isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
+            (measured live at 1024px and 1440px: a near-fixed ~650px list
+            column - 650px to 656px across that range - with the preview
+            as the flexible column that grows to fill whatever's left,
+            225px to 572px over the same range). The list is the fixed
+            share here, not the preview, which is the reverse of this
+            grid's earlier 360px-list/480px-capped-preview shape. At lg+
+            the whole page is locked to the viewport (see the root
+            wrapper's lg:h-[calc(100vh-6rem)]) - this grid fills what's
+            left after the header and filters, and the list column
+            scrolls internally instead of the page growing. */}
+        <div className="grid min-h-0 gap-20 lg:h-full lg:grid-cols-[640px_1fr] lg:items-start">
+          <div className="relative flex min-h-0 flex-col lg:h-full">
+            <div ref={listRef} className="relative lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 no-scrollbar">
+              {visible.map((study, i) => {
+                const isActive = activeId === study.id;
+                return (
+                  <Link
+                    key={study.id}
+                    href={`/work/${study.id}`}
+                    onMouseEnter={() => setHoveredId(study.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    className={`flex items-baseline border-b border-black/[0.14] py-[23px] transition-opacity duration-300 dark:border-white/[0.14] ${
+                      activeId && !isActive ? 'opacity-40' : 'opacity-100'
                     }`}
                   >
-                    {study.company}
-                  </span>
-                </Link>
-              );
-            })}
+                    <span
+                      className={`truncate font-display text-2xl font-semibold leading-none transition-colors sm:text-3xl lg:text-[39px] ${
+                        isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
+                      }`}
+                    >
+                      {study.company}
+                    </span>
+                    {/* Superscript index mark after the title, not a
+                        separate mono-font column before it - matches
+                        wearefred.co.uk/work's own row treatment (a small
+                        footnote-style number, not a left-aligned prefix
+                        column). */}
+                    <sup className="ml-1.5 flex-shrink-0 font-mono text-[11px] text-accent-growth">
+                      {String(i + 1).padStart(2, '0')}
+                    </sup>
+                  </Link>
+                );
+              })}
+            </div>
 
-            {/* Archive toggle - wearefred.co.uk/work only ever shows 7 rows
-                up front (20 total), the rest behind an up/down arrow pair
-                labelled "Archive". Same split here: a project list this
-                long read as a wall of text without it. */}
+            {/* Featured/Archive toggle, matching wearefred.co.uk/work's own
+                two-state nav - a real second state (full list), not a
+                single reveal arrow. The up/down pair only appears once
+                Archive is open and actually overflows the box, and scrolls
+                that revealed list in place - the page itself stays locked
+                to the viewport throughout (lg:h-[calc(100vh-6rem)] on the
+                root), it never grows the way fred's own page does. */}
             {hasArchive && (
-              <div className="mt-5 flex items-center justify-between border-t border-[var(--border-color)] pt-5">
+              <div className="mt-5 flex shrink-0 items-center justify-between border-t border-black/[0.14] pt-5 dark:border-white/[0.14]">
                 <button
                   type="button"
-                  onClick={() => setShowArchive((v) => !v)}
-                  className="font-mono text-xs uppercase tracking-[0.14em] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                  onClick={() => setShowArchive(false)}
+                  className={`font-mono text-xs uppercase tracking-[0.14em] transition-colors ${
+                    !showArchive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  Featured
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowArchive(true)}
+                  className={`font-mono text-xs uppercase tracking-[0.14em] transition-colors ${
+                    showArchive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
                 >
                   Archive
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setShowArchive((v) => !v)}
-                  aria-label={showArchive ? 'Show fewer projects' : 'Show all projects'}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-color)] text-[var(--text-secondary)] transition-colors hover:border-accent-growth/50 hover:text-[var(--text-primary)]"
-                >
-                  <svg
-                    className={`h-3.5 w-3.5 transition-transform duration-300 ${showArchive ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                {showArchive && (
+                  <div className="ml-auto flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => scrollList(-1)}
+                      aria-label="Scroll up"
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-color)] text-[var(--text-secondary)] transition-colors hover:border-accent-growth/50 hover:text-[var(--text-primary)]"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollList(1)}
+                      aria-label="Scroll down"
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-color)] text-[var(--text-secondary)] transition-colors hover:border-accent-growth/50 hover:text-[var(--text-primary)]"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
             <div
               ref={ringRef}
               aria-hidden="true"
-              className="pointer-events-none fixed left-0 top-0 z-50 hidden h-16 w-16 items-center justify-center rounded-full border border-accent-growth font-mono text-[10px] uppercase tracking-[0.06em] text-accent-growth opacity-0 transition-opacity duration-200 lg:flex"
+              className="pointer-events-none fixed left-0 top-0 z-50 hidden h-16 w-16 items-center justify-center rounded-full border border-white font-mono text-[10px] uppercase tracking-[0.06em] text-white opacity-0 transition-opacity duration-200 lg:flex"
               style={{ willChange: 'transform' }}
             >
               View
             </div>
           </div>
 
-          {/* Preview: a bounded, landscape-proportioned box near the top of
-              the remaining space, not stretched to fill it edge-to-edge -
-              fred's own preview is a fixed ~586x381 (3:2) box floating with
-              room around it, not a full-height sticky column. */}
-          <div className="sticky top-24 hidden max-w-[480px] lg:block">
+          {/* Preview: fills the flexible column fully (no width cap) -
+              fred's own preview column is the one that grows with the
+              viewport (225px at 1024px wide up to 572px at 1440px wide),
+              while the list column stays near-fixed. A fixed aspect-[3/2]
+              keeps it landscape-proportioned as it grows. */}
+          <div className="top-24 hidden lg:sticky lg:block">
             <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-[var(--border-color)]">
               {visible.map((study) => (
                 <ProjectPreview key={study.id} study={study} active={activeId === study.id} />

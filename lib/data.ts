@@ -17,6 +17,10 @@ export interface CaseStudy {
   images?: string[];
   tags: string[];
   inProgress?: boolean;
+  /** Left out of /work's index listing for now (still statically built at
+   * its own /work/[slug] URL) - currently just the two case studies whose
+   * company field is a description rather than a real name. */
+  hidden?: boolean;
 }
 
 export interface Capability {
@@ -59,46 +63,6 @@ export const capabilities: Capability[] = [
 ];
 
 export const caseStudies: CaseStudy[] = [
-  {
-    id: 'kcb-bank',
-    company: 'KCB Bank',
-    industry: 'Enterprise / Finance',
-    category: 'web',
-    metricValue: '8',
-    metricLabel: 'Regional Sites Shipped',
-    context:
-      'As part of the Creative Edge / FCB Nairobi team, spanning both the front-end build and the backend integration: KCB Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda/BPR, South Sudan, Bancassurance, Insurance) moved from the UI/UX team\'s designs to a hand-coded front-end in HTML, CSS, JavaScript, and jQuery, then into a headless WordPress build.',
-    challenge:
-      'A regional banking group needed one consistent site across its Kenya headquarters and every subsidiary market, on a front-end built to plug cleanly into a headless CMS rather than each country drifting into its own one-off theme.',
-    approach:
-      'Carried the UI/UX team\'s designs through the full build: a front-end in HTML, CSS, JavaScript, and jQuery, wired into a headless WordPress instance shared across KCB Group and its regional subsidiaries.',
-    result:
-      'Group site and regional subsidiary sites shipped and live on headless WordPress. Delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
-    technicalExecution: [
-      'Front-end built in HTML, CSS, JavaScript, and jQuery from the UI/UX team\'s designs',
-      'Integrated into a headless WordPress instance shared across KCB Group and its regional subsidiaries',
-    ],
-    images: [
-      '/images/work/kcb-bank/kcb-ke.png',
-      '/images/work/kcb-bank/kcb-group.png',
-      '/images/work/kcb-bank/kcb-insurance.png',
-      '/images/work/kcb-bank/kcb-bi.png',
-      '/images/work/kcb-bank/kcb-ss.png',
-      '/images/work/kcb-bank/kcb-bpr-rwanda.png',
-      '/images/work/kcb-bank/kcb-tanzania.png',
-      '/images/work/kcb-bank/kcb-uganda.png',
-      '/images/work/kcb-bank/kcb-investor-relations.webp',
-      '/images/work/kcb-bank/kcb-group-2.png',
-      '/images/work/kcb-bank/kcb-about-2.png',
-      '/images/work/kcb-bank/kcb-sports-football-2.png',
-      '/images/work/kcb-bank/kcb-kenya-home-2.png',
-      '/images/work/kcb-bank/kcb-rwanda-branches.png',
-      '/images/work/kcb-bank/kcb-sahl-2.png',
-      '/images/work/kcb-bank/kcb-diaspora-2.png',
-      '/images/work/kcb-bank/kcb-uganda-credit-cards-2.png',
-    ],
-    tags: ['Enterprise', 'CMS', 'WordPress', 'jQuery', 'Banking'],
-  },
   {
     id: 'im-bank',
     company: 'I&M Bank',
@@ -338,6 +302,7 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     id: 'university-organic-growth',
+    hidden: true,
     company: 'A well-known Kenyan private university',
     industry: 'Education',
     category: 'strategy',
@@ -359,6 +324,7 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     id: 'payment-gateway-organic-growth',
+    hidden: true,
     company: 'An overseas payment gateway company operating across Africa',
     industry: 'Fintech',
     category: 'strategy',
@@ -571,6 +537,46 @@ export const caseStudies: CaseStudy[] = [
     tags: ['Education', 'Development'],
   },
   {
+    id: 'kcb-bank',
+    company: 'KCB Bank',
+    industry: 'Enterprise / Finance',
+    category: 'web',
+    metricValue: '8',
+    metricLabel: 'Regional Sites Shipped',
+    context:
+      'As part of the Creative Edge / FCB Nairobi team, spanning both the front-end build and the backend integration: KCB Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda/BPR, South Sudan, Bancassurance, Insurance) moved from the UI/UX team\'s designs to a hand-coded front-end in HTML, CSS, JavaScript, and jQuery, then into a headless WordPress build.',
+    challenge:
+      'A regional banking group needed one consistent site across its Kenya headquarters and every subsidiary market, on a front-end built to plug cleanly into a headless CMS rather than each country drifting into its own one-off theme.',
+    approach:
+      'Carried the UI/UX team\'s designs through the full build: a front-end in HTML, CSS, JavaScript, and jQuery, wired into a headless WordPress instance shared across KCB Group and its regional subsidiaries.',
+    result:
+      'Group site and regional subsidiary sites shipped and live on headless WordPress. Delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
+    technicalExecution: [
+      'Front-end built in HTML, CSS, JavaScript, and jQuery from the UI/UX team\'s designs',
+      'Integrated into a headless WordPress instance shared across KCB Group and its regional subsidiaries',
+    ],
+    images: [
+      '/images/work/kcb-bank/kcb-ke.png',
+      '/images/work/kcb-bank/kcb-group.png',
+      '/images/work/kcb-bank/kcb-insurance.png',
+      '/images/work/kcb-bank/kcb-bi.png',
+      '/images/work/kcb-bank/kcb-ss.png',
+      '/images/work/kcb-bank/kcb-bpr-rwanda.png',
+      '/images/work/kcb-bank/kcb-tanzania.png',
+      '/images/work/kcb-bank/kcb-uganda.png',
+      '/images/work/kcb-bank/kcb-investor-relations.webp',
+      '/images/work/kcb-bank/kcb-group-2.png',
+      '/images/work/kcb-bank/kcb-about-2.png',
+      '/images/work/kcb-bank/kcb-sports-football-2.png',
+      '/images/work/kcb-bank/kcb-kenya-home-2.png',
+      '/images/work/kcb-bank/kcb-rwanda-branches.png',
+      '/images/work/kcb-bank/kcb-sahl-2.png',
+      '/images/work/kcb-bank/kcb-diaspora-2.png',
+      '/images/work/kcb-bank/kcb-uganda-credit-cards-2.png',
+    ],
+    tags: ['Enterprise', 'CMS', 'WordPress', 'jQuery', 'Banking'],
+  },
+  {
     id: 'sentinel-ai',
     company: 'Sentinel-AI (personal project, solo product)',
     industry: 'AI Security',
@@ -659,8 +665,10 @@ export const socialLinks = [
   { label: 'GitHub', url: 'https://github.com/Patrick-Ngige' },
 ];
 
+export const visibleCaseStudies = caseStudies.filter((c) => !c.hidden);
+
 export const categoryFilters = [
-  { id: 'all', label: 'All Work', count: caseStudies.length },
-  { id: 'web', label: 'Web & Conversion', count: caseStudies.filter((c) => c.category === 'web').length },
-  { id: 'strategy', label: 'Growth Strategy', count: caseStudies.filter((c) => c.category === 'strategy').length },
+  { id: 'all', label: 'All Work', count: visibleCaseStudies.length },
+  { id: 'web', label: 'Web & Conversion', count: visibleCaseStudies.filter((c) => c.category === 'web').length },
+  { id: 'strategy', label: 'Growth Strategy', count: visibleCaseStudies.filter((c) => c.category === 'strategy').length },
 ];

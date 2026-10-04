@@ -102,6 +102,7 @@
     @apply font-mono font-bold text-accent-growth;
   }
 
+
   /* Data label styling */
   .data-label {
     @apply font-mono text-xs tracking-widest uppercase text-[var(--text-secondary)];
