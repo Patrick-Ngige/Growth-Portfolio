@@ -58,6 +58,10 @@ const VISIBLE_COUNT = 7;
 // lg:text-[39px] title exactly, so a scroll step lands on a row boundary
 // instead of stopping mid-row.
 const ROW_HEIGHT = 85;
+// Fixed, not var(--accent-growth): that token is theme-reactive (a
+// brighter #009C4A in dark mode), but the row-hover fill should stay this
+// same deep green in both themes rather than following the token.
+const HOVER_GREEN = '#004D24';
 
 export default function WorkIndexView() {
   const [active, setActive] = useState('all');
@@ -107,10 +111,15 @@ export default function WorkIndexView() {
   // went invisible (green-on-green) the first time this redefined the
   // token itself instead of just body's rendered colour. Cleared on
   // unmount so leaving /work can't strand the page mid-hover-state.
+  //
+  // HOVER_GREEN, not var(--accent-growth): that token switches to a
+  // brighter #009C4A in dark mode, but the hover fill should stay the
+  // same deep green in both themes (explicit preference - the dark-mode
+  // variant read as a different, less deliberate colour here).
   useEffect(() => {
     const { body } = document;
     if (hoveredId) {
-      body.style.backgroundColor = 'var(--accent-growth)';
+      body.style.backgroundColor = HOVER_GREEN;
     } else {
       body.style.removeProperty('background-color');
     }
@@ -184,7 +193,11 @@ export default function WorkIndexView() {
           // above) so it never reaches the header pill's own text - that
           // pill stays white, so white-on-white would make its text
           // disappear if these reached it too.
-          background: hoveredId ? 'var(--accent-growth)' : 'var(--background-primary)',
+          //
+          // HOVER_GREEN, not var(--accent-growth) - see the useEffect
+          // above for why (that token is theme-reactive, this fill isn't
+          // meant to be).
+          background: hoveredId ? HOVER_GREEN : 'var(--background-primary)',
           ...(hoveredId
             ? {
                 '--text-primary': '#FFFFFF',
@@ -234,9 +247,9 @@ export default function WorkIndexView() {
             wrapper's lg:h-[calc(100vh-6rem)]) - this grid fills what's
             left after the header and filters, and the list column
             scrolls internally instead of the page growing. */}
-        <div className="grid min-h-0 gap-20 lg:h-full lg:grid-cols-[640px_1fr] lg:items-start">
-          <div className="relative flex min-h-0 flex-col lg:h-full">
-            <div ref={listRef} className="relative lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 no-scrollbar">
+        <div className="grid min-w-0 min-h-0 gap-20 lg:h-full lg:grid-cols-[640px_1fr] lg:items-start">
+          <div className="relative flex min-w-0 min-h-0 flex-col lg:h-full">
+            <div ref={listRef} className="relative min-w-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 no-scrollbar">
               {visible.map((study, i) => {
                 const isActive = activeId === study.id;
                 return (
@@ -245,12 +258,12 @@ export default function WorkIndexView() {
                     href={`/work/${study.id}`}
                     onMouseEnter={() => setHoveredId(study.id)}
                     onMouseLeave={() => setHoveredId(null)}
-                    className={`flex items-baseline border-b border-black/[0.14] py-[23px] transition-opacity duration-300 dark:border-white/[0.14] ${
-                      activeId && !isActive ? 'opacity-40' : 'opacity-100'
-                    }`}
+                    className={`flex min-w-0 items-baseline border-b py-[23px] transition-opacity duration-300 ${
+                      hoveredId ? 'border-white/25' : 'border-black/[0.14] dark:border-white/[0.14]'
+                    } ${activeId && !isActive ? 'opacity-40' : 'opacity-100'}`}
                   >
                     <span
-                      className={`truncate font-display text-2xl font-semibold leading-none transition-colors sm:text-3xl lg:text-[39px] ${
+                      className={`min-w-0 truncate font-display text-2xl font-semibold leading-none transition-colors sm:text-3xl lg:text-[39px] ${
                         isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
                       }`}
                     >
@@ -277,7 +290,11 @@ export default function WorkIndexView() {
                 to the viewport throughout (lg:h-[calc(100vh-6rem)] on the
                 root), it never grows the way fred's own page does. */}
             {hasArchive && (
-              <div className="mt-5 flex shrink-0 items-center justify-between border-t border-black/[0.14] pt-5 dark:border-white/[0.14]">
+              <div
+                className={`mt-5 flex shrink-0 items-center justify-between border-t pt-5 ${
+                  hoveredId ? 'border-white/25' : 'border-black/[0.14] dark:border-white/[0.14]'
+                }`}
+              >
                 <button
                   type="button"
                   onClick={() => setShowArchive(false)}
