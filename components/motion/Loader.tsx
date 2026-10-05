@@ -47,7 +47,7 @@ const SESSION_KEY = 'patrick-loader-shown';
 
 export default function Loader() {
   const [gone, setGone] = useState(false);
-  const markRef = useRef<SVGSVGElement>(null);
+  const markRef = useRef<HTMLDivElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -153,52 +153,19 @@ export default function Loader() {
         <i className="absolute -top-2 -right-2 font-mono text-[13px] leading-none text-[var(--text-secondary)]">+</i>
         <i className="absolute -bottom-2 -left-2 font-mono text-[13px] leading-none text-[var(--text-secondary)]">+</i>
         <i className="absolute -bottom-2 -right-2 font-mono text-[13px] leading-none text-[var(--text-secondary)]">+</i>
-        <svg
+        {/* Back to the first proposal: the loader's own mark is the same
+            "Patrick." wordmark + accent dot as the header logo (Header.tsx),
+            not a separate glyph - the two monogram attempts before this
+            (a PN/PK ligature, then PK side by side) were dropped in favor
+            of reusing the real brand mark directly. */}
+        <div
           ref={markRef}
-          viewBox="0 0 100 100"
-          fill="none"
-          className="absolute inset-0 m-auto"
-          style={{ width: '44%', height: '44%' }}
+          className="absolute inset-0 m-auto flex items-center justify-center whitespace-nowrap font-display text-3xl font-semibold"
+          style={{ width: '70%', height: 'fit-content' }}
         >
-          {/* PK monogram, replacing the earlier generic arch glyph - P and K
-              side by side rather than overlapping into a shared stem: an
-              earlier ligature version (K's arms branching off P's own
-              stem) read as a stray "R" instead of two letters, since the
-              bowl and the upper arm merged into one continuous curve. Kept
-              simple instead - same stroke weight and frame as before, each
-              letter fully legible on its own. Dot echoes the header
-              wordmark's own "Patrick." accent dot as a trailing period, so
-              the loader and the nav tie back to the same mark. */}
-          <path
-            d="M16 80 L16 20"
-            stroke="var(--text-primary)"
-            strokeWidth={6}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M16 22 Q40 22 40 36 Q40 50 16 48"
-            stroke="var(--text-primary)"
-            strokeWidth={6}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M58 80 L58 20"
-            stroke="var(--text-primary)"
-            strokeWidth={6}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M58 52 L84 20 M58 52 L84 80"
-            stroke="var(--text-primary)"
-            strokeWidth={6}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="90" cy="84" r="4.5" className="fill-accent-growth" />
-        </svg>
+          <span className="text-[var(--text-primary)]">Patrick</span>
+          <span className="text-accent-growth">.</span>
+        </div>
       </div>
       <div
         ref={wordRef}
