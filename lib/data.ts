@@ -162,30 +162,39 @@ export const caseStudies: CaseStudy[] = [
     id: 'strathmore-foundation',
     company: 'Strathmore Foundation',
     industry: 'Education / Nonprofit',
-    category: 'strategy',
-    metricValue: '3',
-    metricLabel: 'Platforms Wired to Server-Side Tracking',
-    context: 'KOB STEM donation funnel measurement, ongoing, plus two live university sites',
+    category: 'web',
+    metricValue: '1',
+    metricLabel: 'Foundation Site Shipped',
+    context: 'foundation.strathmore.edu, built and shipped',
     challenge:
-      'Donation events needed to be measured accurately across GA4, Meta, and Google Ads without relying on client-side pixels alone, which lose events to ad blockers and browser tracking prevention.',
-    approach:
-      'Designed the GA4 and Google Tag Manager measurement architecture for the KOB STEM donation funnel, including a server-side purchase event verified against DPO Pay\'s payment callback and relayed to GA4, Meta CAPI, and Google Ads. Also built and shipped foundation.strathmore.edu and alumni.strathmore.edu.',
-    result:
-      'Server-side purchase event live and verified against the payment provider\'s callback. Both university sites shipped and live.',
-    technicalExecution: [
-      'GA4 + Google Tag Manager measurement architecture',
-      'Server-side purchase event verified against DPO Pay\'s payment callback',
-      'Events relayed to GA4, Meta CAPI, and Google Ads',
-      'foundation.strathmore.edu and alumni.strathmore.edu built and shipped',
-    ],
+      'Strathmore Foundation needed a live site of its own to represent its programs, impact stories, and partnerships to donors and the public.',
+    approach: 'Built and shipped foundation.strathmore.edu end to end.',
+    result: 'Site shipped and live.',
+    technicalExecution: ['foundation.strathmore.edu built and shipped'],
     images: [
-      '/images/work/strathmore-foundation/alumni-strathmore.png',
       '/images/work/strathmore-foundation/strath-foundation-home.png',
       '/images/work/strathmore-foundation/strath-foundation-about.png',
       '/images/work/strathmore-foundation/strath-foundation-what-we-do.png',
-      '/images/work/strathmore-foundation/strath-foundation-kob-project.png',
       '/images/work/strathmore-foundation/strath-foundation-impact-stories.png',
       '/images/work/strathmore-foundation/strath-foundation-partnership.png',
+    ],
+    tags: ['Web Design', 'Education', 'Nonprofit'],
+  },
+  {
+    id: 'strathmore-alumni',
+    company: 'Strathmore Alumni',
+    industry: 'Education / Nonprofit',
+    category: 'web',
+    metricValue: '1',
+    metricLabel: 'Alumni Site Shipped',
+    context: 'alumni.strathmore.edu, built and shipped - a separate site from foundation.strathmore.edu',
+    challenge:
+      'Strathmore\'s alumni network needed its own site, distinct from the Foundation\'s, to run alumni news, events, and awards.',
+    approach: 'Built and shipped alumni.strathmore.edu end to end.',
+    result: 'Site shipped and live.',
+    technicalExecution: ['alumni.strathmore.edu built and shipped'],
+    images: [
+      '/images/work/strathmore-foundation/alumni-strathmore.png',
       '/images/work/strathmore-foundation/strath-alumni-home.png',
       '/images/work/strathmore-foundation/strath-alumni-about.png',
       '/images/work/strathmore-foundation/strath-alumni-stp.png',
@@ -193,6 +202,27 @@ export const caseStudies: CaseStudy[] = [
       '/images/work/strathmore-foundation/strath-alumni-event.png',
       '/images/work/strathmore-foundation/strath-alumni-news.png',
     ],
+    tags: ['Web Design', 'Education', 'Nonprofit'],
+  },
+  {
+    id: 'kob-fundraising',
+    company: 'KOB Fundraising Campaign',
+    industry: 'Nonprofit / Fundraising',
+    category: 'strategy',
+    metricValue: '3',
+    metricLabel: 'Platforms Wired to Server-Side Tracking',
+    context: 'KOB STEM donation funnel measurement for an active fundraising campaign, an initiative of Strathmore Foundation',
+    challenge:
+      'Donation events needed to be measured accurately across GA4, Meta, and Google Ads without relying on client-side pixels alone, which lose events to ad blockers and browser tracking prevention.',
+    approach:
+      'Designed the GA4 and Google Tag Manager measurement architecture for the KOB STEM donation funnel, including a server-side purchase event verified against DPO Pay\'s payment callback and relayed to GA4, Meta CAPI, and Google Ads.',
+    result: 'Server-side purchase event live and verified against the payment provider\'s callback.',
+    technicalExecution: [
+      'GA4 + Google Tag Manager measurement architecture',
+      'Server-side purchase event verified against DPO Pay\'s payment callback',
+      'Events relayed to GA4, Meta CAPI, and Google Ads',
+    ],
+    images: ['/images/work/strathmore-foundation/strath-foundation-kob-project.png'],
     tags: ['Analytics', 'Server-Side Tracking', 'GA4', 'Nonprofit'],
   },
   {
@@ -544,16 +574,19 @@ export const caseStudies: CaseStudy[] = [
     metricValue: '8',
     metricLabel: 'Regional Sites Shipped',
     context:
-      'As part of the Creative Edge / FCB Nairobi team, spanning both the front-end build and the backend integration: KCB Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda/BPR, South Sudan, Bancassurance, Insurance) moved from the UI/UX team\'s designs to a hand-coded front-end in HTML, CSS, JavaScript, and jQuery, then into a headless WordPress build.',
+      'As part of the Creative Edge / FCB Nairobi team, playing a part on both the front-end build and the backend integration, plus content uploads: KCB Group\'s website and its regional subsidiary sites (Kenya, Uganda, Tanzania, Rwanda/BPR, South Sudan, Bancassurance, Insurance) moved off the old Joomla site, from the UI/UX team\'s designs to a hand-coded front-end in HTML, CSS, JavaScript, and jQuery, then into Statamic.',
     challenge:
-      'A regional banking group needed one consistent site across its Kenya headquarters and every subsidiary market, on a front-end built to plug cleanly into a headless CMS rather than each country drifting into its own one-off theme.',
+      'A regional banking group needed one consistent site across its Kenya headquarters and every subsidiary market, moving off an old Joomla build onto a front-end built to plug cleanly into Statamic rather than each country drifting into its own one-off theme.',
     approach:
-      'Carried the UI/UX team\'s designs through the full build: a front-end in HTML, CSS, JavaScript, and jQuery, wired into a headless WordPress instance shared across KCB Group and its regional subsidiaries.',
+      'Started on maintenance of the old regional subsidiary sites (on Joomla), then moved into development as new regional sites came online, contributing to both the front-end build and the backend integration plus content uploads: carrying the UI/UX team\'s designs through to a front-end in HTML, CSS, JavaScript, and jQuery, wired into a Statamic CMS instance shared across KCB Group and its regional subsidiaries.',
     result:
-      'Group site and regional subsidiary sites shipped and live on headless WordPress. Delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
+      'Group site and regional subsidiary sites shipped and live on Statamic. Delivered as part of the Creative Edge / FCB Nairobi team, not solo client ownership.',
     technicalExecution: [
-      'Front-end built in HTML, CSS, JavaScript, and jQuery from the UI/UX team\'s designs',
-      'Integrated into a headless WordPress instance shared across KCB Group and its regional subsidiaries',
+      'Maintenance of the old regional subsidiary sites (Joomla)',
+      'Development of new regional subsidiary sites as they came online',
+      'Contributed to the front-end build in HTML, CSS, JavaScript, and jQuery from the UI/UX team\'s designs',
+      'Contributed to backend integration into a Statamic CMS instance shared across KCB Group and its regional subsidiaries',
+      'Content uploads across the regional sites',
     ],
     images: [
       '/images/work/kcb-bank/kcb-ke.png',
@@ -574,7 +607,7 @@ export const caseStudies: CaseStudy[] = [
       '/images/work/kcb-bank/kcb-diaspora-2.png',
       '/images/work/kcb-bank/kcb-uganda-credit-cards-2.png',
     ],
-    tags: ['Enterprise', 'CMS', 'WordPress', 'jQuery', 'Banking'],
+    tags: ['Enterprise', 'CMS', 'Statamic', 'jQuery', 'Banking'],
   },
   {
     id: 'sentinel-ai',

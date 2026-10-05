@@ -160,13 +160,44 @@ export default function Loader() {
           className="absolute inset-0 m-auto"
           style={{ width: '44%', height: '44%' }}
         >
+          {/* PK monogram, replacing the earlier generic arch glyph - P and K
+              side by side rather than overlapping into a shared stem: an
+              earlier ligature version (K's arms branching off P's own
+              stem) read as a stray "R" instead of two letters, since the
+              bowl and the upper arm merged into one continuous curve. Kept
+              simple instead - same stroke weight and frame as before, each
+              letter fully legible on its own. Dot echoes the header
+              wordmark's own "Patrick." accent dot as a trailing period, so
+              the loader and the nav tie back to the same mark. */}
           <path
-            d="M20 78 L20 40 L38 40 L38 22 L62 22 L62 40 L80 40 L80 78"
+            d="M16 80 L16 20"
             stroke="var(--text-primary)"
             strokeWidth={6}
+            strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <circle cx="50" cy="60" r="6" className="fill-accent-growth" />
+          <path
+            d="M16 22 Q40 22 40 36 Q40 50 16 48"
+            stroke="var(--text-primary)"
+            strokeWidth={6}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M58 80 L58 20"
+            stroke="var(--text-primary)"
+            strokeWidth={6}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M58 52 L84 20 M58 52 L84 80"
+            stroke="var(--text-primary)"
+            strokeWidth={6}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="90" cy="84" r="4.5" className="fill-accent-growth" />
         </svg>
       </div>
       <div

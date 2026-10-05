@@ -60,7 +60,7 @@ if (typeof window !== 'undefined') {
 // full 19-project list lives on /work. Picked by id (not a slice) so this
 // stays a deliberate shortlist as more case studies get added, rather than
 // silently growing with the array.
-const FEATURED_IDS = ['im-bank', 'totalenergies-kenya', 'prime-bank', 'strathmore-foundation', 'ngige-growth-audit', 'pulseke'];
+const FEATURED_IDS = ['im-bank', 'totalenergies-kenya', 'prime-bank', 'kcb-bank', 'strathmore-foundation', 'ngige-growth-audit', 'pulseke'];
 const FEATURED = FEATURED_IDS.map((id) => caseStudies.find((c) => c.id === id)).filter((c): c is (typeof caseStudies)[number] => Boolean(c));
 
 const BAND_BG = 'var(--fixed-panel-bg)';
